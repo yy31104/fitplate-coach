@@ -7,7 +7,7 @@ The project has two product tracks:
 1. Food photo calorie estimation with visible assumptions, confidence, and correction.
 2. Exercise form feedback from short videos, starting with squat feedback.
 
-The current repository is in its initial documentation and governance phase. No application code has been scaffolded yet.
+The current repository is in its initial documentation and governance phase. The first code milestone has been approved, but implementation is paused before scaffolding and no application code has been created yet.
 
 ## Current Status
 
@@ -20,11 +20,20 @@ Implemented now:
 - Architecture notes.
 - AI safety boundaries.
 - Implementation plan.
+- Governance transition notes for the approved first code milestone.
+
+Approved but not implemented yet:
+
+- Minimal monorepo.
+- `apps/web` with Next.js, TypeScript, Tailwind, and a home page only.
+- `apps/api` with FastAPI and `GET /api/v0/health` only.
 
 Not implemented yet:
 
 - Next.js frontend.
 - FastAPI backend.
+- Package manifests or lockfiles.
+- Dependency installation.
 - Real AI provider integration.
 - Authentication.
 - Database.
@@ -46,7 +55,7 @@ Squat video feedback is documented for future design but intentionally out of v0
 
 ## Planned Stack
 
-The planned application stack, once scaffolding begins:
+The planned application stack, once scaffolding resumes:
 
 - Frontend: Next.js with TypeScript.
 - Backend: FastAPI.

@@ -13,7 +13,7 @@ The project should feel like a production-style portfolio project, not an AI toy
 
 ## Current Scope
 
-MVP v0 is not an application scaffold yet. It is a governed project foundation.
+MVP v0 is still not an application scaffold. The first code milestone has been approved, but implementation is paused before scaffolding.
 
 Allowed now:
 
@@ -23,11 +23,14 @@ Allowed now:
 - Architecture notes.
 - AI safety constraints.
 - Implementation planning.
+- Transition documentation for the approved first code milestone.
 
 Do not create yet:
 
 - Next.js app.
 - FastAPI app.
+- `apps/web`.
+- `apps/api`.
 - Package manifests.
 - Dependency lockfiles.
 - Database schema.
@@ -49,6 +52,15 @@ For MVP v0, keep these constraints unless the user explicitly changes them:
 - No real AI API call.
 - No video processing.
 - No native mobile app.
+
+Approved first code milestone, when implementation is resumed:
+
+- Minimal monorepo structure only.
+- `apps/web`: Next.js, TypeScript, Tailwind home page only.
+- `apps/api`: FastAPI backend with `GET /api/v0/health` only.
+- Root npm workspace scripts for running and testing the web and API apps.
+- No frontend API integration yet.
+- No upload flow, food analysis mock, correction loop, AI, database, auth, or video routes.
 
 ## Planned Stack
 

@@ -1,0 +1,28 @@
+{
+  "name": "fitplate-coach",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FitPlate Coach is a mobile-first web app concept for helping users reflect on nutrition and exercise technique with AI-assisted estimates, clear uncertainty, and user correction.",
+  "scripts": {
+    "dev:web": "npm run dev --workspace apps/web",
+    "build:web": "npm run build --workspace apps/web",
+    "lint:web": "npm run lint --workspace apps/web",
+    "dev:api": "cd apps/api && ./.venv/bin/uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
+    "test:api": "cd apps/api && ./.venv/bin/pytest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yy31104/fitplate-coach.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yy31104/fitplate-coach/issues"
+  },
+  "homepage": "https://github.com/yy31104/fitplate-coach#readme",
+  "workspaces": [
+    "apps/web"
+  ]
+}

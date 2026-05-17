@@ -17,9 +17,12 @@ The architecture should keep these concerns separate:
 
 ## Current Repository State
 
-The repository currently contains documentation and governance files only.
+The repository currently contains the first minimal monorepo scaffold:
 
-There is no application code, package manifest, framework scaffold, backend service, database, or dependency installation.
+- `apps/web`: static Next.js, TypeScript, Tailwind home page.
+- `apps/api`: FastAPI app exposing `GET /api/v0/health`.
+
+There is no AI integration, database, authentication, upload flow, video processing, Docker setup, or environment secret requirement.
 
 ## Planned High-Level System
 
@@ -88,7 +91,7 @@ Future FastAPI responsibilities:
 
 ## API Versioning
 
-All first backend endpoints should live under `/api/v0/`. The initial food analysis endpoint should be `/api/v0/food/analyze`, and future correction endpoints should use the same version prefix.
+All first backend endpoints should live under `/api/v0/`. The initial scaffold endpoint is `GET /api/v0/health`. The future food analysis endpoint should be `/api/v0/food/analyze`, and future correction endpoints should use the same version prefix.
 
 Do not expose unversioned endpoints. If request or response schemas change incompatibly later, introduce a new API version instead of silently changing `/api/v0/` behavior.
 

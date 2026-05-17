@@ -18,7 +18,7 @@ The MVP v0 is documentation-first and implementation-light:
 
 ## Current Repository Rule
 
-The first code milestone has been approved but is paused before scaffolding. Do not create app code, framework boilerplate, package manifests, lockfiles, dependency installs, generated build artifacts, or `apps/` directories until the user explicitly resumes implementation.
+The first code milestone is approved for implementation. Keep the milestone limited to a minimal monorepo scaffold with a static web home page and a backend health endpoint.
 
 Allowed in the current phase:
 
@@ -27,19 +27,20 @@ Allowed in the current phase:
 - Architecture documentation.
 - Safety documentation.
 - Implementation planning.
-- Transition documentation for the approved first code milestone.
+- `apps/web`: Next.js, TypeScript, Tailwind home page only.
+- `apps/api`: FastAPI backend with `GET /api/v0/health` only.
+- Package manifests, lockfiles, and dependency installation required for this scaffold.
+- Minimal tests and run scripts for the scaffold.
 
 Not allowed in the current phase:
 
-- Next.js scaffolding.
-- FastAPI scaffolding.
-- Creating `apps/web`.
-- Creating `apps/api`.
-- Package manifests or lockfiles.
-- Package installation.
-- Database setup.
 - AI provider integration.
+- Database setup.
+- Authentication.
+- Upload flows.
 - Video processing implementation.
+- Docker.
+- Extra UI libraries, shadcn, Supabase, or environment secrets.
 
 ## Transition to Implementation
 
@@ -55,7 +56,7 @@ During MVP v0 implementation, preserve these rules unless the user explicitly ch
 - No video processing.
 - No native mobile app.
 
-Approved first code milestone, when implementation is resumed:
+Approved first code milestone:
 
 - Minimal monorepo structure only.
 - `apps/web`: Next.js, TypeScript, Tailwind home page only.

@@ -2,7 +2,7 @@
 
 ## Phase 0: Project Foundation
 
-Status: current phase.
+Status: complete.
 
 Goals:
 
@@ -31,7 +31,9 @@ Exit criteria:
 
 ## Phase 1: MVP v0 Implementation
 
-Do not start until application scaffolding is explicitly requested.
+Status: started with the minimal scaffold milestone.
+
+Application scaffolding has been explicitly requested for the approved minimal milestone only.
 
 This phase still preserves the v0 rule: no auth, no database, no real AI call, no video processing, and no native mobile app.
 
@@ -47,28 +49,33 @@ Ordered tasks:
 1. Transition governance:
    - Update `AGENTS.md`, `CLAUDE.md`, and this plan to show that the approved implementation phase has started.
    - Keep the not-allowed list explicit: no auth, database, real AI, or video processing.
-2. Frontend shell with hardcoded mock data:
+2. Minimal monorepo scaffold:
+   - Create `apps/web` with Next.js, TypeScript, Tailwind, and a static home page only.
+   - Create `apps/api` with FastAPI and `GET /api/v0/health` only.
+   - Add root run/test scripts.
+   - Do not add frontend API calls, uploads, AI, auth, database, video processing, Docker, or extra UI libraries.
+3. Frontend shell with hardcoded mock data:
    - Scaffold Next.js with TypeScript only after approval.
    - Add mobile-first layout.
    - Add food image selection UI.
    - Use hardcoded in-memory mock analysis data only.
    - Do not call a backend yet.
-3. Frontend correction loop:
+4. Frontend correction loop:
    - Use the canonical correction object from [Architecture](ARCHITECTURE.md#correction-object-sub-schema).
    - Use the deterministic mock recomputation algorithm from [Architecture](ARCHITECTURE.md#mock-calorie-recalculation).
    - Display rounded calorie ranges.
    - Add uncertainty and safety copy.
-4. Backend mock boundary:
+5. Backend mock boundary:
    - Scaffold FastAPI only after backend work is explicitly approved.
    - Add `/api/v0/food/analyze` as a mock endpoint.
    - Accept direct `multipart/form-data` image upload.
    - Return the same structured response shape used by the frontend mock.
    - Validate supported media metadata and basic file constraints.
-5. Frontend/backend handoff:
+6. Frontend/backend handoff:
    - Replace hardcoded frontend analysis with calls to `/api/v0/food/analyze`.
    - Keep deterministic mock behavior identical across frontend and backend.
    - Preserve local-only correction state unless persistence is separately approved.
-6. Product polish:
+7. Product polish:
    - Add low-confidence and unclear-image states.
    - Add accessible loading and error states.
    - Add documentation updates for any schema changes.

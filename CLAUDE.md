@@ -13,7 +13,7 @@ The project should feel like a production-style portfolio project, not an AI toy
 
 ## Current Scope
 
-MVP v0 is still not an application scaffold. The first code milestone has been approved, but implementation is paused before scaffolding.
+The first code milestone is approved for implementation. Keep it limited to a minimal monorepo scaffold with a static web home page and a backend health endpoint.
 
 Allowed now:
 
@@ -23,21 +23,21 @@ Allowed now:
 - Architecture notes.
 - AI safety constraints.
 - Implementation planning.
-- Transition documentation for the approved first code milestone.
+- `apps/web`: Next.js, TypeScript, Tailwind home page only.
+- `apps/api`: FastAPI backend with `GET /api/v0/health` only.
+- Package manifests, lockfiles, and dependency installation required for this scaffold.
+- Minimal tests and run scripts for the scaffold.
 
-Do not create yet:
+Do not create:
 
-- Next.js app.
-- FastAPI app.
-- `apps/web`.
-- `apps/api`.
-- Package manifests.
-- Dependency lockfiles.
 - Database schema.
 - Auth flows.
 - Real AI calls.
+- Upload flows.
 - Video processing pipeline.
 - Native mobile app.
+- Docker.
+- Extra UI libraries, shadcn, Supabase, or environment secrets.
 
 ## Transition to Implementation
 
@@ -53,7 +53,7 @@ For MVP v0, keep these constraints unless the user explicitly changes them:
 - No video processing.
 - No native mobile app.
 
-Approved first code milestone, when implementation is resumed:
+Approved first code milestone:
 
 - Minimal monorepo structure only.
 - `apps/web`: Next.js, TypeScript, Tailwind home page only.

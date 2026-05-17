@@ -7,11 +7,11 @@ The project has two product tracks:
 1. Food photo calorie estimation with visible assumptions, confidence, and correction.
 2. Exercise form feedback from short videos, starting with squat feedback.
 
-The current repository is in its initial documentation and governance phase. The first code milestone has been approved, but implementation is paused before scaffolding and no application code has been created yet.
+The current repository is moving from documentation into the first minimal scaffold milestone.
 
 ## Current Status
 
-MVP v0 is documentation-first.
+MVP v0 is still intentionally small.
 
 Implemented now:
 
@@ -20,23 +20,19 @@ Implemented now:
 - Architecture notes.
 - AI safety boundaries.
 - Implementation plan.
-- Governance transition notes for the approved first code milestone.
 
-Approved but not implemented yet:
+Current scaffold scope:
 
 - Minimal monorepo.
-- `apps/web` with Next.js, TypeScript, Tailwind, and a home page only.
+- `apps/web` with Next.js, TypeScript, Tailwind, and a static home page only.
 - `apps/api` with FastAPI and `GET /api/v0/health` only.
 
-Not implemented yet:
+Not implemented:
 
-- Next.js frontend.
-- FastAPI backend.
-- Package manifests or lockfiles.
-- Dependency installation.
 - Real AI provider integration.
 - Authentication.
 - Database.
+- Upload flow.
 - Video processing.
 - Native mobile app.
 
@@ -53,18 +49,68 @@ The first implementation milestone will focus on a food photo mock-analysis flow
 
 Squat video feedback is documented for future design but intentionally out of v0 implementation scope.
 
-## Planned Stack
+## Current And Planned Stack
 
-The planned application stack, once scaffolding resumes:
+Current scaffold:
 
 - Frontend: Next.js with TypeScript.
 - Backend: FastAPI.
+
+Planned later:
+
 - AI contracts: structured JSON schemas.
 - Future storage: database for analyses, corrections, prompts, model runs, and evaluations.
 - Future media handling: object storage for uploaded media.
 - Future async work: job queue for video processing.
 
-No packages are installed in the current repository state.
+## Local Development
+
+Install dependencies before running the apps:
+
+```bash
+npm install
+python3.12 -m venv apps/api/.venv
+apps/api/.venv/bin/python -m pip install --upgrade pip
+apps/api/.venv/bin/python -m pip install -e "apps/api[dev]"
+```
+
+Run the frontend:
+
+```bash
+npm run dev:web
+```
+
+Frontend URL:
+
+```text
+http://127.0.0.1:3000
+```
+
+Run the backend:
+
+```bash
+npm run dev:api
+```
+
+Backend health check:
+
+```bash
+curl http://127.0.0.1:8000/api/v0/health
+```
+
+Expected response:
+
+```json
+{"status":"ok","service":"fitplate-api","version":"0.1.0"}
+```
+
+Run checks:
+
+```bash
+npm run lint:web
+npm run build:web
+npm run test:api
+```
 
 ## Product Principles
 

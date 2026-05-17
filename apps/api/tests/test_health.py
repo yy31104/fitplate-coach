@@ -14,3 +14,19 @@ def test_health_endpoint() -> None:
         "service": "fitplate-api",
         "version": "0.1.0",
     }
+
+
+def test_unknown_api_route_returns_404() -> None:
+    client = TestClient(app)
+
+    response = client.get("/api/v0/nonexistent")
+
+    assert response.status_code == 404
+
+
+def test_health_endpoint_rejects_post() -> None:
+    client = TestClient(app)
+
+    response = client.post("/api/v0/health")
+
+    assert response.status_code == 405

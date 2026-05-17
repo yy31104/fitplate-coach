@@ -1,9 +1,11 @@
+from typing import Literal
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 
 class HealthResponse(BaseModel):
-    status: str
+    status: Literal["ok"]
     service: str
     version: str
 

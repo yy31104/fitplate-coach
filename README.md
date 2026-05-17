@@ -65,14 +65,21 @@ Planned later:
 
 ## Local Development
 
-Install dependencies before running the apps:
+Install frontend dependencies:
 
 ```bash
 npm install
+```
+
+Create the backend virtual environment and install the API with dev dependencies:
+
+```bash
 python3.12 -m venv apps/api/.venv
 apps/api/.venv/bin/python -m pip install --upgrade pip
 apps/api/.venv/bin/python -m pip install -e "apps/api[dev]"
 ```
+
+Python dependencies are pinned in `apps/api/uv.lock` for reproducible resolution.
 
 Run the frontend:
 

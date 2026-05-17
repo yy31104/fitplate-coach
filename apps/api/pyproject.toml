@@ -2,7 +2,7 @@
 name = "fitplate-api"
 version = "0.1.0"
 description = "Minimal FastAPI backend for FitPlate Coach."
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.124.0",
   "uvicorn[standard]>=0.38.0",

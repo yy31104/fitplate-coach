@@ -41,7 +41,7 @@ Features:
 - Calorie estimate range.
 - Confidence and uncertainty explanation.
 - User correction interface for food items and portions.
-- Updated estimate after correction, using deterministic mock logic.
+- Updated estimate after correction, using the deterministic mock recomputation algorithm defined in [Architecture](ARCHITECTURE.md).
 - Safety copy that avoids medical and extreme dieting claims.
 
 Technical boundaries:
@@ -61,6 +61,19 @@ Success criteria:
 - Users can correct an estimate without friction.
 - The product never presents calories as exact.
 - Documentation stays aligned with implementation.
+
+## MVP v0 Product Decisions
+
+These decisions are provisional but implementation-ready. Change them only by updating this PRD and the architecture docs together.
+
+- Calorie precision: show rounded ranges, such as `400-550 kcal`, not exact values as the main user-facing claim.
+- Correction contract: use the canonical correction object in [Architecture](ARCHITECTURE.md#correction-object-sub-schema).
+- Recalculation rule: use the deterministic mock calorie recomputation algorithm in [Architecture](ARCHITECTURE.md#mock-calorie-recalculation).
+- Safety flags: use the canonical enum in [Architecture](ARCHITECTURE.md#safety-flags-enum).
+- Food image upload: the first backend version uses direct `multipart/form-data` upload to `/api/v0/food/analyze`.
+- Correction data use: v0 has no database, so corrections are session-local only. Future persisted corrections require explicit product documentation and consent rules before being used for evaluation.
+- Image retention: v0 must not persist uploaded images. The backend should discard request-time images after mock analysis until object storage and retention policy are intentionally added.
+- Squat cues: future squat feedback starts with observable, non-clinical cues such as depth range, torso angle consistency, knee tracking, heel contact, tempo, control, and camera quality.
 
 ## MVP v0 Non-Goals
 
@@ -165,9 +178,6 @@ Future AI metrics:
 - Cost per successful analysis.
 - Latency per analysis.
 
-## Open Questions
+## Deferred Product Questions
 
-- What level of calorie precision should be shown in the UI: exact range endpoints, rounded ranges, or qualitative bands?
-- Should corrected examples be opt-in for future evaluation use?
-- What image retention policy is appropriate for a portfolio project?
-- Which squat feedback cues are safest and most useful for a beginner audience?
+The former open questions now have MVP-ready defaults. Revisit them before v1 real AI, persistence, or video work expands the product surface.

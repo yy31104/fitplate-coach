@@ -37,6 +37,20 @@ Not allowed in the current phase:
 - AI provider integration.
 - Video processing implementation.
 
+## Transition to Implementation
+
+When the user explicitly approves scaffolding or implementation, update this file before creating code. The update must name the approved phase, move only the approved work into the allowed list, and keep the remaining v0 prohibitions visible.
+
+Approval for one layer does not imply approval for all layers. For example, approval to scaffold the Next.js frontend does not approve FastAPI, auth, a database, real AI calls, or video processing.
+
+During MVP v0 implementation, preserve these rules unless the user explicitly changes scope:
+
+- No authentication.
+- No database.
+- No real AI API call.
+- No video processing.
+- No native mobile app.
+
 ## Engineering Principles
 
 - Keep the app mobile-first, pragmatic, and portfolio-grade.

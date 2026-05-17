@@ -6,6 +6,8 @@ FitPlate Coach is a health-adjacent wellness and fitness tool. It is not a medic
 
 The app may provide reflective estimates and general technique observations. It must not provide diagnosis, treatment, or extreme dieting guidance.
 
+Uploaded images that appear non-food, NSFW, or too sensitive to analyze should return a safe unsupported state instead of a food estimate, using flags such as `non_food_image` or `nsfw_or_sensitive_image`.
+
 ## Core Boundaries
 
 The product must not:
@@ -118,16 +120,7 @@ Free-form text should be generated from structured fields, not used as the prima
 
 ## Safety Flags
 
-Future safety checks should be able to flag:
-
-- Extreme dieting request.
-- Medical diagnosis request.
-- Injury diagnosis request.
-- Treatment request.
-- Eating disorder concern.
-- Unsafe exercise instruction.
-- Low confidence due to poor media quality.
-- Unsupported exercise type.
+The canonical `safety_flags` enum is defined in [Architecture](ARCHITECTURE.md#safety-flags-enum). Do not add new safety flag strings in product code without updating that enum and any schema validation.
 
 Safety flags should affect both backend behavior and frontend display.
 
@@ -141,6 +134,7 @@ Correction flow should:
 - Recompute estimates transparently.
 - Preserve original assumptions for auditability.
 - Avoid judgmental feedback about corrections.
+- Use the canonical correction object from [Architecture](ARCHITECTURE.md#correction-object-sub-schema).
 
 Correction flow should not:
 
@@ -158,6 +152,7 @@ Food images and exercise videos can reveal sensitive personal context. Future pr
 - Use references instead of raw files in model logs.
 - Make evaluation-data usage explicit.
 - Support deletion when persistent accounts exist.
+- Review GDPR/CCPA-style access, export, and deletion obligations before adding accounts or persistent personal data.
 
 ## Prompt and Model Governance
 

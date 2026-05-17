@@ -52,7 +52,7 @@ Frontend video upload
   -> Queue receives job
   -> Worker performs video processing
   -> Results stored by job id
-  -> Frontend polls or subscribes for status
+  -> Frontend polls for status
 ```
 
 ## Frontend Responsibilities
@@ -86,6 +86,22 @@ Future FastAPI responsibilities:
 - Store user corrections when persistence is introduced.
 - Keep provider-specific details behind service boundaries.
 
+## API Versioning
+
+All first backend endpoints should live under `/api/v0/`. The initial food analysis endpoint should be `/api/v0/food/analyze`, and future correction endpoints should use the same version prefix.
+
+Do not expose unversioned endpoints. If request or response schemas change incompatibly later, introduce a new API version instead of silently changing `/api/v0/` behavior.
+
+## Secret Management
+
+Future AI provider keys and storage credentials must come from environment variables or a managed secret store. Secrets must never be committed, bundled into frontend code, returned in API responses, or written to logs.
+
+## Image Uploads
+
+The first backend implementation should use a direct `multipart/form-data` POST to `/api/v0/food/analyze` with one image file and optional client metadata. This keeps MVP v0 small and avoids object storage, signed URLs, authentication, or persistent media records.
+
+Backend validation should enforce file type and size limits before mock or AI analysis. Future production versions may move to signed object-storage uploads when media retention, user accounts, and larger files are intentionally introduced.
+
 ## Food Analysis Contract
 
 Food analysis should use structured JSON. A future schema should include:
@@ -97,6 +113,7 @@ Food analysis should use structured JSON. A future schema should include:
   "mode": "mock|ai",
   "items": [
     {
+      "item_id": "string",
       "name": "string",
       "portion": {
         "description": "string",
@@ -108,6 +125,7 @@ Food analysis should use structured JSON. A future schema should include:
         "max": 0,
         "point_estimate": 0
       },
+      "calorie_density_kcal_per_gram": 0,
       "confidence": "low|medium|high"
     }
   ],
@@ -117,26 +135,108 @@ Food analysis should use structured JSON. A future schema should include:
     "point_estimate": 0
   },
   "uncertainty_notes": ["string"],
-  "safety_flags": ["string"],
-  "user_corrections": []
+  "safety_flags": ["low_confidence"],
+  "user_corrections": [
+    {
+      "correction_id": "string",
+      "item_id": "string",
+      "original_name": "string",
+      "corrected_name": "string",
+      "original_grams": 0,
+      "corrected_grams": 0,
+      "original_calories": {
+        "min": 0,
+        "max": 0,
+        "point_estimate": 0
+      },
+      "corrected_calories": {
+        "min": 0,
+        "max": 0,
+        "point_estimate": 0
+      },
+      "correction_timestamp": "ISO-8601 string",
+      "correction_source": "user"
+    }
+  ]
 }
 ```
 
 MVP v0 can use deterministic mock data that follows this shape. The schema should be treated as the product contract even before real AI exists.
 
+## Correction Object Sub-Schema
+
+The correction object is the canonical contract for v0 food corrections.
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `correction_id` | string | yes | Client- or server-created id for the correction event. |
+| `item_id` | string | yes | Stable id of the food item being corrected. |
+| `original_name` | string | yes | Food name before correction. |
+| `corrected_name` | string | yes | User-confirmed food name. If unchanged, repeat `original_name`. |
+| `original_grams` | number | yes | Portion estimate before correction. |
+| `corrected_grams` | number | yes | User-confirmed portion estimate in grams. |
+| `original_calories` | object | yes | Calorie range before correction. |
+| `corrected_calories` | object | yes | Calorie range after deterministic recomputation. |
+| `correction_timestamp` | string | yes | ISO-8601 timestamp. |
+| `correction_source` | string | yes | For v0, always `user`. |
+
+Future versions may add optional fields for prompt version, model id, or evaluation consent. Do not add those to MVP v0 because v0 has no real AI call, auth, or database.
+
+## Mock Calorie Recalculation
+
+MVP v0 recomputation must be deterministic and local to the mock analysis flow.
+
+Algorithm:
+
+1. Each mock food item includes `calorie_density_kcal_per_gram`.
+2. If the user changes only grams, keep the existing density.
+3. If the user changes the food name, look up a density from a small static mock table. If no match exists, use `generic_mixed_food`.
+4. Compute `point_estimate = corrected_grams * calorie_density_kcal_per_gram`.
+5. Compute the range from confidence:
+   - `high`: point estimate plus or minus 10%.
+   - `medium`: point estimate plus or minus 20%.
+   - `low`: point estimate plus or minus 30%.
+6. Sum item ranges to produce `total_calories`.
+7. Store integer calorie values in the contract and display rounded ranges in the UI.
+
+Initial static density table:
+
+| Key | kcal per gram |
+| --- | ---: |
+| `rice_cooked` | 1.30 |
+| `chicken_breast` | 1.65 |
+| `mixed_salad` | 0.35 |
+| `avocado` | 1.60 |
+| `pasta_cooked` | 1.55 |
+| `generic_mixed_food` | 1.50 |
+
+This is not a nutrition database. It is a mock calculation rule so the frontend and backend do not invent different correction behavior.
+
+## Safety Flags Enum
+
+Use only these code-ready `safety_flags` values unless this document and the schema are updated together.
+
+| Flag | When emitted |
+| --- | --- |
+| `low_confidence` | Analysis confidence is too low for a strong estimate. |
+| `poor_media_quality` | Image or video is blurry, dark, occluded, or badly framed. |
+| `non_food_image` | Food analysis receives an image that does not appear to contain food. |
+| `nsfw_or_sensitive_image` | Upload appears NSFW or too sensitive to analyze. |
+| `unsupported_food_image` | Image type or content is outside supported food-analysis scope. |
+| `extreme_calorie_restriction` | User request or generated output points toward unsafe restriction. |
+| `medical_concern` | Request asks for medical diagnosis, clinical interpretation, or disease advice. |
+| `eating_disorder_concern` | Request suggests eating disorder diagnosis, screening, or unsafe compensatory behavior. |
+| `injury_or_pain_concern` | Exercise request includes pain, injury, or diagnosis concerns. |
+| `treatment_request` | User asks for treatment, rehabilitation, medication, or clinical plan. |
+| `unsafe_exercise_instruction` | Output or request encourages training through pain or unsafe loading. |
+| `unsupported_exercise` | Exercise analysis receives a movement other than the supported squat scope. |
+| `schema_validation_failed` | AI or mock output fails the expected structured schema. |
+
 ## User Correction Loop
 
 Corrections are a core product feature, not a secondary edit screen.
 
-Future correction data should capture:
-
-- Original item name and portion estimate.
-- User-corrected item name or portion.
-- Recomputed calories.
-- Timestamp.
-- Schema version.
-- Prompt version, once real AI is introduced.
-- Model identifier, once real AI is introduced.
+The correction object sub-schema above is the canonical shape for food corrections. Other docs should reference that schema instead of redefining correction fields.
 
 Production uses:
 
@@ -207,6 +307,7 @@ Privacy expectations:
 - Provide deletion paths once users and persistence exist.
 - Avoid using uploaded media for evaluation unless users opt in or the project explicitly documents the policy.
 - Keep secrets out of the frontend.
+- Treat GDPR/CCPA-style access and deletion requirements as a future production concern once accounts or persistent personal data exist.
 
 ## Future Async Video Pipeline
 
@@ -214,7 +315,7 @@ Video processing should be async because files can be large and analysis can be 
 
 Planned flow:
 
-1. Frontend uploads video or requests a signed upload URL.
+1. Frontend uploads video through the future approved upload mechanism.
 2. Backend stores metadata and creates a job.
 3. Job starts with status `queued`.
 4. Worker retrieves video from object storage.
@@ -222,7 +323,9 @@ Planned flow:
 6. Worker runs squat-specific analysis.
 7. Worker stores structured result.
 8. Backend exposes job status and result.
-9. Frontend polls or receives updates.
+9. Frontend polls the job status endpoint until completion, failure, or expiry.
+
+The first async video implementation should use polling, not SSE or WebSockets. A reasonable starting point is `GET /api/v0/video/jobs/{job_id}` every 2-5 seconds with a retry limit and job expiry. SSE or WebSockets may replace polling later only if production requirements justify persistent connections.
 
 Job states:
 

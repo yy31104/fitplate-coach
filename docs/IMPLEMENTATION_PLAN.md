@@ -29,81 +29,66 @@ Exit criteria:
 - MVP v0 boundaries are explicit.
 - Future production AI concerns are documented.
 
-## Phase 1: Frontend Shell
+## Phase 1: MVP v0 Implementation
 
 Do not start until application scaffolding is explicitly requested.
+
+This phase still preserves the v0 rule: no auth, no database, no real AI call, no video processing, and no native mobile app.
 
 Goals:
 
 - Create a mobile-first Next.js app.
 - Build the first user-facing food photo flow.
 - Keep all analysis mocked.
+- Make the frontend-to-backend handoff explicit without expanding scope.
 
-Candidate tasks:
+Ordered tasks:
 
-- Scaffold Next.js with TypeScript.
-- Add mobile-first layout.
-- Add food image selection or upload UI.
-- Add mock analysis result screen.
-- Add correction controls.
-- Add uncertainty and safety copy.
-- Add basic UI tests if test tooling exists.
+1. Transition governance:
+   - Update `AGENTS.md`, `CLAUDE.md`, and this plan to show that the approved implementation phase has started.
+   - Keep the not-allowed list explicit: no auth, database, real AI, or video processing.
+2. Frontend shell with hardcoded mock data:
+   - Scaffold Next.js with TypeScript only after approval.
+   - Add mobile-first layout.
+   - Add food image selection UI.
+   - Use hardcoded in-memory mock analysis data only.
+   - Do not call a backend yet.
+3. Frontend correction loop:
+   - Use the canonical correction object from [Architecture](ARCHITECTURE.md#correction-object-sub-schema).
+   - Use the deterministic mock recomputation algorithm from [Architecture](ARCHITECTURE.md#mock-calorie-recalculation).
+   - Display rounded calorie ranges.
+   - Add uncertainty and safety copy.
+4. Backend mock boundary:
+   - Scaffold FastAPI only after backend work is explicitly approved.
+   - Add `/api/v0/food/analyze` as a mock endpoint.
+   - Accept direct `multipart/form-data` image upload.
+   - Return the same structured response shape used by the frontend mock.
+   - Validate supported media metadata and basic file constraints.
+5. Frontend/backend handoff:
+   - Replace hardcoded frontend analysis with calls to `/api/v0/food/analyze`.
+   - Keep deterministic mock behavior identical across frontend and backend.
+   - Preserve local-only correction state unless persistence is separately approved.
+6. Product polish:
+   - Add low-confidence and unclear-image states.
+   - Add accessible loading and error states.
+   - Add documentation updates for any schema changes.
+   - Add focused tests only after test tooling exists.
 
 Exit criteria:
 
 - User can select an image and see a mock result.
 - User can correct food items or portions.
 - The result display uses structured mock data.
+- Frontend-only mock behavior and backend mock behavior follow the same documented schema and recomputation rule.
 - No real AI call exists.
-
-## Phase 2: Backend Shell
-
-Goals:
-
-- Create a FastAPI backend.
-- Define API contracts for food analysis.
-- Return deterministic mock analysis.
-- Keep frontend/backend boundaries clean.
-
-Candidate tasks:
-
-- Scaffold FastAPI service.
-- Define request and response schemas.
-- Add `/food/analyze` mock endpoint.
-- Add validation for supported media metadata.
-- Add deterministic calorie recomputation for corrections.
-- Add backend tests for schema and correction logic.
-
-Exit criteria:
-
-- Frontend can call backend mock endpoint.
-- Backend responses follow documented schema.
-- Invalid inputs return safe, user-readable errors.
-
-## Phase 3: Product-Grade Mock MVP v0
-
-Goals:
-
-- Make the mock food-analysis experience feel credible and complete.
-- Demonstrate production thinking without real AI.
-
-Candidate tasks:
-
-- Improve mock scenarios for common meals.
-- Add low-confidence and unclear-image states.
-- Add user correction loop.
-- Add local-only result state.
-- Add accessible loading and error states.
-- Add documentation updates for any schema changes.
-
-Exit criteria:
-
 - MVP v0 can be demoed end to end.
 - Mock status is clear to users and reviewers.
 - Safety boundaries are visible in the experience.
 - Documentation matches the implemented behavior.
 
-## Phase 4: Persistence Preparation
+## Phase 2: v1 Persistence Preparation
+
+Do not implement persistence in MVP v0.
 
 Goals:
 
@@ -111,20 +96,23 @@ Goals:
 
 Candidate tasks:
 
-- Design database entities for analyses, corrections, prompts, and model runs.
+- Design database entities for analyses and corrections.
 - Document retention policy.
 - Add migration tooling only when backend persistence is approved.
 - Add privacy notes to user-facing copy.
 
 Candidate entities:
 
-- User, once auth exists.
 - FoodAnalysis.
 - FoodItemEstimate.
 - UserCorrection.
-- PromptVersion.
-- ModelRun.
-- EvaluationExample.
+
+Deferred entities:
+
+- User, once auth exists.
+- PromptVersion, once real AI exists.
+- ModelRun, once real AI exists.
+- EvaluationExample, once persisted corrections and consent rules exist.
 
 Exit criteria:
 
@@ -132,7 +120,7 @@ Exit criteria:
 - No raw media is stored in logs.
 - Retention and deletion assumptions are documented.
 
-## Phase 5: Real AI Food Analysis v1
+## Phase 3: Real AI Food Analysis v1
 
 Goals:
 
@@ -158,7 +146,7 @@ Exit criteria:
 - Safety checks can block or soften unsafe output.
 - User corrections are stored for future evaluation.
 
-## Phase 6: Squat Video Design
+## Phase 4: Squat Video Design
 
 Goals:
 
@@ -180,7 +168,7 @@ Exit criteria:
 - Result schema includes uncertainty and safety flags.
 - Product copy avoids diagnosis and treatment advice.
 
-## Phase 7: Async Video Pipeline
+## Phase 5: Async Video Pipeline
 
 Goals:
 
@@ -193,7 +181,7 @@ Candidate tasks:
 - Add queue.
 - Add worker service.
 - Add status endpoint.
-- Add frontend polling or subscription.
+- Add frontend polling for job status.
 - Add timeout and failure handling.
 
 Exit criteria:
@@ -203,7 +191,7 @@ Exit criteria:
 - Failed jobs return useful, safe messages.
 - Results are stored as structured data.
 
-## Phase 8: Evaluation and Operations
+## Phase 6: Evaluation and Operations
 
 Goals:
 

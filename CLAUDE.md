@@ -36,6 +36,20 @@ Do not create yet:
 - Video processing pipeline.
 - Native mobile app.
 
+## Transition to Implementation
+
+When scaffolding or implementation is explicitly approved, update this file before creating code. The update should state which phase is now active, which artifacts are allowed, and which boundaries still apply.
+
+Approval must be interpreted narrowly. Frontend approval does not automatically approve backend work; backend approval does not approve auth, a database, real AI calls, or video processing.
+
+For MVP v0, keep these constraints unless the user explicitly changes them:
+
+- No authentication.
+- No database.
+- No real AI API call.
+- No video processing.
+- No native mobile app.
+
 ## Planned Stack
 
 The intended future stack is:

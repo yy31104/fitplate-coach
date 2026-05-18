@@ -1,4 +1,4 @@
-from app.ai.provider import AIProvider, FakeAIProvider, ImageRef
+from app.ai.provider import AIProvider, FakeAIProvider, ImageRef, ProviderResult
 from app.schemas.food import FoodAnalysis
 
 
@@ -17,21 +17,55 @@ def test_fake_ai_provider_returns_valid_food_analysis_for_each_scenario() -> Non
     ]
 
     for size_bytes, items_count, safety_flags in scenarios:
-        raw = provider.call("prompt", ImageRef(content_type="image/jpeg", size_bytes=size_bytes))
-        analysis = FoodAnalysis.model_validate(raw)
+        result = provider.call("prompt", ImageRef(content_type="image/jpeg", size_bytes=size_bytes))
+        analysis = FoodAnalysis.model_validate(result.raw_analysis)
 
+        assert isinstance(result, ProviderResult)
         assert analysis.schema_version == "food_analysis.v1"
         assert analysis.mode == "ai"
         assert analysis.items_count == items_count
         assert analysis.safety_flags == safety_flags
 
 
-def test_fake_ai_provider_ignores_api_key_environment(monkeypatch) -> None:
-    monkeypatch.setenv("FITPLATE_AI_PROVIDER_API_KEY", "not-used")
-
-    raw = FakeAIProvider().call(
+def test_fake_ai_provider_result_usage_fields_are_zero() -> None:
+    result = FakeAIProvider().call(
         "prompt",
         ImageRef(content_type="image/jpeg", size_bytes=345_678),
     )
 
-    assert FoodAnalysis.model_validate(raw).items_count == 3
+    assert result.input_tokens == 0
+    assert result.output_tokens == 0
+    assert result.cost_usd == 0.0
+    assert result.provider_latency_ms is None
+
+
+def test_image_ref_data_does_not_change_fake_provider_scenario() -> None:
+    provider = FakeAIProvider()
+
+    without_data = provider.call(
+        "prompt",
+        ImageRef(content_type="image/jpeg", size_bytes=345_678),
+    )
+    with_data = provider.call(
+        "prompt",
+        ImageRef(
+            content_type="image/jpeg",
+            size_bytes=345_678,
+            data=b"not used for fake routing",
+        ),
+    )
+
+    assert FoodAnalysis.model_validate(with_data.raw_analysis).items_count == (
+        FoodAnalysis.model_validate(without_data.raw_analysis).items_count
+    )
+
+
+def test_fake_ai_provider_ignores_api_key_environment(monkeypatch) -> None:
+    monkeypatch.setenv("FITPLATE_AI_PROVIDER_API_KEY", "not-used")
+
+    result = FakeAIProvider().call(
+        "prompt",
+        ImageRef(content_type="image/jpeg", size_bytes=345_678),
+    )
+
+    assert FoodAnalysis.model_validate(result.raw_analysis).items_count == 3

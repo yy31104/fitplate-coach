@@ -49,6 +49,9 @@ def build_model_run(
     safety_flags: list[SafetyFlag] | None = None,
     error_code: ErrorCode | None = None,
     error_message: str | None = None,
+    input_tokens: int = 0,
+    output_tokens: int = 0,
+    cost_usd: float = 0.0,
     ended_at: datetime | None = None,
 ) -> ModelRun:
     completed_at = ended_at or now_utc()
@@ -69,7 +72,7 @@ def build_model_run(
         safety_flags=safety_flags or [],
         error_code=error_code,
         error_message=error_message,
-        input_tokens=0,
-        output_tokens=0,
-        cost_usd=0.0,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        cost_usd=cost_usd,
     )

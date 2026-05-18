@@ -35,6 +35,16 @@ COMPLEX_ITEMS: list[ScenarioItem] = [
 class ImageRef:
     content_type: str
     size_bytes: int
+    data: bytes = b""
+
+
+@dataclass(frozen=True)
+class ProviderResult:
+    raw_analysis: dict[str, object]
+    input_tokens: int
+    output_tokens: int
+    cost_usd: float
+    provider_latency_ms: int | None = None
 
 
 @runtime_checkable
@@ -42,7 +52,7 @@ class AIProvider(Protocol):
     name: str
     model: str
 
-    def call(self, prompt: str, image_ref: ImageRef) -> dict[str, object]:
+    def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
         ...
 
 
@@ -50,42 +60,59 @@ class FakeAIProvider:
     name: ClassVar[str] = "fake"
     model: ClassVar[str] = "fake-food-vision-v1"
 
-    def call(self, prompt: str, image_ref: ImageRef) -> dict[str, object]:
+    def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
         if image_ref.size_bytes < 700_000:
-            return _analysis_dict(
-                items=_build_items(STANDARD_ITEMS),
-                safety_flags=[],
-                uncertainty_notes=[
-                    "Portions are estimated from visible image context.",
-                    "Cooking method is assumed to be standard.",
-                ],
+            return _provider_result(
+                _analysis_dict(
+                    items=_build_items(STANDARD_ITEMS),
+                    safety_flags=[],
+                    uncertainty_notes=[
+                        "Portions are estimated from visible image context.",
+                        "Cooking method is assumed to be standard.",
+                    ],
+                )
             )
 
         if image_ref.size_bytes < 800_000:
-            return _analysis_dict(
-                items=_build_items(LOW_CONFIDENCE_ITEMS),
-                safety_flags=["low_confidence"],
-                uncertainty_notes=[
-                    "The image appears difficult to estimate from metadata alone.",
-                    "Portion assumptions are intentionally broad.",
-                ],
+            return _provider_result(
+                _analysis_dict(
+                    items=_build_items(LOW_CONFIDENCE_ITEMS),
+                    safety_flags=["low_confidence"],
+                    uncertainty_notes=[
+                        "The image appears difficult to estimate from metadata alone.",
+                        "Portion assumptions are intentionally broad.",
+                    ],
+                )
             )
 
         if image_ref.size_bytes < 900_000:
-            return _analysis_dict(
-                items=[],
-                safety_flags=["non_food_image"],
-                uncertainty_notes=["No food was detected in this fake AI scenario."],
+            return _provider_result(
+                _analysis_dict(
+                    items=[],
+                    safety_flags=["non_food_image"],
+                    uncertainty_notes=["No food was detected in this fake AI scenario."],
+                )
             )
 
-        return _analysis_dict(
-            items=_build_items(COMPLEX_ITEMS),
-            safety_flags=[],
-            uncertainty_notes=[
-                "Multiple foods are estimated separately.",
-                "Mixed dishes can have wider uncertainty.",
-            ],
+        return _provider_result(
+            _analysis_dict(
+                items=_build_items(COMPLEX_ITEMS),
+                safety_flags=[],
+                uncertainty_notes=[
+                    "Multiple foods are estimated separately.",
+                    "Mixed dishes can have wider uncertainty.",
+                ],
+            )
         )
+
+
+def _provider_result(raw_analysis: dict[str, object]) -> ProviderResult:
+    return ProviderResult(
+        raw_analysis=raw_analysis,
+        input_tokens=0,
+        output_tokens=0,
+        cost_usd=0.0,
+    )
 
 
 def _analysis_dict(

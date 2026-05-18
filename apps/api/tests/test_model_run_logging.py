@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 import app.observability.log_writer as log_writer
 from app.ai.analyzer import AIFoodAnalyzer
-from app.ai.provider import ImageRef
+from app.ai.provider import ImageRef, ProviderResult
 from app.config import get_settings
 from app.main import app
 from app.observability.model_run import ModelRun, build_model_run, now_utc
@@ -41,6 +41,9 @@ def test_successful_analyze_writes_one_valid_jsonl_record(tmp_path, monkeypatch)
     assert records[0].output_summary["analysis_id"] == response.json()["analysis_id"]
     assert records[0].output_summary["items_count"] == response.json()["items_count"]
     assert records[0].error_code is None
+    assert records[0].input_tokens == 0
+    assert records[0].output_tokens == 0
+    assert records[0].cost_usd == 0.0
 
 
 def test_successful_correction_writes_one_valid_jsonl_record(tmp_path, monkeypatch) -> None:
@@ -165,6 +168,37 @@ def test_build_model_run_prompt_fields_default_to_none() -> None:
     assert record.prompt_version is None
 
 
+def test_build_model_run_preserves_usage_when_passed() -> None:
+    record = build_model_run(
+        request_id="request-001",
+        route="POST /api/v0/food/analyze/mock",
+        started_at=now_utc(),
+        input_summary={},
+        output_summary={},
+        input_tokens=11,
+        output_tokens=22,
+        cost_usd=0.0034,
+    )
+
+    assert record.input_tokens == 11
+    assert record.output_tokens == 22
+    assert record.cost_usd == 0.0034
+
+
+def test_build_model_run_usage_defaults_to_zero() -> None:
+    record = build_model_run(
+        request_id="request-001",
+        route="POST /api/v0/food/analyze/mock",
+        started_at=now_utc(),
+        input_summary={},
+        output_summary={},
+    )
+
+    assert record.input_tokens == 0
+    assert record.output_tokens == 0
+    assert record.cost_usd == 0.0
+
+
 def test_ai_mode_analyze_log_records_fake_provider_and_prompt(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
     monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
@@ -178,6 +212,9 @@ def test_ai_mode_analyze_log_records_fake_provider_and_prompt(tmp_path, monkeypa
     assert record.model == "fake-food-vision-v1"
     assert record.prompt_name == "food_analysis"
     assert record.prompt_version == "v1"
+    assert record.input_tokens == 0
+    assert record.output_tokens == 0
+    assert record.cost_usd == 0.0
     assert record.error_code is None
 
     get_settings.cache_clear()
@@ -205,8 +242,13 @@ class MalformedProvider:
     name = "malformed"
     model = "malformed-model"
 
-    def call(self, prompt: str, image_ref: ImageRef) -> dict[str, object]:
-        return {"schema_version": "food_analysis.v1"}
+    def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
+        return ProviderResult(
+            raw_analysis={"schema_version": "food_analysis.v1"},
+            input_tokens=0,
+            output_tokens=0,
+            cost_usd=0.0,
+        )
 
 
 def _use_log_path(tmp_path: Path, monkeypatch) -> Path:

@@ -4,7 +4,7 @@ from typing import Callable, Literal, Protocol
 
 from pydantic import BaseModel
 
-from app.ai.analyzer import AIFoodAnalyzer, MockFoodAnalyzer
+from app.ai.analyzer import AIFoodAnalyzer, AnalyzerResult, MockFoodAnalyzer
 from app.ai.provider import FakeAIProvider
 from app.schemas.food import FoodAnalysis, FoodAnalyzeMockRequest, SafetyFlag
 
@@ -45,7 +45,7 @@ class EvaluationResult(BaseModel):
 
 
 class FoodAnalysisCallable(Protocol):
-    def __call__(self, payload: FoodAnalyzeMockRequest) -> FoodAnalysis:
+    def __call__(self, payload: FoodAnalyzeMockRequest) -> FoodAnalysis | AnalyzerResult:
         ...
 
 
@@ -86,7 +86,12 @@ def _run_case(
     analyze: FoodAnalysisCallable | None = None,
 ) -> CaseResult:
     analyze_case = analyze or MockFoodAnalyzer().analyze
-    analysis = analyze_case(case.input)
+    analysis_result = analyze_case(case.input)
+    analysis = (
+        analysis_result.analysis
+        if isinstance(analysis_result, AnalyzerResult)
+        else analysis_result
+    )
     expected = case.expected_summary
     diffs: list[str] = []
 

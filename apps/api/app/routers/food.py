@@ -5,6 +5,7 @@ from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 
 from app.ai.analyzer import AIAnalysisError, select_food_analyzer
+from app.ai.provider import ImageRef
 from app.mock.density import calorie_range_from_density
 from app.observability.log_writer import write_model_run
 from app.observability.model_run import build_model_run, now_utc
@@ -75,7 +76,8 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         analyzer_model = analyzer.model
         analyzer_prompt_name = getattr(analyzer, "prompt_name", None)
         analyzer_prompt_version = getattr(analyzer, "prompt_version", None)
-        analysis = analyzer.analyze(payload)
+        analyzer_result = analyzer.analyze(payload)
+        analysis = analyzer_result.analysis
         write_model_run(
             build_model_run(
                 request_id=request_id,
@@ -88,6 +90,9 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
                 input_summary=input_summary,
                 output_summary=_analyze_output_summary(analysis),
                 safety_flags=analysis.safety_flags,
+                input_tokens=analyzer_result.usage.input_tokens,
+                output_tokens=analyzer_result.usage.output_tokens,
+                cost_usd=analyzer_result.usage.cost_usd,
             )
         )
         return analysis
@@ -200,6 +205,7 @@ async def analyze_food_upload(
         return JSONResponse(status_code=413, content=error.model_dump())
 
     if size_bytes == 0:
+        uploaded_bytes.clear()
         error = ErrorResponse(
             code="empty_file",
             message="The selected file appears to be empty.",
@@ -223,7 +229,11 @@ async def analyze_food_upload(
         size_bytes=size_bytes,
         last_modified_ms=0,
     )
-    uploaded_bytes.clear()
+    image_ref = ImageRef(
+        content_type=content_type,
+        size_bytes=size_bytes,
+        data=bytes(uploaded_bytes),
+    )
 
     analyzer_mode = "mock"
     analyzer_model = "mock"
@@ -236,7 +246,8 @@ async def analyze_food_upload(
         analyzer_model = analyzer.model
         analyzer_prompt_name = getattr(analyzer, "prompt_name", None)
         analyzer_prompt_version = getattr(analyzer, "prompt_version", None)
-        analysis = analyzer.analyze(payload)
+        analyzer_result = analyzer.analyze(payload, image_ref=image_ref)
+        analysis = analyzer_result.analysis
         write_model_run(
             build_model_run(
                 request_id=request_id,
@@ -249,6 +260,9 @@ async def analyze_food_upload(
                 input_summary=input_summary,
                 output_summary=_analyze_output_summary(analysis),
                 safety_flags=analysis.safety_flags,
+                input_tokens=analyzer_result.usage.input_tokens,
+                output_tokens=analyzer_result.usage.output_tokens,
+                cost_usd=analyzer_result.usage.cost_usd,
             )
         )
         return analysis
@@ -295,6 +309,8 @@ async def analyze_food_upload(
             )
         )
         return JSONResponse(status_code=500, content=error.model_dump())
+    finally:
+        uploaded_bytes.clear()
 
 
 @router.post(

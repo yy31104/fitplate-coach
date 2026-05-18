@@ -8,7 +8,7 @@ Current live endpoints:
 - `POST /api/v0/food/analyze/mock`
 - `POST /api/v0/food/corrections/mock`
 
-The mock food endpoint accepts file metadata only. It does not accept image bytes, upload files, store files, authenticate users, or call an AI model.
+The food analysis endpoint accepts file metadata only. It does not accept image bytes, upload files, store files, authenticate users, or call a real AI model. By default it uses deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, it uses a local fake provider path for AI-readiness testing.
 
 ## Base URL and Versioning
 
@@ -520,7 +520,7 @@ Emitted only if an unexpected exception occurs during correction computation.
 | --- | --- | --- | --- |
 | `analysis_id` | string | yes | UUID string generated fresh per response. |
 | `schema_version` | string literal `"food_analysis.v1"` | yes | Food analysis schema version. |
-| `mode` | string literal `"mock"` | yes | Analysis mode. Only `"mock"` exists in v0. |
+| `mode` | string literal `"mock"` or `"ai"` | yes | Analysis mode. Default mock analyzer responses use `"mock"`; the local fake-provider AI-readiness path uses `"ai"`. |
 | `analyzed_at` | ISO-8601 datetime string | yes | Time the mock analysis was generated. |
 | `items_count` | integer | yes | Equals the number of entries in `items`. |
 | `items` | array of `FoodItem` | yes | Estimated food items. May be empty. |
@@ -609,7 +609,7 @@ The full set exists in the v0 schema so clients can handle future safety flags w
 
 ## Mock Mode Behavior
 
-The live food analysis endpoint is explicitly named `/analyze/mock`, and every response includes `mode: "mock"`.
+The live food analysis endpoint is explicitly named `/analyze/mock`. Default deterministic mock responses include `mode: "mock"`; the opt-in fake-provider AI-readiness path uses the same schema with `mode: "ai"` and still makes no real provider call.
 
 Mock scenario selection is deterministic per filename:
 

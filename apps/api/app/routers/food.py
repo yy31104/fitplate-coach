@@ -4,7 +4,7 @@ from uuid import uuid4
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from app.ai.analyzer import select_food_analyzer
+from app.ai.analyzer import AIAnalysisError, select_food_analyzer
 from app.mock.density import calorie_range_from_density
 from app.observability.log_writer import write_model_run
 from app.observability.model_run import build_model_run, now_utc
@@ -63,11 +63,15 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
 
     analyzer_mode = "mock"
     analyzer_model = "mock"
+    analyzer_prompt_name = None
+    analyzer_prompt_version = None
 
     try:
         analyzer = select_food_analyzer()
         analyzer_mode = analyzer.mode
         analyzer_model = analyzer.model
+        analyzer_prompt_name = getattr(analyzer, "prompt_name", None)
+        analyzer_prompt_version = getattr(analyzer, "prompt_version", None)
         analysis = analyzer.analyze(payload)
         write_model_run(
             build_model_run(
@@ -75,6 +79,8 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
                 route=ANALYZE_MOCK_ROUTE,
                 mode=analyzer_mode,
                 model=analyzer_model,
+                prompt_name=analyzer_prompt_name,
+                prompt_version=analyzer_prompt_version,
                 started_at=started_at,
                 input_summary=input_summary,
                 output_summary=_analyze_output_summary(analysis),
@@ -82,6 +88,28 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
             )
         )
         return analysis
+    except AIAnalysisError as exc:
+        error = ErrorResponse(
+            code="analysis_failed",
+            message="Analysis unavailable. Please try again.",
+        )
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_MOCK_ROUTE,
+                mode=analyzer_mode,
+                model=analyzer_model,
+                prompt_name=analyzer_prompt_name,
+                prompt_version=analyzer_prompt_version,
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary={},
+                safety_flags=exc.safety_flags,
+                error_code=error.code,
+                error_message=error.message,
+            )
+        )
+        return JSONResponse(status_code=500, content=error.model_dump())
     except Exception:
         error = ErrorResponse(
             code="analysis_failed",
@@ -93,6 +121,8 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
                 route=ANALYZE_MOCK_ROUTE,
                 mode=analyzer_mode,
                 model=analyzer_model,
+                prompt_name=analyzer_prompt_name,
+                prompt_version=analyzer_prompt_version,
                 started_at=started_at,
                 input_summary=input_summary,
                 output_summary={},

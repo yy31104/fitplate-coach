@@ -5,7 +5,13 @@ import pytest
 from fastapi.testclient import TestClient
 
 import app.observability.log_writer as log_writer
-from app.ai.analyzer import AIFoodAnalyzer, FoodAnalyzer, MockFoodAnalyzer, select_food_analyzer
+from app.ai.analyzer import (
+    AIFoodAnalyzer,
+    FoodAnalyzer,
+    MockFoodAnalyzer,
+    select_food_analyzer,
+)
+from app.config import get_settings
 from app.main import app
 from app.observability.model_run import ModelRun
 from app.schemas.food import FoodAnalyzeMockRequest
@@ -13,8 +19,16 @@ from app.schemas.food import FoodAnalyzeMockRequest
 client = TestClient(app)
 
 
+@pytest.fixture(autouse=True)
+def clear_settings_cache() -> None:
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
+
+
 def test_select_food_analyzer_defaults_to_mock(monkeypatch) -> None:
     monkeypatch.delenv("FITPLATE_AI_MODE", raising=False)
+    _clear_settings_cache()
 
     analyzer = select_food_analyzer()
 
@@ -23,24 +37,37 @@ def test_select_food_analyzer_defaults_to_mock(monkeypatch) -> None:
 
 def test_select_food_analyzer_returns_mock_for_mock_mode(monkeypatch) -> None:
     monkeypatch.setenv("FITPLATE_AI_MODE", "mock")
+    _clear_settings_cache()
 
     analyzer = select_food_analyzer()
 
     assert isinstance(analyzer, MockFoodAnalyzer)
 
 
-def test_select_food_analyzer_returns_ai_stub_for_ai_mode(monkeypatch) -> None:
+def test_select_food_analyzer_returns_ai_analyzer_for_ai_mode(monkeypatch) -> None:
     monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    _clear_settings_cache()
 
     analyzer = select_food_analyzer()
 
     assert isinstance(analyzer, AIFoodAnalyzer)
+    assert analyzer.model == "fake-food-vision-v1"
 
 
 def test_select_food_analyzer_raises_for_unknown_mode(monkeypatch) -> None:
     monkeypatch.setenv("FITPLATE_AI_MODE", "live-gpt")
+    _clear_settings_cache()
 
     with pytest.raises(ValueError, match="FITPLATE_AI_MODE"):
+        select_food_analyzer()
+
+
+def test_select_food_analyzer_raises_for_unknown_ai_provider(monkeypatch) -> None:
+    monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    monkeypatch.setenv("FITPLATE_AI_PROVIDER", "real-provider")
+    _clear_settings_cache()
+
+    with pytest.raises(ValueError, match="FITPLATE_AI_PROVIDER"):
         select_food_analyzer()
 
 
@@ -66,36 +93,41 @@ def test_mock_analyzer_returns_food_analysis_with_current_mock_behavior() -> Non
     assert result.items_count == 3
 
 
-def test_ai_analyzer_raises_not_implemented() -> None:
+def test_ai_analyzer_returns_fake_provider_food_analysis() -> None:
     analyzer = AIFoodAnalyzer()
 
-    with pytest.raises(NotImplementedError, match="FITPLATE_AI_MODE=mock"):
-        analyzer.analyze(_request_payload())
+    result = analyzer.analyze(_request_payload())
+
+    assert result.schema_version == "food_analysis.v1"
+    assert result.mode == "ai"
 
 
-def test_analyze_route_with_ai_mode_returns_analysis_failed(monkeypatch) -> None:
+def test_analyze_route_with_ai_mode_returns_ai_food_analysis(monkeypatch) -> None:
     monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    _clear_settings_cache()
 
     response = client.post("/api/v0/food/analyze/mock", json=_payload())
 
-    assert response.status_code == 500
-    assert response.json() == {
-        "code": "analysis_failed",
-        "message": "Analysis unavailable. Please try again.",
-    }
+    assert response.status_code == 200
+    assert response.json()["mode"] == "ai"
 
 
-def test_model_run_log_records_ai_mode_on_ai_analyzer_error(tmp_path, monkeypatch) -> None:
+def test_model_run_log_records_ai_mode_on_ai_analyzer_success(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
     monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    _clear_settings_cache()
 
     response = client.post("/api/v0/food/analyze/mock", json=_payload())
 
-    assert response.status_code == 500
+    assert response.status_code == 200
     record = _read_records(log_path)[0]
     assert record.mode == "ai"
-    assert record.model == "ai-provider-stub"
-    assert record.error_code == "analysis_failed"
+    assert record.model == "fake-food-vision-v1"
+    assert record.error_code is None
+
+
+def _clear_settings_cache() -> None:
+    get_settings.cache_clear()
 
 
 def _request_payload() -> FoodAnalyzeMockRequest:

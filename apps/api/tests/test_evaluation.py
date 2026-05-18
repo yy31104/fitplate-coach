@@ -4,6 +4,7 @@ from app.evaluation.runner import (
     _CASES_PATH,
     EvaluationCase,
     evaluate_food_analysis_cases,
+    run_fake_ai_food_analysis_evaluation,
     run_food_analysis_evaluation,
 )
 from app.mock.food_analyzer import analyze_food_metadata
@@ -31,6 +32,12 @@ def test_cases_file_has_required_structure() -> None:
 
 def test_evaluation_runner_passes_all_cases_on_mock_analyzer() -> None:
     result = run_food_analysis_evaluation()
+
+    assert result.failed == 0
+
+
+def test_evaluation_runner_passes_all_cases_on_fake_ai_analyzer() -> None:
+    result = run_fake_ai_food_analysis_evaluation()
 
     assert result.failed == 0
 

@@ -1,31 +1,51 @@
-import { formatFlag } from "../../../../lib/food-analysis-format";
-import type { FoodAnalysis } from "../../../../lib/food-analysis-types";
+import { formatCalories, formatFlag } from "../../../../lib/food-analysis-format";
+import type {
+  CalorieRange,
+  FoodAnalysis,
+  FoodItem,
+  UserCorrection,
+} from "../../../../lib/food-analysis-types";
 import { FoodItemRow } from "./FoodItemRow";
 import { ImagePreview } from "./ImagePreview";
 
 export function ResultView({
   analysis,
   assumptions,
-  headlineRange,
+  correctedTotal,
+  corrections,
+  editingItemId,
+  hasAnyCorrection,
   previewFailed,
   previewUrl,
   file,
+  onCancelEdit,
+  onCommitCorrection,
+  onStartEdit,
+  onUndoCorrection,
 }: {
   analysis: FoodAnalysis;
   assumptions: string[];
-  headlineRange: string;
+  correctedTotal: CalorieRange;
+  corrections: Record<string, UserCorrection>;
+  editingItemId: string | null;
+  hasAnyCorrection: boolean;
   previewFailed: boolean;
   previewUrl: string | null;
   file: File | null;
+  onCancelEdit: () => void;
+  onCommitCorrection: (item: FoodItem, correctedGrams: number) => void;
+  onStartEdit: (itemId: string) => void;
+  onUndoCorrection: (itemId: string) => void;
 }) {
   const hasItems = analysis.items.length > 0;
+  const headlineRange = formatCalories(correctedTotal);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-3">
           <span className="inline-flex rounded-full border border-stone-300 bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-700">
-            Mock analysis
+            {hasAnyCorrection ? "Mock analysis — user corrected" : "Mock analysis"}
           </span>
           <div>
             <h2 className="text-2xl font-semibold">
@@ -53,7 +73,20 @@ export function ResultView({
       ) : (
         <div className="space-y-3">
           {analysis.items.map((item) => (
-            <FoodItemRow item={item} key={item.item_id} />
+            // The compound key intentionally remounts rows when edit/display/correction state
+            // changes, resetting local draft grams without a useEffect.
+            <FoodItemRow
+              correction={corrections[item.item_id] ?? null}
+              isEditing={editingItemId === item.item_id}
+              item={item}
+              key={`${item.item_id}-${editingItemId === item.item_id ? "editing" : "display"}-${
+                corrections[item.item_id]?.correction_id ?? "original"
+              }`}
+              onCancel={onCancelEdit}
+              onCommit={(correctedGrams) => onCommitCorrection(item, correctedGrams)}
+              onStartEdit={() => onStartEdit(item.item_id)}
+              onUndo={() => onUndoCorrection(item.item_id)}
+            />
           ))}
         </div>
       )}

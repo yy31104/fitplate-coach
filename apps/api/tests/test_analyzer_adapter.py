@@ -87,19 +87,29 @@ def test_mock_analyzer_returns_food_analysis_with_current_mock_behavior() -> Non
     analyzer = MockFoodAnalyzer()
 
     result = analyzer.analyze(_request_payload())
+    analysis = result.analysis
 
-    assert result.schema_version == "food_analysis.v1"
-    assert result.mode == "mock"
-    assert result.items_count == 3
+    assert analysis.schema_version == "food_analysis.v1"
+    assert analysis.mode == "mock"
+    assert analysis.items_count == 3
+
+
+def test_mock_analyzer_usage_is_zero() -> None:
+    result = MockFoodAnalyzer().analyze(_request_payload())
+
+    assert result.usage.input_tokens == 0
+    assert result.usage.output_tokens == 0
+    assert result.usage.cost_usd == 0.0
 
 
 def test_ai_analyzer_returns_fake_provider_food_analysis() -> None:
     analyzer = AIFoodAnalyzer()
 
     result = analyzer.analyze(_request_payload())
+    analysis = result.analysis
 
-    assert result.schema_version == "food_analysis.v1"
-    assert result.mode == "ai"
+    assert analysis.schema_version == "food_analysis.v1"
+    assert analysis.mode == "ai"
 
 
 def test_analyze_route_with_ai_mode_returns_ai_food_analysis(monkeypatch) -> None:

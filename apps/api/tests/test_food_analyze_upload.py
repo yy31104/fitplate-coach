@@ -6,9 +6,12 @@ from fastapi.testclient import TestClient
 from starlette.formparsers import MultiPartParser
 
 import app.observability.log_writer as log_writer
+from app.ai.analyzer import AIFoodAnalyzer
+from app.ai.provider import FakeAIProvider, ImageRef, ProviderResult
 from app.config import get_settings
 from app.main import app
 from app.observability.model_run import ModelRun
+from app.routers import food as food_router
 from app.routers.food import MAX_FILE_SIZE_BYTES
 
 client = TestClient(app)
@@ -137,6 +140,30 @@ def test_upload_ai_mode_uses_fake_provider_and_logs_prompt(
     assert record.prompt_version == "v1"
 
 
+def test_upload_ai_mode_passes_bytes_to_provider_without_logging_them(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    log_path = _use_log_path(tmp_path, monkeypatch)
+    sentinel = b"AI_UPLOAD_SENTINEL_BYTES"
+    provider = RecordingProvider()
+    analyzer = AIFoodAnalyzer(provider=provider)
+    monkeypatch.setattr(food_router, "select_food_analyzer", lambda: analyzer)
+
+    response = client.post(
+        "/api/v0/food/analyze",
+        files=_image_file(content=sentinel),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["mode"] == "ai"
+    assert provider.seen_data == sentinel
+    raw_line = log_path.read_text(encoding="utf-8").strip()
+    record = ModelRun.model_validate(json.loads(raw_line))
+    assert record.mode == "ai"
+    assert sentinel.decode("utf-8") not in raw_line
+
+
 def test_upload_long_filename_is_truncated_in_model_run(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
     filename = f"{'a' * 300}.jpg"
@@ -183,6 +210,14 @@ def _item_names(body: dict[str, object]) -> list[str]:
     items = body["items"]
     assert isinstance(items, list)
     return [item["name"] for item in items]
+
+
+class RecordingProvider(FakeAIProvider):
+    seen_data: bytes | None = None
+
+    def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
+        self.seen_data = image_ref.data
+        return super().call(prompt, image_ref)
 
 
 def _use_log_path(tmp_path: Path, monkeypatch) -> Path:

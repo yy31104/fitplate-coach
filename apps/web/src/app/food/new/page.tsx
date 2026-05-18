@@ -1,14 +1,20 @@
 "use client";
 
-import { type ChangeEvent, type FormEvent, useMemo, useState } from "react";
+import { type ChangeEvent, type FormEvent, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 
-import { analyzeFoodMock, FoodAnalysisApiError } from "../../../lib/food-analysis-api";
 import {
-  buildCorrectedTotal,
-  recomputeCalorieRange,
-} from "../../../lib/food-analysis-correction";
-import type { FoodAnalysis, FoodItem, UserCorrection } from "../../../lib/food-analysis-types";
+  analyzeFoodMock,
+  FoodAnalysisApiError,
+  submitFoodCorrectionMock,
+} from "../../../lib/food-analysis-api";
+import { buildCorrectedTotal } from "../../../lib/food-analysis-correction";
+import type {
+  FoodAnalysis,
+  FoodCorrectionMockRequest,
+  FoodItem,
+  UserCorrection,
+} from "../../../lib/food-analysis-types";
 import {
   acceptedFoodImageTypes,
   acceptedFoodImageTypesLabel,
@@ -30,6 +36,12 @@ export default function NewFoodAnalysisPage() {
   const [inputKey, setInputKey] = useState(0);
   const [corrections, setCorrections] = useState<Record<string, UserCorrection>>({});
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [correctionLoading, setCorrectionLoading] = useState<string | null>(null);
+  const [correctionError, setCorrectionError] = useState<{
+    itemId: string;
+    message: string;
+  } | null>(null);
+  const correctionRequestId = useRef(0);
 
   const previewUrl = usePreviewUrl(file);
   const assumptions = useMemo(() => collectAssumptions(analysis), [analysis]);
@@ -46,6 +58,9 @@ export default function NewFoodAnalysisPage() {
     setPreviewFailed(false);
     setCorrections({});
     setEditingItemId(null);
+    setCorrectionLoading(null);
+    setCorrectionError(null);
+    correctionRequestId.current += 1;
 
     if (!selectedFile) {
       setFile(null);
@@ -80,6 +95,9 @@ export default function NewFoodAnalysisPage() {
     setError(null);
     setCorrections({});
     setEditingItemId(null);
+    setCorrectionLoading(null);
+    setCorrectionError(null);
+    correctionRequestId.current += 1;
 
     try {
       const [result] = await Promise.all([
@@ -102,41 +120,70 @@ export default function NewFoodAnalysisPage() {
     setPreviewFailed(false);
     setCorrections({});
     setEditingItemId(null);
+    setCorrectionLoading(null);
+    setCorrectionError(null);
+    correctionRequestId.current += 1;
     setInputKey((current) => current + 1);
   }
 
   function handleStartEdit(itemId: string) {
+    setCorrectionLoading(null);
+    setCorrectionError(null);
+    correctionRequestId.current += 1;
     setEditingItemId(itemId);
   }
 
-  function handleCommitCorrection(item: FoodItem, correctedGrams: number) {
-    const correctedCalories = recomputeCalorieRange(
-      correctedGrams,
-      item.calorie_density_kcal_per_gram,
-      item.confidence,
-    );
+  async function handleCommitCorrection(item: FoodItem, correctedGrams: number) {
+    const requestId = correctionRequestId.current + 1;
+    correctionRequestId.current = requestId;
+    setCorrectionLoading(item.item_id);
+    setCorrectionError(null);
 
-    const correction: UserCorrection = {
-      correction_id: crypto.randomUUID(),
+    const request: FoodCorrectionMockRequest = {
       item_id: item.item_id,
       original_name: item.name,
-      corrected_name: item.name,
       original_grams: item.portion.grams_estimate,
       corrected_grams: correctedGrams,
+      calorie_density_kcal_per_gram: item.calorie_density_kcal_per_gram,
+      confidence: item.confidence,
       original_calories: item.calories,
-      corrected_calories: correctedCalories,
-      correction_timestamp: new Date().toISOString(),
-      correction_source: "user",
     };
 
-    setCorrections((current) => ({
-      ...current,
-      [item.item_id]: correction,
-    }));
-    setEditingItemId(null);
+    try {
+      const correction = await submitFoodCorrectionMock(request);
+
+      if (correctionRequestId.current !== requestId) {
+        return;
+      }
+
+      setCorrections((current) => ({
+        ...current,
+        [item.item_id]: correction,
+      }));
+      setEditingItemId(null);
+    } catch (caughtError) {
+      if (correctionRequestId.current !== requestId) {
+        return;
+      }
+
+      setCorrectionError({
+        itemId: item.item_id,
+        message:
+          caughtError instanceof FoodAnalysisApiError
+            ? caughtError.message
+            : "Correction failed. Please try again.",
+      });
+    } finally {
+      if (correctionRequestId.current === requestId) {
+        setCorrectionLoading(null);
+      }
+    }
   }
 
   function handleCancelEdit() {
+    setCorrectionLoading(null);
+    setCorrectionError(null);
+    correctionRequestId.current += 1;
     setEditingItemId(null);
   }
 
@@ -147,6 +194,7 @@ export default function NewFoodAnalysisPage() {
       return next;
     });
     setEditingItemId((current) => (current === itemId ? null : current));
+    setCorrectionError((current) => (current?.itemId === itemId ? null : current));
   }
 
   return (
@@ -241,6 +289,8 @@ export default function NewFoodAnalysisPage() {
                 assumptions={assumptions}
                 correctedTotal={correctedTotal}
                 corrections={corrections}
+                correctionError={correctionError}
+                correctionLoading={correctionLoading}
                 editingItemId={editingItemId}
                 hasAnyCorrection={hasAnyCorrection}
                 previewFailed={previewFailed}

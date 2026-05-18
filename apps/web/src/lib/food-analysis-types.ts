@@ -24,6 +24,16 @@ export interface FoodAnalyzeMockRequest {
   last_modified_ms: number;
 }
 
+export interface FoodCorrectionMockRequest {
+  item_id: string;
+  original_name: string;
+  original_grams: number;
+  corrected_grams: number;
+  calorie_density_kcal_per_gram: number;
+  confidence: Confidence;
+  original_calories: CalorieRange;
+}
+
 export interface CalorieRange {
   min: number;
   max: number;
@@ -89,6 +99,25 @@ export function isFoodAnalysis(value: unknown): value is FoodAnalysis {
     Array.isArray(value.safety_flags) &&
     value.safety_flags.every(isSafetyFlag) &&
     Array.isArray(value.user_corrections)
+  );
+}
+
+export function isUserCorrection(value: unknown): value is UserCorrection {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    isString(value.correction_id) &&
+    isString(value.item_id) &&
+    isString(value.original_name) &&
+    isString(value.corrected_name) &&
+    isNumber(value.original_grams) &&
+    isNumber(value.corrected_grams) &&
+    isCalorieRange(value.original_calories) &&
+    isCalorieRange(value.corrected_calories) &&
+    isString(value.correction_timestamp) &&
+    value.correction_source === "user"
   );
 }
 

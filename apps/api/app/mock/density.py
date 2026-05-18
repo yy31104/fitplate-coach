@@ -29,6 +29,14 @@ def calorie_range_for(
         density_key,
         CALORIE_DENSITY_KCAL_PER_GRAM["generic_mixed_food"],
     )
+    return calorie_range_from_density(grams=grams, density=density, confidence=confidence)
+
+
+def calorie_range_from_density(
+    grams: int,
+    density: float,
+    confidence: Confidence,
+) -> CalorieRange:
     point_estimate = round(grams * density)
     margin = CONFIDENCE_MARGIN[confidence]
 

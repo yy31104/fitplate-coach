@@ -6,6 +6,7 @@ Current live endpoints:
 
 - `GET /api/v0/health`
 - `POST /api/v0/food/analyze/mock`
+- `POST /api/v0/food/corrections/mock`
 
 The mock food endpoint accepts file metadata only. It does not accept image bytes, upload files, store files, authenticate users, or call an AI model.
 
@@ -53,7 +54,7 @@ Datetime values in responses are ISO-8601 strings with timezone information.
 
 ## Error Envelope
 
-Project-defined 4xx and 5xx food mock errors use this envelope:
+Project-defined food endpoint errors use this envelope:
 
 ```json
 {
@@ -68,6 +69,7 @@ Current `ErrorResponse.code` values are:
 - `file_too_large`
 - `empty_file`
 - `analysis_failed`
+- `correction_failed`
 
 FastAPI request validation errors return HTTP `422 Unprocessable Entity` using FastAPI's standard validation response body. They are not wrapped in the project `ErrorResponse` envelope.
 
@@ -369,6 +371,126 @@ Emitted only if an unexpected exception occurs during mock analysis.
 - The backend does not verify that the selected image contains food.
 - `analysis_id` and `item_id` values are generated UUID strings and change on every call.
 
+### POST /api/v0/food/corrections/mock
+
+Purpose: recompute one corrected food item calorie range and return a `UserCorrection`.
+
+Authentication: none.
+
+#### Request
+
+Content-Type: `application/json`
+
+Body schema: `FoodCorrectionMockRequest`
+
+Fields:
+
+| Field | Type | Required | Constraints | Description |
+| --- | --- | --- | --- | --- |
+| `item_id` | string | yes | `min_length=1` | Item identifier from the original `FoodItem`. |
+| `original_name` | string | yes | `min_length=1` | Food name from the original `FoodItem`. |
+| `original_grams` | integer | yes | `>= 1` | Original estimated portion in grams. |
+| `corrected_grams` | integer | yes | `>= 1` and `<= 2000` | User-corrected portion in grams. |
+| `calorie_density_kcal_per_gram` | number | yes | `> 0` | Density returned by the original `FoodItem`. |
+| `confidence` | string | yes | `"high"`, `"medium"`, or `"low"` | Original item confidence used to preserve the uncertainty margin. |
+| `original_calories` | `CalorieRange` | yes | Must match `CalorieRange` shape. | Original item calorie range, passed through unchanged. |
+
+Request example:
+
+```http
+POST /api/v0/food/corrections/mock HTTP/1.1
+Host: 127.0.0.1:8000
+Content-Type: application/json
+
+{
+  "item_id": "test-item-id-001",
+  "original_name": "Chicken breast",
+  "original_grams": 150,
+  "corrected_grams": 200,
+  "calorie_density_kcal_per_gram": 1.65,
+  "confidence": "medium",
+  "original_calories": {
+    "min": 198,
+    "max": 298,
+    "point_estimate": 248
+  }
+}
+```
+
+#### Response
+
+Success status: `200 OK`
+
+Response schema: `UserCorrection`
+
+Success example:
+
+```json
+{
+  "correction_id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+  "item_id": "test-item-id-001",
+  "original_name": "Chicken breast",
+  "corrected_name": "Chicken breast",
+  "original_grams": 150,
+  "corrected_grams": 200,
+  "original_calories": {
+    "min": 198,
+    "max": 298,
+    "point_estimate": 248
+  },
+  "corrected_calories": {
+    "min": 264,
+    "max": 396,
+    "point_estimate": 330
+  },
+  "correction_timestamp": "2026-05-18T12:00:00Z",
+  "correction_source": "user"
+}
+```
+
+#### Error Responses
+
+`422 Unprocessable Entity` for invalid request body:
+
+```json
+{
+  "detail": [
+    {
+      "type": "greater_than_equal",
+      "loc": ["body", "corrected_grams"],
+      "msg": "Input should be greater than or equal to 1",
+      "input": 0,
+      "ctx": {
+        "ge": 1
+      }
+    }
+  ]
+}
+```
+
+FastAPI emits this for schema validation failures such as missing fields, empty `item_id`, empty `original_name`, `corrected_grams < 1`, `corrected_grams > 2000`, `calorie_density_kcal_per_gram <= 0`, invalid `confidence`, or invalid `original_calories` shape. This response is not wrapped in `ErrorResponse`.
+
+`500 Internal Server Error` with `correction_failed`:
+
+```json
+{
+  "code": "correction_failed",
+  "message": "Correction unavailable. Please try again."
+}
+```
+
+Emitted only if an unexpected exception occurs during correction computation.
+
+#### Notes
+
+- This endpoint corrects one item only.
+- `corrected_name` is always equal to `original_name`; food name correction is not implemented.
+- The confidence margin is preserved from the original item.
+- `correction_id` is a fresh UUID per call and is not stable across identical requests.
+- No correction data is persisted.
+- `analysis_id` is not included in the request. This mock endpoint does not associate corrections with a persisted analysis record.
+- The response does not include total calories. Callers sum item ranges if needed.
+
 ## Schema Reference
 
 ### FoodAnalyzeMockRequest
@@ -379,6 +501,18 @@ Emitted only if an unexpected exception occurs during mock analysis.
 | `content_type` | string | yes | Must pass endpoint allowlist validation. | Browser-provided MIME type. |
 | `size_bytes` | integer | yes | Pydantic `>= 0`; endpoint requires `> 0` and `<= 10485760`. | File size in bytes. |
 | `last_modified_ms` | integer | yes | No explicit range constraint. | File last-modified time as Unix milliseconds. |
+
+### FoodCorrectionMockRequest
+
+| Field | Type | Required | Constraints | Description |
+| --- | --- | --- | --- | --- |
+| `item_id` | string | yes | `min_length=1` | Item identifier from the original `FoodItem`. |
+| `original_name` | string | yes | `min_length=1` | Food name from the original `FoodItem`. |
+| `original_grams` | integer | yes | `>= 1` | Original estimated portion in grams. |
+| `corrected_grams` | integer | yes | `>= 1` and `<= 2000` | User-corrected portion in grams. |
+| `calorie_density_kcal_per_gram` | number | yes | `> 0` | Density returned by the original `FoodItem`. |
+| `confidence` | `"high"`, `"medium"`, or `"low"` | yes | Must be a valid `Confidence` value. | Original confidence used to choose the uncertainty margin. |
+| `original_calories` | `CalorieRange` | yes | Must match `CalorieRange` shape. | Original item calorie range, passed through unchanged. |
 
 ### FoodAnalysis
 
@@ -443,7 +577,7 @@ Emitted only if an unexpected exception occurs during mock analysis.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `code` | error code string | yes | One of `invalid_file_type`, `file_too_large`, `empty_file`, `analysis_failed`. |
+| `code` | error code string | yes | One of `invalid_file_type`, `file_too_large`, `empty_file`, `analysis_failed`, `correction_failed`. |
 | `message` | string | yes | Human-readable message suitable for display. |
 
 ## Safety Flags Reference
@@ -535,5 +669,5 @@ CORS is restricted to `http://127.0.0.1:3000` in the development configuration. 
 These endpoints are planned but not implemented. Their contracts are intentionally not defined here.
 
 - `POST /api/v0/food/analyze`: real AI-backed food analysis. Expected to use the `FoodAnalysis` response schema with `mode: "ai"`.
-- `POST /api/v0/food/corrections`: submit user corrections for an analysis.
+- `POST /api/v0/food/corrections`: persisted correction endpoint. Not yet implemented. Will store corrections in a database.
 - `POST /api/v0/exercise/analyze/mock`: mock squat form feedback.

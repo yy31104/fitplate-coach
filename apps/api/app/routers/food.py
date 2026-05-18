@@ -1,8 +1,18 @@
+from datetime import UTC, datetime
+from uuid import uuid4
+
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
+from app.mock.density import calorie_range_from_density
 from app.mock.food_analyzer import analyze_food_metadata
-from app.schemas.food import ErrorResponse, FoodAnalysis, FoodAnalyzeMockRequest
+from app.schemas.food import (
+    ErrorResponse,
+    FoodAnalysis,
+    FoodAnalyzeMockRequest,
+    FoodCorrectionMockRequest,
+    UserCorrection,
+)
 
 router = APIRouter(prefix="/api/v0/food", tags=["food"])
 
@@ -38,6 +48,42 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         error = ErrorResponse(
             code="analysis_failed",
             message="Analysis unavailable. Please try again.",
+        )
+        return JSONResponse(status_code=500, content=error.model_dump())
+
+
+@router.post(
+    "/corrections/mock",
+    response_model=UserCorrection,
+    responses={
+        422: {"description": "Invalid request body"},
+        500: {"model": ErrorResponse},
+    },
+)
+def correct_food_mock(payload: FoodCorrectionMockRequest) -> UserCorrection | JSONResponse:
+    try:
+        corrected_calories = calorie_range_from_density(
+            grams=payload.corrected_grams,
+            density=payload.calorie_density_kcal_per_gram,
+            confidence=payload.confidence,
+        )
+
+        return UserCorrection(
+            correction_id=str(uuid4()),
+            item_id=payload.item_id,
+            original_name=payload.original_name,
+            corrected_name=payload.original_name,
+            original_grams=payload.original_grams,
+            corrected_grams=payload.corrected_grams,
+            original_calories=payload.original_calories,
+            corrected_calories=corrected_calories,
+            correction_timestamp=datetime.now(UTC),
+            correction_source="user",
+        )
+    except Exception:
+        error = ErrorResponse(
+            code="correction_failed",
+            message="Correction unavailable. Please try again.",
         )
         return JSONResponse(status_code=500, content=error.model_dump())
 

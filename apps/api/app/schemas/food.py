@@ -25,9 +25,16 @@ ErrorCode = Literal[
     "file_too_large",
     "empty_file",
     "analysis_failed",
+    "correction_failed",
 ]
 
 KNOWN_SAFETY_FLAGS: set[str] = set(get_args(SafetyFlag))
+
+
+class CalorieRange(BaseModel):
+    min: int
+    max: int
+    point_estimate: int
 
 
 class FoodAnalyzeMockRequest(BaseModel):
@@ -37,15 +44,19 @@ class FoodAnalyzeMockRequest(BaseModel):
     last_modified_ms: int
 
 
+class FoodCorrectionMockRequest(BaseModel):
+    item_id: str = Field(min_length=1)
+    original_name: str = Field(min_length=1)
+    original_grams: int = Field(ge=1)
+    corrected_grams: int = Field(ge=1, le=2000)
+    calorie_density_kcal_per_gram: float = Field(gt=0)
+    confidence: Confidence
+    original_calories: CalorieRange
+
+
 class ErrorResponse(BaseModel):
     code: ErrorCode
     message: str
-
-
-class CalorieRange(BaseModel):
-    min: int
-    max: int
-    point_estimate: int
 
 
 class PortionEstimate(BaseModel):

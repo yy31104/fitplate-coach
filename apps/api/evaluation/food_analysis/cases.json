@@ -1,0 +1,81 @@
+{
+  "schema_version": "evaluation.v1",
+  "cases": [
+    {
+      "case_id": "standard-scenario",
+      "description": "Standard three-item meal (bucket 0-6)",
+      "input": {
+        "filename": "lunch-photo.jpg",
+        "content_type": "image/jpeg",
+        "size_bytes": 345678,
+        "last_modified_ms": 1710000000000
+      },
+      "expected_summary": {
+        "items_count": 3,
+        "item_names": ["Chicken breast", "Mixed salad", "Steamed rice"],
+        "safety_flags": [],
+        "total_calories": {
+          "min_at_least": 400,
+          "max_at_most": 700
+        }
+      }
+    },
+    {
+      "case_id": "low-confidence-scenario",
+      "description": "Low-confidence estimate (bucket 7)",
+      "input": {
+        "filename": "eval-bucket-7-17.jpg",
+        "content_type": "image/jpeg",
+        "size_bytes": 345678,
+        "last_modified_ms": 1710000000000
+      },
+      "expected_summary": {
+        "items_count": 2,
+        "item_names": ["Avocado", "Mixed entree"],
+        "safety_flags": ["low_confidence"],
+        "total_calories": {
+          "min_at_least": 250,
+          "max_at_most": 650
+        }
+      }
+    },
+    {
+      "case_id": "non-food-scenario",
+      "description": "Non-food image detection (bucket 8)",
+      "input": {
+        "filename": "eval-bucket-8-7.jpg",
+        "content_type": "image/jpeg",
+        "size_bytes": 345678,
+        "last_modified_ms": 1710000000000
+      },
+      "expected_summary": {
+        "items_count": 0,
+        "item_names": [],
+        "safety_flags": ["non_food_image"],
+        "total_calories": {
+          "min_at_least": 0,
+          "max_at_most": 0
+        }
+      }
+    },
+    {
+      "case_id": "complex-scenario",
+      "description": "Complex five-item meal (bucket 9)",
+      "input": {
+        "filename": "eval-bucket-9-30.jpg",
+        "content_type": "image/jpeg",
+        "size_bytes": 345678,
+        "last_modified_ms": 1710000000000
+      },
+      "expected_summary": {
+        "items_count": 5,
+        "item_names": ["Beans", "Fried egg", "Pasta", "Salmon", "Tortilla"],
+        "safety_flags": [],
+        "total_calories": {
+          "min_at_least": 600,
+          "max_at_most": 1200
+        }
+      }
+    }
+  ]
+}

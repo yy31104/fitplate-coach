@@ -285,6 +285,21 @@ Each AI request should record:
 
 Prompt changes should be evaluated against fixed examples before being promoted.
 
+## Prompt Registry
+
+The API contains an internal prompt registry for future AI adapters. Prompt
+artifacts live under `apps/api/prompts/`, and `app.ai.prompts.get_prompt`
+loads registered prompt records with name, version, target schema version,
+status, creation date, and prompt body.
+
+The initial `food_analysis` `v1` prompt targets `food_analysis.v1` but is not
+used by the live mock food route. It exists so real AI integration can start
+from a versioned prompt contract instead of an ad hoc string.
+
+Fixed food-analysis evaluation cases live under `apps/api/evaluation/` and run
+against the deterministic mock analyzer today. Future AI adapters should use
+the same case structure for prompt regression checks before promotion.
+
 ## Model Run Logs
 
 Current food mock routes write append-only model run logs to

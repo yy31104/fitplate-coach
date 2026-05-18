@@ -19,6 +19,7 @@ There is no real model call yet. That is intentional: the project is built aroun
 - **Mock mode is observable:** the endpoint is explicitly named `POST /api/v0/food/analyze/mock`, and every response includes `mode: "mock"`.
 - **Corrections are product data:** `UserCorrection` records original and corrected values, timestamps, item IDs, and source. In v0 it stays in React state; later it becomes evaluation data.
 - **Model runs are observable:** current mock food routes append summary-only `model_run.v1` records to local JSONL logs without storing raw media or full responses.
+- **Prompts and evals are versioned early:** a future food-analysis prompt registry and fixed mock evaluation cases are in place before any real AI provider call exists.
 - **Safety is typed:** safety flags are named schema values, not unstructured UI copy.
 - **CI checks the basics:** GitHub Actions runs web lint, web build, backend API tests, and Playwright E2E tests on every push.
 

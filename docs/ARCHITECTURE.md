@@ -311,10 +311,10 @@ to `mock`, which keeps existing local behavior unchanged. By default those
 settings are process-local via `get_settings()`.
 
 `MockFoodAnalyzer` delegates to the deterministic mock analyzer. `AIFoodAnalyzer`
-uses the prompt registry and an `AIProvider` boundary, but the only current
-provider implementation is fake and local. Setting `FITPLATE_AI_MODE=ai` returns
-a schema-validated fake `FoodAnalysis` with `mode: "ai"` so the integration
-contract can be exercised without calling a real provider.
+uses the prompt registry and an `AIProvider` boundary. Setting
+`FITPLATE_AI_MODE=ai` selects an AI provider through cached backend settings;
+`FITPLATE_AI_PROVIDER=fake` stays local, while `FITPLATE_AI_PROVIDER=openai`
+enables the real OpenAI provider when a server-side API key is configured.
 
 ### Provider Adapter
 
@@ -325,16 +325,31 @@ schema, and overriding backend-controlled fields (`analysis_id`,
 `schema_version`, `mode`, and `analyzed_at`). `AIProvider` implementations own
 only the provider call shape.
 
-`FakeAIProvider` is not real AI. It never reads API keys, never performs network
-calls, and never receives image bytes. Its `ImageRef` currently contains only
-`content_type` and `size_bytes`, which lets backend tests and evaluation cases
-exercise the future provider path while preserving the v0 privacy boundary.
+`ImageRef` carries `content_type`, `size_bytes`, and request-scoped image bytes
+for upload transport. Application code does not persist those bytes or write
+them to model-run logs. `FakeAIProvider` ignores the bytes and remains local.
 
-Real provider integration remains future work. It should use settings-backed
-credentials, the same prompt registry record, tool-calling or equivalent
-structured output guarantees, model run logging with prompt name and version,
-timeout handling, and cost controls before any public product behavior depends
-on it.
+### Real AI Provider
+
+OpenAI is the first real provider, behind explicit flags:
+`FITPLATE_AI_MODE=ai` and `FITPLATE_AI_PROVIDER=openai`. The API key is loaded
+server-side from `FITPLATE_AI_PROVIDER_API_KEY`; it is never sent to the
+frontend, returned in errors, or written to model-run logs.
+
+`OpenAIProvider` uses the Responses API with image input and Structured Outputs
+JSON Schema enforcement. It base64-encodes image bytes only inside the provider
+call, rejects HEIC/HEIF at the provider seam, and returns token/cost usage for
+model-run logging. The default model is `gpt-5.4-mini`; it can be overridden
+with `FITPLATE_AI_MODEL`.
+
+Before real provider calls, food analysis routes check the month-to-date AI
+cost from `apps/api/logs/model_runs.jsonl` against
+`FITPLATE_MONTHLY_COST_CAP_USD`. A cap of `0.0` disables enforcement. Provider
+requests use `FITPLATE_AI_REQUEST_TIMEOUT_SECONDS`; timeouts map to the existing
+`analysis_failed` public error.
+
+See [ADR 0003](adr/0003-real-ai-provider.md) for the provider decision and
+deferred production concerns.
 
 ## Model Run Logs
 

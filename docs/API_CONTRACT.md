@@ -78,6 +78,7 @@ Current `ErrorResponse.code` values are:
 - `empty_file`
 - `analysis_failed`
 - `correction_failed`
+- `cost_cap_exceeded`
 
 FastAPI request validation errors return HTTP `422 Unprocessable Entity` using FastAPI's standard validation response body. They are not wrapped in the project `ErrorResponse` envelope.
 
@@ -213,7 +214,7 @@ Default behavior uses mock mode. Example response shape for a non-food scenario:
 }
 ```
 
-When `FITPLATE_AI_MODE=ai`, this route currently uses `FakeAIProvider`, not a real AI provider. In that mode the response uses the same schema with `mode: "ai"`.
+When `FITPLATE_AI_MODE=ai`, this route uses the configured analyzer provider. `FITPLATE_AI_PROVIDER=fake` stays local and deterministic. `FITPLATE_AI_PROVIDER=openai` calls OpenAI from the backend only when an API key is configured and the monthly cost cap has not been reached.
 
 #### Error Responses
 
@@ -225,7 +226,8 @@ Validation order:
 4. The endpoint reads actual uploaded bytes in bounded chunks.
 5. Actual bytes read are checked against `10485760`.
 6. Empty upload body is checked.
-7. The analyzer adapter runs.
+7. Monthly AI cost cap is checked when `FITPLATE_AI_MODE=ai`.
+8. The analyzer adapter runs.
 
 `400 Bad Request` with `invalid_file_type`:
 
@@ -282,6 +284,17 @@ Emitted when actual bytes read exceed `10485760`. The endpoint does not trust th
 ```
 
 FastAPI emits this when the `image` field is missing or a different field name is used. This response is not wrapped in `ErrorResponse`.
+
+`503 Service Unavailable` with `cost_cap_exceeded`:
+
+```json
+{
+  "code": "cost_cap_exceeded",
+  "message": "Monthly AI cost cap reached. Please try again later."
+}
+```
+
+Emitted when `FITPLATE_AI_MODE=ai`, the configured monthly cost cap is greater than `0`, and month-to-date AI cost in model-run logs is already at or above the cap.
 
 `500 Internal Server Error` with `analysis_failed`:
 
@@ -450,7 +463,8 @@ Validation order:
 2. `content_type` is checked against the allowlist.
 3. `size_bytes == 0` is checked.
 4. `size_bytes > 10485760` is checked.
-5. Mock analysis runs.
+5. Monthly AI cost cap is checked when `FITPLATE_AI_MODE=ai`.
+6. The analyzer adapter runs.
 
 `400 Bad Request` with `invalid_file_type`:
 
@@ -511,6 +525,17 @@ Emitted when `size_bytes` is greater than `10485760`.
 
 FastAPI emits this for schema validation failures such as missing required fields, wrong field types, or `size_bytes < 0`. This response is not wrapped in `ErrorResponse`.
 
+`503 Service Unavailable` with `cost_cap_exceeded`:
+
+```json
+{
+  "code": "cost_cap_exceeded",
+  "message": "Monthly AI cost cap reached. Please try again later."
+}
+```
+
+Emitted when `FITPLATE_AI_MODE=ai`, the configured monthly cost cap is greater than `0`, and month-to-date AI cost in model-run logs is already at or above the cap.
+
 `500 Internal Server Error` with `analysis_failed`:
 
 ```json
@@ -524,7 +549,7 @@ Emitted only if an unexpected exception occurs during mock analysis.
 
 #### Notes
 
-- This endpoint is explicitly mock-only.
+- This endpoint remains the metadata-only analysis transport. Default behavior is mock mode; when `FITPLATE_AI_MODE=ai`, it uses the configured analyzer provider.
 - The request body contains file metadata only.
 - Image bytes are not transmitted to or stored by the backend.
 - The backend does not verify that the selected image contains food.
@@ -736,7 +761,7 @@ Emitted only if an unexpected exception occurs during correction computation.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `code` | error code string | yes | One of `invalid_file_type`, `file_too_large`, `empty_file`, `analysis_failed`, `correction_failed`. |
+| `code` | error code string | yes | One of `invalid_file_type`, `file_too_large`, `empty_file`, `analysis_failed`, `correction_failed`, `cost_cap_exceeded`. |
 | `message` | string | yes | Human-readable message suitable for display. |
 
 ## Safety Flags Reference

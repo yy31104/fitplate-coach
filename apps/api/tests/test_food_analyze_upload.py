@@ -1,5 +1,8 @@
 import json
+import base64
+from datetime import UTC, datetime
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -7,6 +10,7 @@ from starlette.formparsers import MultiPartParser
 
 import app.observability.log_writer as log_writer
 from app.ai.analyzer import AIFoodAnalyzer
+from app.ai.openai_provider import OpenAIProvider
 from app.ai.provider import FakeAIProvider, ImageRef, ProviderResult
 from app.config import get_settings
 from app.main import app
@@ -164,6 +168,88 @@ def test_upload_ai_mode_passes_bytes_to_provider_without_logging_them(
     assert sentinel.decode("utf-8") not in raw_line
 
 
+def test_upload_openai_provider_missing_key_returns_analysis_failed(monkeypatch) -> None:
+    monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    monkeypatch.setenv("FITPLATE_AI_PROVIDER", "openai")
+    monkeypatch.delenv("FITPLATE_AI_PROVIDER_API_KEY", raising=False)
+    get_settings.cache_clear()
+
+    response = client.post("/api/v0/food/analyze", files=_image_file())
+
+    assert response.status_code == 500
+    assert response.json()["code"] == "analysis_failed"
+
+
+def test_upload_cost_cap_exceeded_returns_503_and_does_not_select_provider(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    log_path = _use_log_path(tmp_path, monkeypatch)
+    log_path.write_text(
+        json.dumps(
+                {
+                    "mode": "ai",
+                    "started_at": datetime.now(UTC).isoformat(),
+                    "cost_usd": 1.0,
+                }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    monkeypatch.setenv("FITPLATE_MONTHLY_COST_CAP_USD", "1.0")
+    monkeypatch.setattr(
+        food_router,
+        "select_food_analyzer",
+        lambda: (_ for _ in ()).throw(AssertionError("provider should not be selected")),
+    )
+    get_settings.cache_clear()
+
+    response = client.post("/api/v0/food/analyze", files=_image_file())
+
+    assert response.status_code == 503
+    assert response.json()["code"] == "cost_cap_exceeded"
+    record = ModelRun.model_validate(
+        json.loads(log_path.read_text(encoding="utf-8").splitlines()[-1])
+    )
+    assert record.error_code == "cost_cap_exceeded"
+    assert record.model == "cost-cap"
+
+
+def test_upload_openai_provider_logs_usage_without_secrets_or_image_bytes(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    log_path = _use_log_path(tmp_path, monkeypatch)
+    api_key = "SECRET_OPENAI_KEY_SENTINEL"
+    image_bytes = b"UNIQUE_OPENAI_IMAGE_BYTES"
+    client = FakeOpenAIClient(_openai_response(input_tokens=1000, output_tokens=2000))
+    provider = OpenAIProvider(
+        api_key=api_key,
+        model="gpt-5.4-mini",
+        timeout_seconds=30,
+        client=client,
+    )
+    monkeypatch.setattr(
+        food_router,
+        "select_food_analyzer",
+        lambda: AIFoodAnalyzer(provider=provider),
+    )
+
+    response = client_post_upload(image_bytes)
+
+    assert response.status_code == 200
+    assert response.json()["mode"] == "ai"
+    raw_line = log_path.read_text(encoding="utf-8").strip()
+    record = ModelRun.model_validate(json.loads(raw_line))
+    assert record.input_tokens == 1000
+    assert record.output_tokens == 2000
+    assert record.cost_usd > 0
+    assert api_key not in raw_line
+    assert image_bytes.decode("utf-8") not in raw_line
+    assert base64.b64encode(image_bytes).decode("ascii") not in raw_line
+
+
 def test_upload_long_filename_is_truncated_in_model_run(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
     filename = f"{'a' * 300}.jpg"
@@ -218,6 +304,62 @@ class RecordingProvider(FakeAIProvider):
     def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
         self.seen_data = image_ref.data
         return super().call(prompt, image_ref)
+
+
+class FakeResponses:
+    def __init__(self, response) -> None:
+        self._response = response
+
+    def create(self, **kwargs):
+        return self._response
+
+
+class FakeOpenAIClient:
+    def __init__(self, response) -> None:
+        self.responses = FakeResponses(response)
+
+
+def client_post_upload(content: bytes):
+    return client.post(
+        "/api/v0/food/analyze",
+        files=_image_file(content=content),
+    )
+
+
+def _openai_response(input_tokens: int, output_tokens: int):
+    return SimpleNamespace(
+        output_text=json.dumps(
+            {
+                "items_count": 1,
+                "items": [
+                    {
+                        "item_id": "openai-item-1",
+                        "name": "Chicken breast",
+                        "portion": {
+                            "description": "~150g",
+                            "grams_estimate": 150,
+                            "assumptions": ["Estimated from image."],
+                        },
+                        "calories": {
+                            "min": 198,
+                            "max": 298,
+                            "point_estimate": 248,
+                        },
+                        "calorie_density_kcal_per_gram": 1.65,
+                        "confidence": "medium",
+                    }
+                ],
+                "total_calories": {
+                    "min": 198,
+                    "max": 298,
+                    "point_estimate": 248,
+                },
+                "uncertainty_notes": ["Estimated with uncertainty."],
+                "safety_flags": [],
+            }
+        ),
+        usage={"input_tokens": input_tokens, "output_tokens": output_tokens},
+    )
 
 
 def _use_log_path(tmp_path: Path, monkeypatch) -> Path:

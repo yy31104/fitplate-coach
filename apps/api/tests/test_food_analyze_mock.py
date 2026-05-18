@@ -1,8 +1,15 @@
+import json
+from datetime import UTC, datetime
+
 from fastapi.testclient import TestClient
 
+import app.observability.log_writer as log_writer
+from app.config import get_settings
 from app.main import app
 from app.mock.density import CONFIDENCE_MARGIN
 from app.mock.food_analyzer import scenario_bucket
+from app.observability.model_run import ModelRun
+from app.routers import food as food_router
 from app.schemas.food import KNOWN_SAFETY_FLAGS
 
 client = TestClient(app)
@@ -137,6 +144,43 @@ def test_analyze_non_food_scenario_returns_empty_items() -> None:
     assert body["items"] == []
     assert body["items_count"] == 0
     assert "non_food_image" in body["safety_flags"]
+
+
+def test_analyze_mock_cost_cap_exceeded_returns_503_and_logs(tmp_path, monkeypatch) -> None:
+    log_path = tmp_path / "model_runs.jsonl"
+    log_path.write_text(
+        json.dumps(
+                {
+                    "mode": "ai",
+                    "started_at": datetime.now(UTC).isoformat(),
+                    "cost_usd": 1.0,
+                }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(log_writer, "LOG_PATH", log_path)
+    monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    monkeypatch.setenv("FITPLATE_MONTHLY_COST_CAP_USD", "1.0")
+    monkeypatch.setattr(
+        food_router,
+        "select_food_analyzer",
+        lambda: (_ for _ in ()).throw(AssertionError("provider should not be selected")),
+    )
+    get_settings.cache_clear()
+
+    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+
+    assert response.status_code == 503
+    assert response.json()["code"] == "cost_cap_exceeded"
+    record = ModelRun.model_validate(
+        json.loads(log_path.read_text(encoding="utf-8").splitlines()[-1])
+    )
+    assert record.error_code == "cost_cap_exceeded"
+    assert record.mode == "ai"
+    assert record.model == "cost-cap"
+
+    get_settings.cache_clear()
 
 
 def _payload(

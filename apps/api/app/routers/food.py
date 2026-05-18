@@ -4,8 +4,11 @@ from uuid import uuid4
 from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 
+import app.observability.log_writer as log_writer
+from app.ai.cost import check_monthly_cost_cap
 from app.ai.analyzer import AIAnalysisError, select_food_analyzer
 from app.ai.provider import ImageRef
+from app.config import get_settings
 from app.mock.density import calorie_range_from_density
 from app.observability.log_writer import write_model_run
 from app.observability.model_run import build_model_run, now_utc
@@ -42,6 +45,7 @@ CORRECTION_MOCK_ROUTE = "POST /api/v0/food/corrections/mock"
         400: {"model": ErrorResponse},
         413: {"model": ErrorResponse},
         422: {"description": "Invalid request body"},
+        503: {"model": ErrorResponse},
         500: {"model": ErrorResponse},
     },
 )
@@ -64,6 +68,27 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
             )
         )
         return JSONResponse(status_code=status_code, content=error.model_dump())
+
+    cost_cap_error = check_monthly_cost_cap(
+        get_settings(),
+        now_utc(),
+        log_writer.LOG_PATH,
+    )
+    if cost_cap_error is not None:
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_MOCK_ROUTE,
+                mode="ai",
+                model="cost-cap",
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary={},
+                error_code=cost_cap_error.code,
+                error_message=cost_cap_error.message,
+            )
+        )
+        return JSONResponse(status_code=503, content=cost_cap_error.model_dump())
 
     analyzer_mode = "mock"
     analyzer_model = "mock"
@@ -148,6 +173,7 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         400: {"model": ErrorResponse},
         413: {"model": ErrorResponse},
         422: {"description": "Invalid request body"},
+        503: {"model": ErrorResponse},
         500: {"model": ErrorResponse},
     },
 )
@@ -222,6 +248,28 @@ async def analyze_food_upload(
             )
         )
         return JSONResponse(status_code=400, content=error.model_dump())
+
+    cost_cap_error = check_monthly_cost_cap(
+        get_settings(),
+        now_utc(),
+        log_writer.LOG_PATH,
+    )
+    if cost_cap_error is not None:
+        uploaded_bytes.clear()
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_UPLOAD_ROUTE,
+                mode="ai",
+                model="cost-cap",
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary={},
+                error_code=cost_cap_error.code,
+                error_message=cost_cap_error.message,
+            )
+        )
+        return JSONResponse(status_code=503, content=cost_cap_error.model_dump())
 
     payload = FoodAnalyzeMockRequest(
         filename=image.filename or "",

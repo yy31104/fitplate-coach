@@ -54,6 +54,30 @@ def test_select_food_analyzer_returns_ai_analyzer_for_ai_mode(monkeypatch) -> No
     assert analyzer.model == "fake-food-vision-v1"
 
 
+def test_select_food_analyzer_returns_openai_provider_for_openai_mode(monkeypatch) -> None:
+    monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    monkeypatch.setenv("FITPLATE_AI_PROVIDER", "openai")
+    monkeypatch.setenv("FITPLATE_AI_PROVIDER_API_KEY", "test-key")
+    monkeypatch.setenv("FITPLATE_AI_MODEL", "gpt-test-model")
+    _clear_settings_cache()
+
+    analyzer = select_food_analyzer()
+
+    assert isinstance(analyzer, AIFoodAnalyzer)
+    assert analyzer.model == "gpt-test-model"
+    assert analyzer.provider.name == "openai"
+
+
+def test_select_food_analyzer_raises_for_openai_missing_key(monkeypatch) -> None:
+    monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    monkeypatch.setenv("FITPLATE_AI_PROVIDER", "openai")
+    monkeypatch.delenv("FITPLATE_AI_PROVIDER_API_KEY", raising=False)
+    _clear_settings_cache()
+
+    with pytest.raises(ValueError, match="FITPLATE_AI_PROVIDER_API_KEY"):
+        select_food_analyzer()
+
+
 def test_select_food_analyzer_raises_for_unknown_mode(monkeypatch) -> None:
     monkeypatch.setenv("FITPLATE_AI_MODE", "live-gpt")
     _clear_settings_cache()

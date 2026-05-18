@@ -47,6 +47,18 @@ class ProviderResult:
     provider_latency_ms: int | None = None
 
 
+class AIAnalysisError(Exception):
+    def __init__(
+        self,
+        message: str,
+        safety_flags: list[SafetyFlag] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.safety_flags = (
+            safety_flags if safety_flags is not None else ["schema_validation_failed"]
+        )
+
+
 @runtime_checkable
 class AIProvider(Protocol):
     name: str

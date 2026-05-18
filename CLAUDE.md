@@ -28,12 +28,15 @@ Allowed now:
 - `apps/web`: `/food/new` route for one-image metadata selection, local validation, mock result display, and inline error/loading states.
 - `apps/api`: `POST /api/v0/food/analyze/mock` accepting JSON file metadata only.
 - Backend tests for the mock food analysis endpoint.
+- Real OpenAI calls only when explicitly requested and all required flags are set:
+  `FITPLATE_AI_MODE=ai`, `FITPLATE_AI_PROVIDER=openai`, a server-side
+  `FITPLATE_AI_PROVIDER_API_KEY`, and a local testing cost cap.
 
 Do not create:
 
 - Database schema.
 - Auth flows.
-- Real AI calls.
+- Unapproved real AI calls.
 - Real image upload bytes or `multipart/form-data`.
 - File storage.
 - Video processing pipeline.
@@ -42,6 +45,11 @@ Do not create:
 - Extra UI libraries, shadcn, Supabase, or environment secrets.
 - Frontend test framework.
 - Correction UI or recompute endpoint.
+
+Real AI remains forbidden unless the user explicitly approves that work for the
+current task. Even when real AI is approved, do not add auth, a database, file
+storage, video processing, async pipelines, or frontend real-AI UX redesign
+unless those are separately requested.
 
 ## Transition to Implementation
 

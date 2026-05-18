@@ -143,6 +143,10 @@ Food mock analysis:
 http://127.0.0.1:3000/food/new
 ```
 
+Real AI is opt-in and requires explicit local environment configuration. See
+[Real AI Local Runbook](docs/runbooks/real-ai-local.md) before using the OpenAI
+path locally.
+
 ## Tests And CI
 
 Run all checks:
@@ -205,4 +209,5 @@ Safety flags are typed schema values. A backend can emit a safety flag and the f
 - [API Contract](docs/API_CONTRACT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [AI Safety](docs/AI_SAFETY.md)
+- [Real AI Local Runbook](docs/runbooks/real-ai-local.md)
 - [Implementation Plan](docs/IMPLEMENTATION_PLAN.md)

@@ -22,7 +22,7 @@ The repository currently contains the first minimal monorepo scaffold:
 - `apps/web`: static Next.js, TypeScript, Tailwind home page.
 - `apps/api`: FastAPI app exposing `GET /api/v0/health`.
 - `apps/web`: `/food/new` metadata-only mock food analysis route.
-- `apps/api`: `POST /api/v0/food/analyze/mock`.
+- `apps/api`: `POST /api/v0/food/analyze/mock` and multipart `POST /api/v0/food/analyze`.
 
 There is no AI integration, database, authentication, real file upload, file storage, video processing, Docker setup, or environment secret requirement.
 
@@ -93,7 +93,7 @@ Future FastAPI responsibilities:
 
 ## API Versioning
 
-All first backend endpoints should live under `/api/v0/`. The initial scaffold endpoint is `GET /api/v0/health`. The metadata-only mock food endpoint is `POST /api/v0/food/analyze/mock`. Future production food analysis and correction endpoints should use the same version prefix.
+All first backend endpoints should live under `/api/v0/`. The initial scaffold endpoint is `GET /api/v0/health`. Food analysis currently exposes both the metadata-only mock endpoint `POST /api/v0/food/analyze/mock` and the multipart upload transport `POST /api/v0/food/analyze`. Future production food analysis and correction endpoints should use the same version prefix.
 
 Do not expose unversioned endpoints. If request or response schemas change incompatibly later, introduce a new API version instead of silently changing `/api/v0/` behavior.
 
@@ -109,11 +109,13 @@ The mock food milestone sends JSON file metadata only to `POST /api/v0/food/anal
 
 The backend returns structured mock `FoodAnalysis` JSON and validates metadata with the same type and size boundaries. The endpoint must not use `UploadFile`, `multipart/form-data`, storage, AI calls, authentication, or database writes.
 
-## Future Image Uploads
+## Image Upload Route
 
-A later backend implementation may use a direct `multipart/form-data` POST to `/api/v0/food/analyze` with one image file and optional client metadata. This should remain separate from the mock metadata endpoint.
+`POST /api/v0/food/analyze` accepts a direct `multipart/form-data` request with one file field named `image`. This route is the upload transport for food analysis, while `/api/v0/food/analyze/mock` remains the metadata-only deterministic test endpoint and is not deprecated.
 
-Backend validation should enforce file type and size limits before mock or AI analysis. Future production versions may move to signed object-storage uploads when media retention, user accounts, and larger files are intentionally introduced.
+The upload route uses a multipart spool threshold above the 10 MB app-level cap, so accepted uploads within that cap stay in memory at the framework parser layer. Application code then reads bytes synchronously with a hard size cap, validates the declared content type and actual byte count, and discards the byte buffer at request scope end. It never persists image bytes and never writes them to disk, model-run logs, responses, or errors. Filenames are not used as filesystem paths and are truncated before logging.
+
+In this PR, the analyzer still receives a metadata-shaped `FoodAnalyzeMockRequest` built from the upload: filename, content type, actual byte count, and `last_modified_ms=0`. `ImageRef` is not extended with bytes yet, and no real provider receives image content. Future production versions may move to signed object-storage uploads when media retention, user accounts, and larger files are intentionally introduced.
 
 ## Food Analysis Contract
 
@@ -336,7 +338,7 @@ on it.
 
 ## Model Run Logs
 
-Current food mock routes write append-only model run logs to
+Current food analysis and correction routes write append-only model run logs to
 `apps/api/logs/model_runs.jsonl`. Each line is one `model_run.v1` JSON object
 with route, mode, model, timing, summarized inputs, summarized outputs, safety
 flags, token placeholders, cost placeholders, and error details when a route
@@ -349,8 +351,8 @@ zero cost.
 
 Privacy boundary: model run logs store summaries only. They must not store raw
 media, raw full request bodies, raw full responses, secrets, or provider keys.
-For future upload flows, logs should store media references rather than media
-content.
+For multipart food uploads, logs include filename, content type, transport, and
+actual byte count only.
 
 ## Cost Tracking
 

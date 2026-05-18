@@ -3,6 +3,7 @@ from typing import Literal
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from starlette.formparsers import MultiPartParser
 
 from app.routers.food import router as food_router
 
@@ -12,6 +13,10 @@ class HealthResponse(BaseModel):
     service: str
     version: str
 
+
+# Keep Starlette's multipart spool threshold above the 10 MB app upload cap so
+# accepted image uploads remain in memory at the framework parser layer.
+MultiPartParser.spool_max_size = 11 * 1024 * 1024
 
 app = FastAPI(title="FitPlate Coach API", version="0.1.0")
 

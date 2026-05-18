@@ -30,6 +30,8 @@ out/
 dist/
 build/
 coverage/
+playwright-report/
+test-results/
 
 # Python / FastAPI future artifacts
 __pycache__/

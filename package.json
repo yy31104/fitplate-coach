@@ -8,7 +8,8 @@
     "build:web": "npm run build --workspace apps/web",
     "lint:web": "npm run lint --workspace apps/web",
     "dev:api": "cd apps/api && ./.venv/bin/uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
-    "test:api": "cd apps/api && ./.venv/bin/pytest"
+    "test:api": "cd apps/api && ./.venv/bin/pytest",
+    "test:e2e": "npm run test:e2e --workspace apps/web"
   },
   "repository": {
     "type": "git",

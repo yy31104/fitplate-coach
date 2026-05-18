@@ -48,6 +48,28 @@ export async function analyzeFoodMock(
   return body;
 }
 
+export async function submitFoodAnalyzeUpload(file: File): Promise<FoodAnalysis> {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${apiBaseUrl}/api/v0/food/analyze`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const body: unknown = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw toApiError(body);
+  }
+
+  if (!isFoodAnalysis(body)) {
+    throw new FoodAnalysisApiError("Analysis unavailable. Please try again.", "invalid_response");
+  }
+
+  return body;
+}
+
 export async function submitFoodCorrectionMock(
   request: FoodCorrectionMockRequest,
 ): Promise<UserCorrection> {

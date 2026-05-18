@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   analyzeFoodMock,
   FoodAnalysisApiError,
+  submitFoodAnalyzeUpload,
   submitFoodCorrectionMock,
 } from "../../../lib/food-analysis-api";
 import { buildCorrectedTotal } from "../../../lib/food-analysis-correction";
@@ -34,6 +35,7 @@ export default function NewFoodAnalysisPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [previewFailed, setPreviewFailed] = useState(false);
   const [inputKey, setInputKey] = useState(0);
+  const [useUploadTransport, setUseUploadTransport] = useState(false);
   const [corrections, setCorrections] = useState<Record<string, UserCorrection>>({});
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [correctionLoading, setCorrectionLoading] = useState<string | null>(null);
@@ -101,7 +103,9 @@ export default function NewFoodAnalysisPage() {
 
     try {
       const [result] = await Promise.all([
-        analyzeFoodMock(foodPhotoMetadata(file)),
+        useUploadTransport
+          ? submitFoodAnalyzeUpload(file)
+          : analyzeFoodMock(foodPhotoMetadata(file)),
         delay(450),
       ]);
       setAnalysis(result);
@@ -124,6 +128,7 @@ export default function NewFoodAnalysisPage() {
     setCorrectionError(null);
     correctionRequestId.current += 1;
     setInputKey((current) => current + 1);
+    setUseUploadTransport(false);
   }
 
   function handleStartEdit(itemId: string) {
@@ -197,6 +202,17 @@ export default function NewFoodAnalysisPage() {
     setCorrectionError((current) => (current?.itemId === itemId ? null : current));
   }
 
+  function handleUploadTransportChange(event: ChangeEvent<HTMLInputElement>) {
+    setUseUploadTransport(event.target.checked);
+    setAnalysis(null);
+    setError(null);
+    setCorrections({});
+    setEditingItemId(null);
+    setCorrectionLoading(null);
+    setCorrectionError(null);
+    correctionRequestId.current += 1;
+  }
+
   return (
     <main className="min-h-screen bg-[#f7f4ef] px-5 py-6 text-stone-950 sm:px-8 lg:px-12">
       <section className="mx-auto max-w-5xl space-y-8">
@@ -212,7 +228,8 @@ export default function NewFoodAnalysisPage() {
               Select a food photo to estimate calories.
             </h1>
             <p className="text-base leading-7 text-stone-700">
-              This milestone sends file metadata only. Image bytes are not uploaded or stored.
+              Metadata-only remains the default. Upload transport can send image bytes
+              to the backend when enabled.
             </p>
           </div>
         </header>
@@ -259,6 +276,22 @@ export default function NewFoodAnalysisPage() {
                   <p className="font-medium text-stone-950">{file.name}</p>
                   <p>{formatFileSize(file.size)}</p>
                   <p>{file.type || "Image type unavailable"}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="flex items-center gap-2 text-sm text-stone-700">
+                    <input
+                      checked={useUploadTransport}
+                      className="size-4 accent-emerald-800"
+                      disabled={isLoading}
+                      type="checkbox"
+                      onChange={handleUploadTransportChange}
+                    />
+                    Send image bytes to backend (upload transport)
+                  </label>
+                  <p className="text-xs leading-5 text-stone-500">
+                    Metadata-only remains default. Upload sends the actual file to the
+                    backend. No real AI provider is active.
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <button

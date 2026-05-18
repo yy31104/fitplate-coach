@@ -61,6 +61,8 @@ const JPEG_FILE = {
   buffer: Buffer.from([0xff, 0xd8, 0xff, 0xd9]),
 };
 
+const UPLOAD_SENTINEL = "fitplate-upload-sentinel";
+
 test("page renders the file selection UI", async ({ page }) => {
   await page.goto("/food/new");
 
@@ -129,6 +131,37 @@ test("applying a correction updates the display with a corrected badge and user-
   await expect(page.getByText("Original: 150g")).toBeVisible();
 });
 
+test("upload transport sends multipart file bytes and displays analysis", async ({ page }) => {
+  const uploadRequest: UploadRequestCapture = { hit: false };
+  await mockFoodEndpoints(page);
+  await mockUploadEndpoint(page, uploadRequest);
+  await page.goto("/food/new");
+
+  await page.locator("#food-photo").setInputFiles({
+    name: "meal.jpg",
+    mimeType: "image/jpeg",
+    buffer: Buffer.from(`fake-jpeg-${UPLOAD_SENTINEL}`),
+  });
+  await page
+    .getByRole("checkbox", { name: "Send image bytes to backend (upload transport)" })
+    .check();
+  await page.getByRole("button", { name: "Analyze" }).click();
+
+  await expect(page.getByRole("heading", { name: "Food photo estimate" })).toBeVisible();
+  expect(uploadRequest.hit).toBe(true);
+  expect(uploadRequest.method).toBe("POST");
+  expect(uploadRequest.contentType).toContain("multipart/form-data");
+  expect(uploadRequest.body?.toString("utf8")).toContain(UPLOAD_SENTINEL);
+  await expect(page.getByText("Chicken breast")).toBeVisible();
+});
+
+type UploadRequestCapture = {
+  hit: boolean;
+  method?: string;
+  contentType?: string;
+  body?: Buffer;
+};
+
 async function mockFoodEndpoints(page: Page) {
   await page.route("**/api/v0/food/analyze/mock", async (route) => {
     await route.fulfill({
@@ -143,6 +176,22 @@ async function mockFoodEndpoints(page: Page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(MOCK_CORRECTION),
+    });
+  });
+}
+
+async function mockUploadEndpoint(page: Page, capture: UploadRequestCapture) {
+  await page.route("**/api/v0/food/analyze", async (route) => {
+    const request = route.request();
+    capture.hit = true;
+    capture.method = request.method();
+    capture.contentType = request.headers()["content-type"];
+    capture.body = request.postDataBuffer() ?? undefined;
+
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(MOCK_ANALYSIS),
     });
   });
 }

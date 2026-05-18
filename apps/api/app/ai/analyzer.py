@@ -6,10 +6,11 @@ from uuid import uuid4
 from pydantic import ValidationError
 
 from app.ai.prompts import PromptRecord, get_prompt
-from app.ai.provider import AIProvider, FakeAIProvider, ImageRef
+from app.ai.openai_provider import OpenAIProvider
+from app.ai.provider import AIAnalysisError, AIProvider, FakeAIProvider, ImageRef
 from app.config import get_settings
 from app.mock.food_analyzer import analyze_food_metadata
-from app.schemas.food import FoodAnalysis, FoodAnalyzeMockRequest, SafetyFlag
+from app.schemas.food import FoodAnalysis, FoodAnalyzeMockRequest
 
 
 @dataclass(frozen=True)
@@ -52,18 +53,6 @@ class MockFoodAnalyzer:
         return AnalyzerResult(
             analysis=analyze_food_metadata(payload),
             usage=ProviderUsage(input_tokens=0, output_tokens=0, cost_usd=0.0),
-        )
-
-
-class AIAnalysisError(Exception):
-    def __init__(
-        self,
-        message: str,
-        safety_flags: list[SafetyFlag] | None = None,
-    ) -> None:
-        super().__init__(message)
-        self.safety_flags = (
-            safety_flags if safety_flags is not None else ["schema_validation_failed"]
         )
 
 
@@ -136,10 +125,22 @@ def select_food_analyzer() -> FoodAnalyzer:
         return MockFoodAnalyzer()
 
     if mode == "ai":
-        if settings.ai_provider != "fake":
-            raise ValueError(
-                f"Unknown FITPLATE_AI_PROVIDER {settings.ai_provider!r}. Expected 'fake'."
+        if settings.ai_provider == "fake":
+            return AIFoodAnalyzer(provider=FakeAIProvider())
+        if settings.ai_provider == "openai":
+            if not settings.ai_provider_api_key:
+                raise ValueError(
+                    "FITPLATE_AI_PROVIDER_API_KEY is required for OpenAI provider."
+                )
+            return AIFoodAnalyzer(
+                provider=OpenAIProvider(
+                    api_key=settings.ai_provider_api_key,
+                    model=settings.ai_model,
+                    timeout_seconds=settings.ai_request_timeout_seconds,
+                )
             )
-        return AIFoodAnalyzer(provider=FakeAIProvider())
+        raise ValueError(
+            f"Unknown FITPLATE_AI_PROVIDER {settings.ai_provider!r}. Expected 'fake' or 'openai'."
+        )
 
     raise ValueError(f"Unknown FITPLATE_AI_MODE {mode!r}. Expected 'mock' or 'ai'.")

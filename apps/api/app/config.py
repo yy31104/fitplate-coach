@@ -8,6 +8,7 @@ class Settings(BaseSettings):
 
     ai_mode: str = "mock"
     ai_provider: str = "fake"
+    ai_model: str = "gpt-5.4-mini"
     ai_provider_api_key: str | None = None
     monthly_cost_cap_usd: float = 0.0
     ai_request_timeout_seconds: int = 30

@@ -26,6 +26,7 @@ ErrorCode = Literal[
     "empty_file",
     "analysis_failed",
     "correction_failed",
+    "cost_cap_exceeded",
 ]
 
 KNOWN_SAFETY_FLAGS: set[str] = set(get_args(SafetyFlag))

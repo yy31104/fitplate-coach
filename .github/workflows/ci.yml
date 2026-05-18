@@ -48,3 +48,9 @@ jobs:
 
       - name: Test API
         run: npm run test:api
+
+      - name: Install Playwright browsers
+        run: npm exec --workspace apps/web playwright install --with-deps chromium
+
+      - name: Test E2E
+        run: npm run test:e2e

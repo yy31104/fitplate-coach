@@ -1,87 +1,102 @@
+[![CI](https://github.com/yy31104/fitplate-coach/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/yy31104/fitplate-coach/actions/workflows/ci.yml)
+
 # FitPlate Coach
 
-FitPlate Coach is a mobile-first web app concept for helping users reflect on nutrition and exercise technique with AI-assisted estimates, clear uncertainty, and user correction.
+FitPlate Coach is a mobile-first food photo calorie estimation app that treats AI-style output as uncertain, structured, and user-correctable instead of pretending a model can return exact nutrition facts.
 
-The project has two product tracks:
+## Project Overview
 
-1. Food photo calorie estimation with visible assumptions, confidence, and correction.
-2. Exercise form feedback from short videos, starting with squat feedback.
+The current app lets a user select one food image in the browser. The frontend validates the file locally, sends metadata only to the backend, and never uploads or stores image bytes. The backend returns a deterministic mock `FoodAnalysis` JSON response with food items, portion assumptions, calorie ranges, confidence levels, and safety flags.
 
-The current repository is moving from documentation into the first minimal scaffold milestone.
+After the mock result appears, the user can correct an item's portion in grams. The frontend recomputes that item's calorie range and the total calorie range locally using the density and confidence values returned in the original structured response.
 
-## Current Status
+There is no real model call yet. That is intentional: the project is built around the production contract first, so a future AI integration can sit behind the same schema and safety boundaries instead of forcing a UI rewrite.
 
-MVP v0 is still intentionally small.
+## Engineering Discipline Over Demo Shortcuts
 
-Implemented now:
+- **Schema-first AI contract:** `FoodAnalysis` is a versioned JSON-shaped contract with `schema_version: "food_analysis.v1"`, `mode`, `confidence`, `uncertainty_notes`, `safety_flags`, and `user_corrections`.
+- **Uncertainty is explicit:** calorie estimates are ranges with `min`, `max`, and `point_estimate`. Confidence maps to deterministic range widths instead of vague prose.
+- **Mock mode is observable:** the endpoint is explicitly named `POST /api/v0/food/analyze/mock`, and every response includes `mode: "mock"`.
+- **Corrections are product data:** `UserCorrection` records original and corrected values, timestamps, item IDs, and source. In v0 it stays in React state; later it becomes evaluation data.
+- **Safety is typed:** safety flags are named schema values, not unstructured UI copy.
+- **CI checks the basics:** GitHub Actions runs web lint, web build, and backend API tests on every push.
 
-- Repository governance files.
-- Product requirements.
-- Architecture notes.
-- AI safety boundaries.
-- Implementation plan.
+## Current Features
 
-Current scaffold scope:
+- `/food/new` mobile-first food photo selection flow.
+- Local validation for image type, size, and empty files.
+- Metadata-only request containing filename, content type, size in bytes, and last modified time.
+- `POST /api/v0/food/analyze/mock` returning structured mock `FoodAnalysis` JSON.
+- Food item display with portion estimates, calorie ranges, confidence, assumptions, and safety flags.
+- Grams-only correction flow with original estimate preserved beside the corrected estimate.
+- Frontend recomputation using the same calorie density and confidence margin model as the backend mock logic.
+- GitHub Actions CI for `npm run lint:web`, `npm run build:web`, and `npm run test:api`.
 
-- Minimal monorepo.
-- `apps/web` with Next.js, TypeScript, Tailwind, and a static home page only.
-- `apps/api` with FastAPI and `GET /api/v0/health` only.
-- `/food/new` for metadata-only mock food photo analysis.
-- `POST /api/v0/food/analyze/mock` for structured mock `FoodAnalysis` JSON.
+## Architecture
 
-Not implemented:
+FitPlate Coach is a small monorepo:
 
-- Real AI provider integration.
-- Authentication.
-- Database.
-- Real image upload bytes or file storage.
-- Video processing.
-- Native mobile app.
+- `apps/web`: Next.js frontend using TypeScript and Tailwind.
+- `apps/api`: FastAPI backend using Pydantic models.
 
-## MVP v0 Scope
+The browser sends JSON metadata to the API; it does not send multipart image data in v0. API routes are versioned under `/api/v0/`, and `FoodAnalysis` is the integration contract between the frontend and backend.
 
-The first implementation milestone will focus on a food photo mock-analysis flow:
+Correction recomputation is currently client-side. It uses `calorie_density_kcal_per_gram` from the backend response and mirrored confidence margins for high, medium, and low confidence. CORS is restricted to `http://127.0.0.1:3000` in local development.
 
-- Mobile-first upload or image selection experience.
-- Mock food analysis response.
-- Structured JSON-shaped analysis contract.
-- Calorie estimate ranges rather than exact claims.
-- User correction path for food items and portions.
-- Clear safety and uncertainty language.
+For the full system design, see [Architecture](docs/ARCHITECTURE.md).
 
-Squat video feedback is documented for future design but intentionally out of v0 implementation scope.
+## Safety And Privacy Boundaries
 
-## Current And Planned Stack
+FitPlate Coach is not a medical device and does not provide medical, dietary, clinical, or treatment advice.
 
-Current scaffold:
+The system is designed not to:
 
-- Frontend: Next.js with TypeScript.
-- Backend: FastAPI.
+- Claim exact calorie counts.
+- Diagnose eating disorders, injuries, or medical conditions.
+- Provide treatment plans.
+- Encourage extreme dieting, dehydration, purging, or overtraining.
+- Process images classified as sensitive or NSFW.
 
-Planned later:
+Privacy in v0 is deliberately narrow: image bytes are never sent to the backend or stored. There are no user accounts, no database persistence, no session storage, and no analytics.
 
-- AI contracts: structured JSON schemas.
-- Future storage: database for analyses, corrections, prompts, model runs, and evaluations.
-- Future media handling: object storage for uploaded media.
-- Future async work: job queue for video processing.
+The future exercise feedback track follows the same safety policy: non-clinical technique cues only, with escalation language for pain or injury concerns.
+
+## What The AI Layer Will And Will Not Do
+
+Current mode is mock. The backend returns deterministic structured data derived from request metadata; no AI provider is called.
+
+The next AI-related work is AI-readiness, not simply "turn on a model." Before a real multimodal endpoint exists, the project needs prompt versioning, model run logging, an evaluation set, and cost tracking.
+
+A later real endpoint can return `mode: "ai"` using the same `FoodAnalysis` schema. Estimates should still be ranges, not exact numbers, and user corrections should continue to use the same `UserCorrection` contract.
+
+## Tech Stack
+
+- **Frontend:** Next.js 16, TypeScript, Tailwind CSS. App Router, mobile-first UI, no component library dependency.
+- **Backend:** FastAPI, Python 3.12, Pydantic. Pydantic models define request and response contracts.
+- **Monorepo:** npm workspaces at the root, with a Python virtual environment in `apps/api/.venv`.
+- **CI:** GitHub Actions with Node 22 and Python 3.12.
+
+No database, authentication, AI provider, upload storage, Docker, or video processing exists in v0. Those are deferred until the schema contract and correction loop are stable.
 
 ## Local Development
+
+Prerequisites:
+
+- Node 22 or newer.
+- Python 3.12.
 
 Install frontend dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
-Create the backend virtual environment and install the API with dev dependencies:
+Create the backend virtual environment and install API dependencies:
 
 ```bash
-python3.12 -m venv apps/api/.venv
-apps/api/.venv/bin/python -m pip install --upgrade pip
+python -m venv apps/api/.venv
 apps/api/.venv/bin/python -m pip install -e "apps/api[dev]"
 ```
-
-Python dependencies are pinned in `apps/api/uv.lock` for reproducible resolution.
 
 Run the frontend:
 
@@ -101,7 +116,13 @@ Run the backend:
 npm run dev:api
 ```
 
-Backend health check:
+Backend URL:
+
+```text
+http://127.0.0.1:8000
+```
+
+Health check:
 
 ```bash
 curl http://127.0.0.1:8000/api/v0/health
@@ -119,9 +140,9 @@ Food mock analysis:
 http://127.0.0.1:3000/food/new
 ```
 
-The browser sends file metadata only to `POST /api/v0/food/analyze/mock`; image bytes are not uploaded or stored.
+## Tests And CI
 
-Run checks:
+Run all checks:
 
 ```bash
 npm run lint:web
@@ -129,27 +150,50 @@ npm run build:web
 npm run test:api
 ```
 
-## Product Principles
+CI runs the same three commands on every push and on pull requests to `main`. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
-- Production-style portfolio quality over demo-only shortcuts.
-- Mobile-first workflows.
-- Structured AI outputs instead of fragile free-form parsing.
-- Uncertainty shown directly in the user experience.
-- User corrections treated as product value and future evaluation data.
-- Safety boundaries for nutrition and exercise advice.
-- Privacy-aware handling of photos, videos, and health-adjacent data.
+The backend currently has 16 pytest tests covering the health endpoint and mock food analysis behavior: schema fields, mode, scenario routing, calorie consistency, safety flags, error codes, and edge cases. There is no frontend test framework in v0.
 
-## Safety Position
+## Current Limitations
 
-FitPlate Coach is not a medical device and does not replace a doctor, dietitian, physical therapist, trainer, or other qualified professional.
+- **Mock analysis only:** calorie values come from deterministic mock scenarios and a small static density table, not from image recognition or nutrition databases.
+- **No persistence:** analyses and corrections live in React state. A page reload clears them.
+- **No authentication:** API requests are not associated with users.
+- **No image content analysis:** the backend receives metadata only and cannot verify whether the selected image actually contains food.
+- **Grams-only correction:** users can correct portion size in grams, but not the food name. Name correction needs a density lookup flow.
+- **No exercise feedback:** squat video feedback is documented as a future track but not implemented.
 
-The product must not:
+## Roadmap
 
-- Diagnose medical conditions, eating disorders, injuries, or movement disorders.
-- Provide treatment advice.
-- Encourage extreme dieting or unsafe weight loss.
-- Present calorie estimates as exact.
-- Claim that form feedback prevents or diagnoses injury.
+Next:
+
+- AI-readiness work: prompt versioning, model run logging, evaluation examples, and cost tracking.
+- A separate real multimodal food analysis endpoint that can return `mode: "ai"` without changing the `FoodAnalysis` contract.
+
+Near-term:
+
+- Database storage for analyses, corrections, and model runs.
+- Authentication for associating analyses with users.
+- Food name correction with density lookup by corrected name.
+- Image upload and storage design with explicit retention rules.
+
+Future:
+
+- Squat video feedback with short video upload, frame extraction, structured form analysis JSON, and non-clinical technique cues.
+- Evaluation dashboard for correction rate, confidence calibration, and model comparison across prompt versions.
+- Async job queue for video processing.
+
+## Why This Codebase Is Structured This Way
+
+The `FoodAnalysis` response schema was defined before the UI depended on it. The frontend TypeScript types and backend Pydantic models use the same field names and versioning, so a future model integration does not change the frontend contract.
+
+The mock endpoint is explicitly named, and `mode` is present in every response. Mock behavior is visible at runtime rather than hidden behind deployment configuration.
+
+User corrections are modeled as first-class data with item IDs, original values, corrected values, timestamps, and a source field. That matters because corrections are the strongest signal for evaluating and improving food estimation.
+
+Calorie estimates are ranges by design. Returning `min`, `max`, and `point_estimate` forces the product to represent uncertainty directly, and both backend mock logic and frontend correction logic use the same confidence margins.
+
+Safety flags are typed schema values. A backend can emit a safety flag and the frontend can respond structurally, which leaves room for future moderation and safety classifiers without changing the UI contract.
 
 ## Documentation Map
 
@@ -157,19 +201,3 @@ The product must not:
 - [Architecture](docs/ARCHITECTURE.md)
 - [AI Safety](docs/AI_SAFETY.md)
 - [Implementation Plan](docs/IMPLEMENTATION_PLAN.md)
-
-## Non-Goals
-
-For the current MVP v0, this project will not include:
-
-- Real AI API calls.
-- User accounts.
-- Persistent storage.
-- Payment or subscription features.
-- Medical, clinical, or therapeutic workflows.
-- Multi-exercise video analysis.
-- Native iOS or Android apps.
-
-## License
-
-No license has been selected yet.

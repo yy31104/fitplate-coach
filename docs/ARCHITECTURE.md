@@ -304,14 +304,35 @@ the same case structure for prompt regression checks before promotion.
 
 Food analysis routes call a selected analyzer through a backend adapter
 boundary instead of calling provider or mock logic directly. The current
-selector reads `FITPLATE_AI_MODE` per request and defaults to `mock`, which
-keeps existing local behavior unchanged.
+selector reads `FITPLATE_AI_MODE` through cached backend settings and defaults
+to `mock`, which keeps existing local behavior unchanged. By default those
+settings are process-local via `get_settings()`.
 
 `MockFoodAnalyzer` delegates to the deterministic mock analyzer. `AIFoodAnalyzer`
-is only a controlled stub: setting `FITPLATE_AI_MODE=ai` records AI-stub mode
-in model run logs and returns the existing `analysis_failed` response until a
-real provider adapter is implemented. No prompt registry entry is load-bearing
-for live routes yet.
+uses the prompt registry and an `AIProvider` boundary, but the only current
+provider implementation is fake and local. Setting `FITPLATE_AI_MODE=ai` returns
+a schema-validated fake `FoodAnalysis` with `mode: "ai"` so the integration
+contract can be exercised without calling a real provider.
+
+### Provider Adapter
+
+The provider seam is separate from the analyzer seam. `AIFoodAnalyzer` owns
+application-level behavior such as loading the registered food-analysis prompt,
+building an `ImageRef`, validating provider output with the `FoodAnalysis`
+schema, and overriding backend-controlled fields (`analysis_id`,
+`schema_version`, `mode`, and `analyzed_at`). `AIProvider` implementations own
+only the provider call shape.
+
+`FakeAIProvider` is not real AI. It never reads API keys, never performs network
+calls, and never receives image bytes. Its `ImageRef` currently contains only
+`content_type` and `size_bytes`, which lets backend tests and evaluation cases
+exercise the future provider path while preserving the v0 privacy boundary.
+
+Real provider integration remains future work. It should use settings-backed
+credentials, the same prompt registry record, tool-calling or equivalent
+structured output guarantees, model run logging with prompt name and version,
+timeout handling, and cost controls before any public product behavior depends
+on it.
 
 ## Model Run Logs
 

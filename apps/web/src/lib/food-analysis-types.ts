@@ -71,7 +71,7 @@ export interface UserCorrection {
 export interface FoodAnalysis {
   analysis_id: string;
   schema_version: "food_analysis.v1";
-  mode: "mock";
+  mode: "mock" | "ai";
   analyzed_at: string;
   items_count: number;
   items: FoodItem[];
@@ -89,7 +89,7 @@ export function isFoodAnalysis(value: unknown): value is FoodAnalysis {
   return (
     isString(value.analysis_id) &&
     value.schema_version === "food_analysis.v1" &&
-    value.mode === "mock" &&
+    (value.mode === "mock" || value.mode === "ai") &&
     isString(value.analyzed_at) &&
     isNumber(value.items_count) &&
     Array.isArray(value.items) &&

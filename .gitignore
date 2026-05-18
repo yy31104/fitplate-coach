@@ -12,6 +12,8 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+!apps/api/.env.example
+apps/api/.env
 *.pem
 *.key
 

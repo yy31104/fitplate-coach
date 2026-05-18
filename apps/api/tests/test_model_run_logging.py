@@ -1,14 +1,25 @@
 import json
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 import app.observability.log_writer as log_writer
+from app.ai.analyzer import AIFoodAnalyzer
+from app.ai.provider import ImageRef
+from app.config import get_settings
 from app.main import app
-from app.observability.model_run import ModelRun
+from app.observability.model_run import ModelRun, build_model_run, now_utc
 from app.routers import food as food_router
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def clear_settings_cache() -> None:
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 def test_successful_analyze_writes_one_valid_jsonl_record(tmp_path, monkeypatch) -> None:
@@ -124,6 +135,78 @@ def test_logging_failure_does_not_break_successful_route_response(tmp_path, monk
 
     assert response.status_code == 200
     assert response.json()["mode"] == "mock"
+
+
+def test_build_model_run_preserves_prompt_fields_when_passed() -> None:
+    record = build_model_run(
+        request_id="request-001",
+        route="POST /api/v0/food/analyze/mock",
+        started_at=now_utc(),
+        input_summary={},
+        output_summary={},
+        prompt_name="food_analysis",
+        prompt_version="v1",
+    )
+
+    assert record.prompt_name == "food_analysis"
+    assert record.prompt_version == "v1"
+
+
+def test_build_model_run_prompt_fields_default_to_none() -> None:
+    record = build_model_run(
+        request_id="request-001",
+        route="POST /api/v0/food/analyze/mock",
+        started_at=now_utc(),
+        input_summary={},
+        output_summary={},
+    )
+
+    assert record.prompt_name is None
+    assert record.prompt_version is None
+
+
+def test_ai_mode_analyze_log_records_fake_provider_and_prompt(tmp_path, monkeypatch) -> None:
+    log_path = _use_log_path(tmp_path, monkeypatch)
+    monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
+    get_settings.cache_clear()
+
+    response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+
+    assert response.status_code == 200
+    record = _read_records(log_path)[0]
+    assert record.mode == "ai"
+    assert record.model == "fake-food-vision-v1"
+    assert record.prompt_name == "food_analysis"
+    assert record.prompt_version == "v1"
+    assert record.error_code is None
+
+    get_settings.cache_clear()
+
+
+def test_malformed_ai_provider_output_logs_schema_validation_flag(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    log_path = _use_log_path(tmp_path, monkeypatch)
+    analyzer = AIFoodAnalyzer(provider=MalformedProvider())
+    monkeypatch.setattr(food_router, "select_food_analyzer", lambda: analyzer)
+
+    response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+
+    assert response.status_code == 500
+    record = _read_records(log_path)[0]
+    assert record.mode == "ai"
+    assert record.model == "malformed-model"
+    assert record.error_code == "analysis_failed"
+    assert record.safety_flags == ["schema_validation_failed"]
+
+
+class MalformedProvider:
+    name = "malformed"
+    model = "malformed-model"
+
+    def call(self, prompt: str, image_ref: ImageRef) -> dict[str, object]:
+        return {"schema_version": "food_analysis.v1"}
 
 
 def _use_log_path(tmp_path: Path, monkeypatch) -> Path:

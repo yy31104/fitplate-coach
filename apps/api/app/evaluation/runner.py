@@ -1,11 +1,12 @@
 import json
 from pathlib import Path
-from typing import Literal
+from typing import Callable, Literal, Protocol
 
 from pydantic import BaseModel
 
-from app.mock.food_analyzer import analyze_food_metadata
-from app.schemas.food import FoodAnalyzeMockRequest, SafetyFlag
+from app.ai.analyzer import AIFoodAnalyzer, MockFoodAnalyzer
+from app.ai.provider import FakeAIProvider
+from app.schemas.food import FoodAnalysis, FoodAnalyzeMockRequest, SafetyFlag
 
 _CASES_PATH = Path(__file__).resolve().parents[2] / "evaluation" / "food_analysis" / "cases.json"
 
@@ -43,14 +44,32 @@ class EvaluationResult(BaseModel):
     cases: list[CaseResult]
 
 
-def run_food_analysis_evaluation() -> EvaluationResult:
+class FoodAnalysisCallable(Protocol):
+    def __call__(self, payload: FoodAnalyzeMockRequest) -> FoodAnalysis:
+        ...
+
+
+AnalyzerInput = FoodAnalysisCallable | Callable[[], FoodAnalysisCallable]
+
+
+def run_food_analysis_evaluation(analyzer: AnalyzerInput | None = None) -> EvaluationResult:
     cases_raw = json.loads(_CASES_PATH.read_text(encoding="utf-8"))
     cases = [EvaluationCase.model_validate(case) for case in cases_raw["cases"]]
-    return evaluate_food_analysis_cases(cases)
+    return evaluate_food_analysis_cases(cases, analyzer=analyzer)
 
 
-def evaluate_food_analysis_cases(cases: list[EvaluationCase]) -> EvaluationResult:
-    case_results = [_run_case(case) for case in cases]
+def run_fake_ai_food_analysis_evaluation() -> EvaluationResult:
+    return run_food_analysis_evaluation(
+        analyzer=lambda: AIFoodAnalyzer(provider=FakeAIProvider()).analyze,
+    )
+
+
+def evaluate_food_analysis_cases(
+    cases: list[EvaluationCase],
+    analyzer: AnalyzerInput | None = None,
+) -> EvaluationResult:
+    analyze = _resolve_analyzer(analyzer)
+    case_results = [_run_case(case, analyze=analyze) for case in cases]
     passed = sum(1 for result in case_results if result.passed)
 
     return EvaluationResult(
@@ -62,13 +81,19 @@ def evaluate_food_analysis_cases(cases: list[EvaluationCase]) -> EvaluationResul
     )
 
 
-def _run_case(case: EvaluationCase) -> CaseResult:
-    analysis = analyze_food_metadata(case.input)
+def _run_case(
+    case: EvaluationCase,
+    analyze: FoodAnalysisCallable | None = None,
+) -> CaseResult:
+    analyze_case = analyze or MockFoodAnalyzer().analyze
+    analysis = analyze_case(case.input)
     expected = case.expected_summary
     diffs: list[str] = []
 
     if analysis.items_count != expected.items_count:
-        diffs.append(f"items_count: expected {expected.items_count}, got {analysis.items_count}")
+        diffs.append(
+            f"items_count: expected {expected.items_count}, got {analysis.items_count}"
+        )
 
     actual_names = sorted(item.name for item in analysis.items)
     expected_names = sorted(expected.item_names)
@@ -84,12 +109,28 @@ def _run_case(case: EvaluationCase) -> CaseResult:
     min_floor = expected.total_calories.min_at_least
     max_ceiling = expected.total_calories.max_at_most
     if total_calories.min < min_floor:
-        diffs.append(f"total_calories.min {total_calories.min} < min_at_least {min_floor}")
+        diffs.append(
+            f"total_calories.min {total_calories.min} < min_at_least {min_floor}"
+        )
     if total_calories.max > max_ceiling:
-        diffs.append(f"total_calories.max {total_calories.max} > max_at_most {max_ceiling}")
+        diffs.append(
+            f"total_calories.max {total_calories.max} > max_at_most {max_ceiling}"
+        )
 
     return CaseResult(
         case_id=case.case_id,
         passed=len(diffs) == 0,
         diffs=diffs,
     )
+
+
+def _resolve_analyzer(analyzer: AnalyzerInput | None) -> FoodAnalysisCallable:
+    if analyzer is None:
+        return MockFoodAnalyzer().analyze
+
+    try:
+        candidate = analyzer()
+    except TypeError:
+        return analyzer
+
+    return candidate

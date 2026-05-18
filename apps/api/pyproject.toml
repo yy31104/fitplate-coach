@@ -5,6 +5,7 @@ description = "Minimal FastAPI backend for FitPlate Coach."
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.124.0",
+  "pydantic-settings>=2.12.0",
   "uvicorn[standard]>=0.38.0",
 ]
 

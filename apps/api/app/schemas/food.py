@@ -3,7 +3,7 @@ from typing import Literal, get_args
 
 from pydantic import BaseModel, Field
 
-AnalysisMode = Literal["mock"]
+AnalysisMode = Literal["mock", "ai"]
 Confidence = Literal["high", "medium", "low"]
 SafetyFlag = Literal[
     "low_confidence",

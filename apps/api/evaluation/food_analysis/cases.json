@@ -26,7 +26,7 @@
       "input": {
         "filename": "eval-bucket-7-17.jpg",
         "content_type": "image/jpeg",
-        "size_bytes": 345678,
+        "size_bytes": 745678,
         "last_modified_ms": 1710000000000
       },
       "expected_summary": {
@@ -45,7 +45,7 @@
       "input": {
         "filename": "eval-bucket-8-7.jpg",
         "content_type": "image/jpeg",
-        "size_bytes": 345678,
+        "size_bytes": 845678,
         "last_modified_ms": 1710000000000
       },
       "expected_summary": {
@@ -64,7 +64,7 @@
       "input": {
         "filename": "eval-bucket-9-30.jpg",
         "content_type": "image/jpeg",
-        "size_bytes": 345678,
+        "size_bytes": 945678,
         "last_modified_ms": 1710000000000
       },
       "expected_summary": {

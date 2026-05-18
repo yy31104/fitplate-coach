@@ -287,24 +287,21 @@ Prompt changes should be evaluated against fixed examples before being promoted.
 
 ## Model Run Logs
 
-Future model run logs should include:
+Current food mock routes write append-only model run logs to
+`apps/api/logs/model_runs.jsonl`. Each line is one `model_run.v1` JSON object
+with route, mode, model, timing, summarized inputs, summarized outputs, safety
+flags, token placeholders, cost placeholders, and error details when a route
+fails unexpectedly.
 
-- Request id.
-- User id, if auth exists.
-- Analysis id.
-- Prompt version.
-- Schema version.
-- Model and provider.
-- Input media reference, not raw media.
-- Output JSON.
-- Validation result.
-- Safety flags.
-- Latency.
-- Token usage, if applicable.
-- Cost estimate.
-- Error details.
+The log exists before real AI integration so prompt observability, latency
+tracking, cost tracking, and schema validation can attach to an existing
+contract later. Current mock runs use `model: "mock"`, zero token counts, and
+zero cost.
 
-Logs should avoid storing unnecessary sensitive data.
+Privacy boundary: model run logs store summaries only. They must not store raw
+media, raw full request bodies, raw full responses, secrets, or provider keys.
+For future upload flows, logs should store media references rather than media
+content.
 
 ## Cost Tracking
 

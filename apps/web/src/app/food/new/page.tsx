@@ -4,8 +4,11 @@ import { type ChangeEvent, type FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { analyzeFoodMock, FoodAnalysisApiError } from "../../../lib/food-analysis-api";
-import { formatCalories } from "../../../lib/food-analysis-format";
-import type { FoodAnalysis } from "../../../lib/food-analysis-types";
+import {
+  buildCorrectedTotal,
+  recomputeCalorieRange,
+} from "../../../lib/food-analysis-correction";
+import type { FoodAnalysis, FoodItem, UserCorrection } from "../../../lib/food-analysis-types";
 import {
   acceptedFoodImageTypes,
   acceptedFoodImageTypesLabel,
@@ -25,16 +28,24 @@ export default function NewFoodAnalysisPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [previewFailed, setPreviewFailed] = useState(false);
   const [inputKey, setInputKey] = useState(0);
+  const [corrections, setCorrections] = useState<Record<string, UserCorrection>>({});
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   const previewUrl = usePreviewUrl(file);
   const assumptions = useMemo(() => collectAssumptions(analysis), [analysis]);
-  const headlineRange = analysis ? formatCalories(analysis.total_calories) : "";
+  const correctedTotal = useMemo(
+    () => buildCorrectedTotal(analysis?.items ?? [], corrections),
+    [analysis, corrections],
+  );
+  const hasAnyCorrection = Object.keys(corrections).length > 0;
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const selectedFile = event.target.files?.[0] ?? null;
     setAnalysis(null);
     setError(null);
     setPreviewFailed(false);
+    setCorrections({});
+    setEditingItemId(null);
 
     if (!selectedFile) {
       setFile(null);
@@ -67,6 +78,8 @@ export default function NewFoodAnalysisPage() {
 
     setIsLoading(true);
     setError(null);
+    setCorrections({});
+    setEditingItemId(null);
 
     try {
       const [result] = await Promise.all([
@@ -87,7 +100,53 @@ export default function NewFoodAnalysisPage() {
     setAnalysis(null);
     setError(null);
     setPreviewFailed(false);
+    setCorrections({});
+    setEditingItemId(null);
     setInputKey((current) => current + 1);
+  }
+
+  function handleStartEdit(itemId: string) {
+    setEditingItemId(itemId);
+  }
+
+  function handleCommitCorrection(item: FoodItem, correctedGrams: number) {
+    const correctedCalories = recomputeCalorieRange(
+      correctedGrams,
+      item.calorie_density_kcal_per_gram,
+      item.confidence,
+    );
+
+    const correction: UserCorrection = {
+      correction_id: crypto.randomUUID(),
+      item_id: item.item_id,
+      original_name: item.name,
+      corrected_name: item.name,
+      original_grams: item.portion.grams_estimate,
+      corrected_grams: correctedGrams,
+      original_calories: item.calories,
+      corrected_calories: correctedCalories,
+      correction_timestamp: new Date().toISOString(),
+      correction_source: "user",
+    };
+
+    setCorrections((current) => ({
+      ...current,
+      [item.item_id]: correction,
+    }));
+    setEditingItemId(null);
+  }
+
+  function handleCancelEdit() {
+    setEditingItemId(null);
+  }
+
+  function handleUndoCorrection(itemId: string) {
+    setCorrections((current) => {
+      const next = { ...current };
+      delete next[itemId];
+      return next;
+    });
+    setEditingItemId((current) => (current === itemId ? null : current));
   }
 
   return (
@@ -180,10 +239,17 @@ export default function NewFoodAnalysisPage() {
               <ResultView
                 analysis={analysis}
                 assumptions={assumptions}
-                headlineRange={headlineRange}
+                correctedTotal={correctedTotal}
+                corrections={corrections}
+                editingItemId={editingItemId}
+                hasAnyCorrection={hasAnyCorrection}
                 previewFailed={previewFailed}
                 previewUrl={previewUrl}
                 file={file}
+                onCancelEdit={handleCancelEdit}
+                onCommitCorrection={handleCommitCorrection}
+                onStartEdit={handleStartEdit}
+                onUndoCorrection={handleUndoCorrection}
               />
             ) : null}
             {!isLoading && !analysis ? <EmptyResult /> : null}

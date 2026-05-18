@@ -4,8 +4,8 @@ from uuid import uuid4
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
+from app.ai.analyzer import select_food_analyzer
 from app.mock.density import calorie_range_from_density
-from app.mock.food_analyzer import analyze_food_metadata
 from app.observability.log_writer import write_model_run
 from app.observability.model_run import build_model_run, now_utc
 from app.schemas.food import (
@@ -61,12 +61,20 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         )
         return JSONResponse(status_code=status_code, content=error.model_dump())
 
+    analyzer_mode = "mock"
+    analyzer_model = "mock"
+
     try:
-        analysis = analyze_food_metadata(payload)
+        analyzer = select_food_analyzer()
+        analyzer_mode = analyzer.mode
+        analyzer_model = analyzer.model
+        analysis = analyzer.analyze(payload)
         write_model_run(
             build_model_run(
                 request_id=request_id,
                 route=ANALYZE_MOCK_ROUTE,
+                mode=analyzer_mode,
+                model=analyzer_model,
                 started_at=started_at,
                 input_summary=input_summary,
                 output_summary=_analyze_output_summary(analysis),
@@ -83,6 +91,8 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
             build_model_run(
                 request_id=request_id,
                 route=ANALYZE_MOCK_ROUTE,
+                mode=analyzer_mode,
+                model=analyzer_model,
                 started_at=started_at,
                 input_summary=input_summary,
                 output_summary={},

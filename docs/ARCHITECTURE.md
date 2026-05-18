@@ -300,6 +300,19 @@ Fixed food-analysis evaluation cases live under `apps/api/evaluation/` and run
 against the deterministic mock analyzer today. Future AI adapters should use
 the same case structure for prompt regression checks before promotion.
 
+## Analyzer Adapter
+
+Food analysis routes call a selected analyzer through a backend adapter
+boundary instead of calling provider or mock logic directly. The current
+selector reads `FITPLATE_AI_MODE` per request and defaults to `mock`, which
+keeps existing local behavior unchanged.
+
+`MockFoodAnalyzer` delegates to the deterministic mock analyzer. `AIFoodAnalyzer`
+is only a controlled stub: setting `FITPLATE_AI_MODE=ai` records AI-stub mode
+in model run logs and returns the existing `analysis_failed` response until a
+real provider adapter is implemented. No prompt registry entry is load-bearing
+for live routes yet.
+
 ## Model Run Logs
 
 Current food mock routes write append-only model run logs to

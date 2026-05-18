@@ -80,10 +80,14 @@ def test_each_line_is_valid_json_and_validates_as_model_run(tmp_path, monkeypatc
 def test_analyze_forced_exception_writes_error_log(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
 
-    def fail_analyze(_payload) -> None:
-        raise RuntimeError("forced analyze failure")
+    class FailingAnalyzer:
+        mode = "mock"
+        model = "mock"
 
-    monkeypatch.setattr(food_router, "analyze_food_metadata", fail_analyze)
+        def analyze(self, _payload) -> None:
+            raise RuntimeError("forced analyze failure")
+
+    monkeypatch.setattr(food_router, "select_food_analyzer", lambda: FailingAnalyzer())
 
     response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
 

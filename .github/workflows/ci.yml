@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: apps/api/pyproject.toml
+
+      - name: Install web dependencies
+        run: npm ci
+
+      - name: Create API virtual environment
+        run: python -m venv apps/api/.venv
+
+      - name: Install API dependencies
+        run: apps/api/.venv/bin/python -m pip install -e "apps/api[dev]"
+
+      - name: Lint web
+        run: npm run lint:web
+
+      - name: Build web
+        run: npm run build:web
+
+      - name: Test API
+        run: npm run test:api

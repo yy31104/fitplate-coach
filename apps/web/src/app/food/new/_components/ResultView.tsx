@@ -13,6 +13,8 @@ export function ResultView({
   assumptions,
   correctedTotal,
   corrections,
+  correctionError,
+  correctionLoading,
   editingItemId,
   hasAnyCorrection,
   previewFailed,
@@ -27,13 +29,15 @@ export function ResultView({
   assumptions: string[];
   correctedTotal: CalorieRange;
   corrections: Record<string, UserCorrection>;
+  correctionError: { itemId: string; message: string } | null;
+  correctionLoading: string | null;
   editingItemId: string | null;
   hasAnyCorrection: boolean;
   previewFailed: boolean;
   previewUrl: string | null;
   file: File | null;
   onCancelEdit: () => void;
-  onCommitCorrection: (item: FoodItem, correctedGrams: number) => void;
+  onCommitCorrection: (item: FoodItem, correctedGrams: number) => Promise<void>;
   onStartEdit: (itemId: string) => void;
   onUndoCorrection: (itemId: string) => void;
 }) {
@@ -76,8 +80,12 @@ export function ResultView({
             // The compound key intentionally remounts rows when edit/display/correction state
             // changes, resetting local draft grams without a useEffect.
             <FoodItemRow
+              applyError={
+                correctionError?.itemId === item.item_id ? correctionError.message : null
+              }
               correction={corrections[item.item_id] ?? null}
               isEditing={editingItemId === item.item_id}
+              isSubmitting={correctionLoading === item.item_id}
               item={item}
               key={`${item.item_id}-${editingItemId === item.item_id ? "editing" : "display"}-${
                 corrections[item.item_id]?.correction_id ?? "original"

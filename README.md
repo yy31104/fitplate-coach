@@ -8,7 +8,7 @@ FitPlate Coach is a mobile-first food photo calorie estimation app that treats A
 
 The current app lets a user select one food image in the browser. The frontend validates the file locally, sends metadata only to the backend, and never uploads or stores image bytes. The backend returns a deterministic mock `FoodAnalysis` JSON response with food items, portion assumptions, calorie ranges, confidence levels, and safety flags.
 
-After the mock result appears, the user can correct an item's portion in grams. The frontend recomputes that item's calorie range and the total calorie range locally using the density and confidence values returned in the original structured response.
+After the mock result appears, the user can correct an item's portion in grams. The backend mock correction endpoint recomputes that item's calorie range from corrected grams, the original calorie density, and the original confidence margin, then the frontend updates the display from the returned `UserCorrection`.
 
 There is no real model call yet. That is intentional: the project is built around the production contract first, so a future AI integration can sit behind the same schema and safety boundaries instead of forcing a UI rewrite.
 
@@ -18,8 +18,9 @@ There is no real model call yet. That is intentional: the project is built aroun
 - **Uncertainty is explicit:** calorie estimates are ranges with `min`, `max`, and `point_estimate`. Confidence maps to deterministic range widths instead of vague prose.
 - **Mock mode is observable:** the endpoint is explicitly named `POST /api/v0/food/analyze/mock`, and every response includes `mode: "mock"`.
 - **Corrections are product data:** `UserCorrection` records original and corrected values, timestamps, item IDs, and source. In v0 it stays in React state; later it becomes evaluation data.
+- **Model runs are observable:** current mock food routes append summary-only `model_run.v1` records to local JSONL logs without storing raw media or full responses.
 - **Safety is typed:** safety flags are named schema values, not unstructured UI copy.
-- **CI checks the basics:** GitHub Actions runs web lint, web build, and backend API tests on every push.
+- **CI checks the basics:** GitHub Actions runs web lint, web build, backend API tests, and Playwright E2E tests on every push.
 
 ## Current Features
 
@@ -29,8 +30,9 @@ There is no real model call yet. That is intentional: the project is built aroun
 - `POST /api/v0/food/analyze/mock` returning structured mock `FoodAnalysis` JSON.
 - Food item display with portion estimates, calorie ranges, confidence, assumptions, and safety flags.
 - Grams-only correction flow with original estimate preserved beside the corrected estimate.
-- Frontend recomputation using the same calorie density and confidence margin model as the backend mock logic.
-- GitHub Actions CI for `npm run lint:web`, `npm run build:web`, and `npm run test:api`.
+- `POST /api/v0/food/corrections/mock` recomputing corrected calorie ranges from corrected grams, original density, and confidence margin.
+- Append-only JSONL model run logs for food mock analysis and correction routes.
+- GitHub Actions CI for `npm run lint:web`, `npm run build:web`, `npm run test:api`, and `npm run test:e2e`.
 
 ## Architecture
 
@@ -41,7 +43,7 @@ FitPlate Coach is a small monorepo:
 
 The browser sends JSON metadata to the API; it does not send multipart image data in v0. API routes are versioned under `/api/v0/`, and `FoodAnalysis` is the integration contract between the frontend and backend.
 
-Correction recomputation is currently client-side. It uses `calorie_density_kcal_per_gram` from the backend response and mirrored confidence margins for high, medium, and low confidence. CORS is restricted to `http://127.0.0.1:3000` in local development.
+Correction recomputation is handled by the backend mock correction endpoint. It uses `calorie_density_kcal_per_gram`, corrected grams, and the original confidence margin for high, medium, or low confidence. CORS is restricted to `http://127.0.0.1:3000` in local development.
 
 For the full system design, see [Architecture](docs/ARCHITECTURE.md).
 
@@ -148,11 +150,12 @@ Run all checks:
 npm run lint:web
 npm run build:web
 npm run test:api
+npm run test:e2e
 ```
 
-CI runs the same three commands on every push and on pull requests to `main`. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
+CI runs the same commands on every push and on pull requests to `main`. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
-The backend currently has 16 pytest tests covering the health endpoint and mock food analysis behavior: schema fields, mode, scenario routing, calorie consistency, safety flags, error codes, and edge cases. There is no frontend test framework in v0.
+The backend currently has pytest coverage for health, mock food analysis, mock correction, and model run logging. Playwright E2E covers the current `/food/new` browser flow with mocked API calls.
 
 ## Current Limitations
 
@@ -191,7 +194,7 @@ The mock endpoint is explicitly named, and `mode` is present in every response. 
 
 User corrections are modeled as first-class data with item IDs, original values, corrected values, timestamps, and a source field. That matters because corrections are the strongest signal for evaluating and improving food estimation.
 
-Calorie estimates are ranges by design. Returning `min`, `max`, and `point_estimate` forces the product to represent uncertainty directly, and both backend mock logic and frontend correction logic use the same confidence margins.
+Calorie estimates are ranges by design. Returning `min`, `max`, and `point_estimate` forces the product to represent uncertainty directly, and the backend mock analysis and correction paths use the same confidence margins.
 
 Safety flags are typed schema values. A backend can emit a safety flag and the frontend can respond structurally, which leaves room for future moderation and safety classifiers without changing the UI contract.
 

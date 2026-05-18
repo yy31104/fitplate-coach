@@ -16,7 +16,7 @@ Thumbs.db
 *.key
 
 # Logs
-logs/
+/logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -44,6 +44,8 @@ __pycache__/
 .venv/
 venv/
 env/
+apps/api/logs/*
+!apps/api/logs/.gitkeep
 
 # Local data and generated media
 uploads/

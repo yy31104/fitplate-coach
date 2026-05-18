@@ -1,10 +1,11 @@
 "use client";
 
-import { type ChangeEvent, type FormEvent, useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, type FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { analyzeFoodMock, FoodAnalysisApiError } from "../../../lib/food-analysis-api";
-import type { FoodAnalysis, FoodItem, SafetyFlag } from "../../../lib/food-analysis-types";
+import { formatCalories } from "../../../lib/food-analysis-format";
+import type { FoodAnalysis } from "../../../lib/food-analysis-types";
 import {
   acceptedFoodImageTypes,
   acceptedFoodImageTypesLabel,
@@ -12,6 +13,8 @@ import {
   formatFileSize,
   validateFoodPhotoFile,
 } from "../../../lib/food-analysis-validation";
+import { ImagePreview, usePreviewUrl } from "./_components/ImagePreview";
+import { EmptyResult, LoadingResult, ResultView } from "./_components/ResultView";
 
 const inputAccept = acceptedFoodImageTypes.join(",");
 
@@ -191,202 +194,6 @@ export default function NewFoodAnalysisPage() {
   );
 }
 
-function ResultView({
-  analysis,
-  assumptions,
-  headlineRange,
-  previewFailed,
-  previewUrl,
-  file,
-}: {
-  analysis: FoodAnalysis;
-  assumptions: string[];
-  headlineRange: string;
-  previewFailed: boolean;
-  previewUrl: string | null;
-  file: File | null;
-}) {
-  const hasItems = analysis.items.length > 0;
-
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-3">
-          <span className="inline-flex rounded-full border border-stone-300 bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-700">
-            Mock analysis
-          </span>
-          <div>
-            <h2 className="text-2xl font-semibold">
-              {hasItems ? "Food photo estimate" : "No food detected"}
-            </h2>
-            <p className="mt-1 text-3xl font-semibold text-emerald-900">{headlineRange}</p>
-          </div>
-        </div>
-        {file ? (
-          <div className="w-24 shrink-0">
-            <ImagePreview
-              compact
-              file={file}
-              previewFailed={previewFailed}
-              previewUrl={previewUrl}
-            />
-          </div>
-        ) : null}
-      </div>
-
-      {!hasItems ? (
-        <p className="rounded-md border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-700">
-          No food was detected in this photo. Try a closer or clearer shot.
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {analysis.items.map((item) => (
-            <FoodItemRow item={item} key={item.item_id} />
-          ))}
-        </div>
-      )}
-
-      <div className="border-t border-stone-200 pt-4">
-        <p className="text-sm text-stone-600">Total estimate</p>
-        <p className="text-xl font-semibold">{headlineRange}</p>
-      </div>
-
-      <div className="space-y-2 border-t border-stone-200 pt-4">
-        <h3 className="font-semibold">Assumptions</h3>
-        <ul className="space-y-1 text-sm leading-6 text-stone-700">
-          {assumptions.map((assumption) => (
-            <li key={assumption}>- {assumption}</li>
-          ))}
-        </ul>
-      </div>
-
-      {analysis.safety_flags.length > 0 ? (
-        <div className="space-y-2 border-t border-stone-200 pt-4">
-          <h3 className="font-semibold">Safety flags</h3>
-          <div className="flex flex-wrap gap-2">
-            {analysis.safety_flags.map((flag) => (
-              <span
-                className="rounded-full border border-stone-300 bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700"
-                key={flag}
-              >
-                {formatFlag(flag)}
-              </span>
-            ))}
-          </div>
-        </div>
-      ) : null}
-
-      <p className="border-t border-stone-200 pt-4 text-sm leading-6 text-stone-600">
-        Calorie estimates are for reflection only. This is not medical nutrition advice.
-      </p>
-    </div>
-  );
-}
-
-function FoodItemRow({ item }: { item: FoodItem }) {
-  return (
-    <div className="rounded-md border border-stone-200 bg-stone-50 p-3">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="font-medium text-stone-950">{item.name}</p>
-          <p className="mt-1 text-sm text-stone-600">
-            {item.portion.description} · {formatCalories(item.calories)}
-          </p>
-        </div>
-        <span className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-medium text-stone-700">
-          {item.confidence} confidence
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function ImagePreview({
-  compact = false,
-  file,
-  onPreviewError,
-  previewFailed,
-  previewUrl,
-}: {
-  compact?: boolean;
-  file: File;
-  onPreviewError?: () => void;
-  previewFailed: boolean;
-  previewUrl: string | null;
-}) {
-  const canPreview = previewUrl && !previewFailed;
-
-  return (
-    <div
-      className={`flex items-center justify-center overflow-hidden rounded-md border border-stone-200 bg-stone-100 ${
-        compact ? "aspect-square" : "aspect-video"
-      }`}
-    >
-      {canPreview ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          alt={`Preview of ${file.name}`}
-          className="h-full w-full object-cover"
-          src={previewUrl}
-          onError={onPreviewError}
-        />
-      ) : (
-        <div className="px-4 text-center text-sm leading-6 text-stone-600">
-          <p className="font-medium text-stone-800">Preview unavailable</p>
-          <p>{file.name}</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function LoadingResult() {
-  return (
-    <div className="animate-pulse space-y-5">
-      <div className="h-7 w-32 rounded-full bg-stone-200" />
-      <div className="space-y-3">
-        <div className="h-8 w-56 rounded bg-stone-200" />
-        <div className="h-10 w-44 rounded bg-stone-200" />
-      </div>
-      <div className="space-y-3">
-        <div className="h-16 rounded-md bg-stone-200" />
-        <div className="h-16 rounded-md bg-stone-200" />
-        <div className="h-16 rounded-md bg-stone-200" />
-      </div>
-    </div>
-  );
-}
-
-function EmptyResult() {
-  return (
-    <div className="flex min-h-80 items-center justify-center text-center">
-      <p className="max-w-sm text-sm leading-6 text-stone-600">
-        Select a food photo to see a structured mock analysis here.
-      </p>
-    </div>
-  );
-}
-
-function usePreviewUrl(file: File | null): string | null {
-  const previewUrl = useMemo(() => {
-    if (!file || file.type === "image/heic" || file.type === "image/heif") {
-      return null;
-    }
-
-    return URL.createObjectURL(file);
-  }, [file]);
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  return previewUrl;
-}
-
 function collectAssumptions(analysis: FoodAnalysis | null): string[] {
   if (!analysis) {
     return [];
@@ -398,14 +205,6 @@ function collectAssumptions(analysis: FoodAnalysis | null): string[] {
       ...analysis.items.flatMap((item) => item.portion.assumptions),
     ]),
   );
-}
-
-function formatCalories(range: FoodAnalysis["total_calories"]): string {
-  return `${range.min}-${range.max} kcal`;
-}
-
-function formatFlag(flag: SafetyFlag): string {
-  return flag.replaceAll("_", " ");
 }
 
 function errorMessageFor(error: unknown, file: File): string {

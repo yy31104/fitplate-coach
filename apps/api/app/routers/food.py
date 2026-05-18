@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from fastapi import APIRouter
+from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 
 from app.ai.analyzer import AIAnalysisError, select_food_analyzer
@@ -27,6 +27,9 @@ ALLOWED_IMAGE_TYPES = {
     "image/heif",
 }
 MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
+UPLOAD_READ_CHUNK_BYTES = 64 * 1024
+MAX_LOGGED_FILENAME_LENGTH = 255
+ANALYZE_UPLOAD_ROUTE = "POST /api/v0/food/analyze"
 ANALYZE_MOCK_ROUTE = "POST /api/v0/food/analyze/mock"
 CORRECTION_MOCK_ROUTE = "POST /api/v0/food/corrections/mock"
 
@@ -119,6 +122,167 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
             build_model_run(
                 request_id=request_id,
                 route=ANALYZE_MOCK_ROUTE,
+                mode=analyzer_mode,
+                model=analyzer_model,
+                prompt_name=analyzer_prompt_name,
+                prompt_version=analyzer_prompt_version,
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary={},
+                error_code=error.code,
+                error_message=error.message,
+            )
+        )
+        return JSONResponse(status_code=500, content=error.model_dump())
+
+
+@router.post(
+    "/analyze",
+    response_model=FoodAnalysis,
+    responses={
+        400: {"model": ErrorResponse},
+        413: {"model": ErrorResponse},
+        422: {"description": "Invalid request body"},
+        500: {"model": ErrorResponse},
+    },
+)
+async def analyze_food_upload(
+    image: UploadFile = File(...),
+) -> FoodAnalysis | JSONResponse:
+    request_id = str(uuid4())
+    started_at = now_utc()
+    filename = _truncate_filename(image.filename)
+    content_type = image.content_type or ""
+    input_summary = _upload_input_summary(
+        filename=filename,
+        content_type=content_type,
+        size_bytes=0,
+    )
+
+    content_type_error = _validate_upload_content_type(image.content_type)
+    if content_type_error is not None:
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_UPLOAD_ROUTE,
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary={},
+                error_code=content_type_error.code,
+                error_message=content_type_error.message,
+            )
+        )
+        return JSONResponse(status_code=400, content=content_type_error.model_dump())
+
+    uploaded_bytes, size_bytes, exceeded = await _read_upload_bytes_bounded(image)
+    input_summary = _upload_input_summary(
+        filename=filename,
+        content_type=content_type,
+        size_bytes=size_bytes,
+    )
+
+    if exceeded:
+        error = ErrorResponse(
+            code="file_too_large",
+            message="Photo must be under 10 MB.",
+        )
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_UPLOAD_ROUTE,
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary={},
+                error_code=error.code,
+                error_message=error.message,
+            )
+        )
+        return JSONResponse(status_code=413, content=error.model_dump())
+
+    if size_bytes == 0:
+        error = ErrorResponse(
+            code="empty_file",
+            message="The selected file appears to be empty.",
+        )
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_UPLOAD_ROUTE,
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary={},
+                error_code=error.code,
+                error_message=error.message,
+            )
+        )
+        return JSONResponse(status_code=400, content=error.model_dump())
+
+    payload = FoodAnalyzeMockRequest(
+        filename=image.filename or "",
+        content_type=content_type,
+        size_bytes=size_bytes,
+        last_modified_ms=0,
+    )
+    uploaded_bytes.clear()
+
+    analyzer_mode = "mock"
+    analyzer_model = "mock"
+    analyzer_prompt_name = None
+    analyzer_prompt_version = None
+
+    try:
+        analyzer = select_food_analyzer()
+        analyzer_mode = analyzer.mode
+        analyzer_model = analyzer.model
+        analyzer_prompt_name = getattr(analyzer, "prompt_name", None)
+        analyzer_prompt_version = getattr(analyzer, "prompt_version", None)
+        analysis = analyzer.analyze(payload)
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_UPLOAD_ROUTE,
+                mode=analyzer_mode,
+                model=analyzer_model,
+                prompt_name=analyzer_prompt_name,
+                prompt_version=analyzer_prompt_version,
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary=_analyze_output_summary(analysis),
+                safety_flags=analysis.safety_flags,
+            )
+        )
+        return analysis
+    except AIAnalysisError as exc:
+        error = ErrorResponse(
+            code="analysis_failed",
+            message="Analysis unavailable. Please try again.",
+        )
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_UPLOAD_ROUTE,
+                mode=analyzer_mode,
+                model=analyzer_model,
+                prompt_name=analyzer_prompt_name,
+                prompt_version=analyzer_prompt_version,
+                started_at=started_at,
+                input_summary=input_summary,
+                output_summary={},
+                safety_flags=exc.safety_flags,
+                error_code=error.code,
+                error_message=error.message,
+            )
+        )
+        return JSONResponse(status_code=500, content=error.model_dump())
+    except Exception:
+        error = ErrorResponse(
+            code="analysis_failed",
+            message="Analysis unavailable. Please try again.",
+        )
+        write_model_run(
+            build_model_run(
+                request_id=request_id,
+                route=ANALYZE_UPLOAD_ROUTE,
                 mode=analyzer_mode,
                 model=analyzer_model,
                 prompt_name=analyzer_prompt_name,
@@ -232,6 +396,53 @@ def _analyze_input_summary(payload: FoodAnalyzeMockRequest) -> dict[str, object]
         "content_type": payload.content_type,
         "size_bytes": payload.size_bytes,
     }
+
+
+def _truncate_filename(name: str | None, limit: int = MAX_LOGGED_FILENAME_LENGTH) -> str:
+    return (name or "")[:limit]
+
+
+def _upload_input_summary(
+    *,
+    filename: str,
+    content_type: str,
+    size_bytes: int,
+) -> dict[str, object]:
+    return {
+        "transport": "multipart",
+        "filename": filename,
+        "content_type": content_type,
+        "size_bytes": size_bytes,
+    }
+
+
+def _validate_upload_content_type(content_type: str | None) -> ErrorResponse | None:
+    if not content_type or content_type not in ALLOWED_IMAGE_TYPES:
+        return ErrorResponse(
+            code="invalid_file_type",
+            message="Only JPEG, PNG, WebP, and HEIC images are supported.",
+        )
+
+    return None
+
+
+async def _read_upload_bytes_bounded(
+    image: UploadFile,
+) -> tuple[bytearray, int, bool]:
+    uploaded_bytes = bytearray()
+    total_bytes = 0
+
+    while True:
+        chunk = await image.read(UPLOAD_READ_CHUNK_BYTES)
+        if not chunk:
+            return uploaded_bytes, total_bytes, False
+
+        total_bytes += len(chunk)
+        if total_bytes > MAX_FILE_SIZE_BYTES:
+            uploaded_bytes.clear()
+            return uploaded_bytes, total_bytes, True
+
+        uploaded_bytes.extend(chunk)
 
 
 def _analyze_output_summary(analysis: FoodAnalysis) -> dict[str, object]:

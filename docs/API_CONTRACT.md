@@ -5,10 +5,11 @@ This document describes the current FastAPI contract for FitPlate Coach. It is s
 Current live endpoints:
 
 - `GET /api/v0/health`
+- `POST /api/v0/food/analyze`
 - `POST /api/v0/food/analyze/mock`
 - `POST /api/v0/food/corrections/mock`
 
-The food analysis endpoint accepts file metadata only. It does not accept image bytes, upload files, store files, authenticate users, or call a real AI model. By default it uses deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, it uses a local fake provider path for AI-readiness testing.
+The food analysis endpoints do not store uploaded files, authenticate users, or call a real AI model. `POST /api/v0/food/analyze/mock` accepts JSON metadata only. `POST /api/v0/food/analyze` accepts one multipart image, keeps accepted uploads within the 10 MB cap in memory via the configured multipart spool threshold, summarizes metadata for logging, and discards bytes before returning. By default both routes use deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, they use a local fake provider path for AI-readiness testing.
 
 ## Base URL and Versioning
 
@@ -41,14 +42,21 @@ Do not expose this API on a public host until authentication and abuse controls 
 
 ## Request and Response Format
 
-The API uses JSON request and response bodies for the current food mock endpoint.
+The API uses JSON request and response bodies for the metadata mock endpoint and correction endpoint. The upload endpoint accepts `multipart/form-data` with one file field named `image` and returns the same JSON `FoodAnalysis` shape.
 
-The current mock endpoint is metadata-only:
+The metadata mock endpoint is metadata-only:
 
 - The client sends filename, MIME type, file size, and last-modified timestamp.
 - The client does not send image bytes.
 - The backend does not store image files.
 - The backend does not inspect image content.
+
+The multipart upload endpoint:
+
+- Receives one image file field named `image`.
+- Keeps accepted uploads within the `10485760` byte cap in memory via the configured multipart spool threshold and enforces that cap on actual bytes read.
+- Does not persist, log, hash, fingerprint, or return image bytes.
+- Passes metadata-shaped input to the analyzer adapter in this PR.
 
 Datetime values in responses are ISO-8601 strings with timezone information.
 
@@ -144,6 +152,157 @@ These responses use FastAPI's default error body, not `ErrorResponse`.
 #### Notes
 
 This endpoint is intentionally small and does not perform dependency checks.
+
+### POST /api/v0/food/analyze
+
+Purpose: accept one image upload, keep accepted uploads in memory under the configured multipart spool threshold, enforce a hard size cap, and return `FoodAnalysis` through the existing analyzer adapter.
+
+Authentication: none.
+
+#### Request
+
+Content-Type: `multipart/form-data`
+
+Required file field: `image`
+
+There are no additional form fields in this version.
+
+Request example:
+
+```http
+POST /api/v0/food/analyze HTTP/1.1
+Host: 127.0.0.1:8000
+Content-Type: multipart/form-data; boundary=example
+
+--example
+Content-Disposition: form-data; name="image"; filename="lunch-photo.jpg"
+Content-Type: image/jpeg
+
+<image bytes>
+--example--
+```
+
+#### Response
+
+Success status: `200 OK`
+
+Response schema: `FoodAnalysis`
+
+The response shape is the same as `POST /api/v0/food/analyze/mock`.
+
+Default behavior uses mock mode. Example response shape for a non-food scenario:
+
+```json
+{
+  "analysis_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "schema_version": "food_analysis.v1",
+  "mode": "mock",
+  "analyzed_at": "2026-05-18T12:00:00Z",
+  "items_count": 0,
+  "items": [],
+  "total_calories": {
+    "min": 0,
+    "max": 0,
+    "point_estimate": 0
+  },
+  "uncertainty_notes": [
+    "No food was detected in this mock scenario."
+  ],
+  "safety_flags": ["non_food_image"],
+  "user_corrections": []
+}
+```
+
+When `FITPLATE_AI_MODE=ai`, this route currently uses `FakeAIProvider`, not a real AI provider. In that mode the response uses the same schema with `mode: "ai"`.
+
+#### Error Responses
+
+Validation order:
+
+1. FastAPI validates multipart structure and required field presence.
+2. The endpoint creates a model-run request id and initial input summary.
+3. `image.content_type` is checked against the allowlist.
+4. The endpoint reads actual uploaded bytes in bounded chunks.
+5. Actual bytes read are checked against `10485760`.
+6. Empty upload body is checked.
+7. The analyzer adapter runs.
+
+`400 Bad Request` with `invalid_file_type`:
+
+```json
+{
+  "code": "invalid_file_type",
+  "message": "Only JPEG, PNG, WebP, and HEIC images are supported."
+}
+```
+
+Emitted when the uploaded file has no content type or a content type outside:
+
+- `image/jpeg`
+- `image/png`
+- `image/webp`
+- `image/heic`
+- `image/heif`
+
+`400 Bad Request` with `empty_file`:
+
+```json
+{
+  "code": "empty_file",
+  "message": "The selected file appears to be empty."
+}
+```
+
+Emitted when the actual uploaded byte count is `0`.
+
+`413 Payload Too Large` with `file_too_large`:
+
+```json
+{
+  "code": "file_too_large",
+  "message": "Photo must be under 10 MB."
+}
+```
+
+Emitted when actual bytes read exceed `10485760`. The endpoint does not trust the `Content-Length` header for this decision.
+
+`422 Unprocessable Entity` for invalid multipart body:
+
+```json
+{
+  "detail": [
+    {
+      "type": "missing",
+      "loc": ["body", "image"],
+      "msg": "Field required",
+      "input": null
+    }
+  ]
+}
+```
+
+FastAPI emits this when the `image` field is missing or a different field name is used. This response is not wrapped in `ErrorResponse`.
+
+`500 Internal Server Error` with `analysis_failed`:
+
+```json
+{
+  "code": "analysis_failed",
+  "message": "Analysis unavailable. Please try again."
+}
+```
+
+Emitted only if an unexpected exception occurs during analyzer execution.
+
+#### Notes
+
+- Accepted uploads within the 10 MB cap are kept in memory by the configured multipart spool threshold.
+- Application code never persists image bytes and never writes them to disk, model-run logs, responses, or error payloads.
+- Filenames are not used to construct filesystem paths.
+- Filenames are truncated to 255 characters in model-run logs.
+- Model-run input summaries include only `transport`, `filename`, `content_type`, and `size_bytes`.
+- This route does not perform EXIF parsing, magic-byte sniffing, object storage upload, rate limiting, or async job creation.
+- `/api/v0/food/analyze/mock` remains available and is not deprecated.
 
 ### POST /api/v0/food/analyze/mock
 
@@ -609,7 +768,7 @@ The full set exists in the v0 schema so clients can handle future safety flags w
 
 ## Mock Mode Behavior
 
-The live food analysis endpoint is explicitly named `/analyze/mock`. Default deterministic mock responses include `mode: "mock"`; the opt-in fake-provider AI-readiness path uses the same schema with `mode: "ai"` and still makes no real provider call.
+The metadata-only mock food analysis endpoint is explicitly named `/analyze/mock`. Default deterministic mock responses include `mode: "mock"`; the opt-in fake-provider AI-readiness path uses the same schema with `mode: "ai"` and still makes no real provider call. The multipart `/analyze` endpoint reuses the same analyzer adapter but obtains filename, content type, and byte size from the uploaded file.
 
 Mock scenario selection is deterministic per filename:
 
@@ -658,7 +817,7 @@ FitPlate Coach does not provide medical, clinical, dietary, or therapeutic advic
 
 Clients must not present `point_estimate` as an exact calorie count. The `min` and `max` values in `CalorieRange` are the appropriate primary display values.
 
-This API does not receive image bytes. The request body contains file metadata only, and no image content is transmitted to or stored by the server.
+The metadata mock endpoint does not receive image bytes. The multipart upload endpoint receives image bytes; accepted uploads within the 10 MB cap are kept in memory by the configured multipart spool threshold, and application code does not store, log, hash, fingerprint, or return them.
 
 The API has no authentication in v0. It must not be exposed on a public host until authentication is added.
 
@@ -668,6 +827,5 @@ CORS is restricted to `http://127.0.0.1:3000` in the development configuration. 
 
 These endpoints are planned but not implemented. Their contracts are intentionally not defined here.
 
-- `POST /api/v0/food/analyze`: real AI-backed food analysis. Expected to use the `FoodAnalysis` response schema with `mode: "ai"`.
 - `POST /api/v0/food/corrections`: persisted correction endpoint. Not yet implemented. Will store corrections in a database.
 - `POST /api/v0/exercise/analyze/mock`: mock squat form feedback.

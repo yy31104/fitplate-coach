@@ -55,3 +55,4 @@ temp/
 .turbo/
 .vercel/
 .cache/
+*.tsbuildinfo

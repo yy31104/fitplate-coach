@@ -21,8 +21,10 @@ The repository currently contains the first minimal monorepo scaffold:
 
 - `apps/web`: static Next.js, TypeScript, Tailwind home page.
 - `apps/api`: FastAPI app exposing `GET /api/v0/health`.
+- `apps/web`: `/food/new` metadata-only mock food analysis route.
+- `apps/api`: `POST /api/v0/food/analyze/mock`.
 
-There is no AI integration, database, authentication, upload flow, video processing, Docker setup, or environment secret requirement.
+There is no AI integration, database, authentication, real file upload, file storage, video processing, Docker setup, or environment secret requirement.
 
 ## Planned High-Level System
 
@@ -91,17 +93,25 @@ Future FastAPI responsibilities:
 
 ## API Versioning
 
-All first backend endpoints should live under `/api/v0/`. The initial scaffold endpoint is `GET /api/v0/health`. The future food analysis endpoint should be `/api/v0/food/analyze`, and future correction endpoints should use the same version prefix.
+All first backend endpoints should live under `/api/v0/`. The initial scaffold endpoint is `GET /api/v0/health`. The metadata-only mock food endpoint is `POST /api/v0/food/analyze/mock`. Future production food analysis and correction endpoints should use the same version prefix.
 
 Do not expose unversioned endpoints. If request or response schemas change incompatibly later, introduce a new API version instead of silently changing `/api/v0/` behavior.
+
+For local development, the API allows CORS from `http://127.0.0.1:3000` only. Do not use wildcard CORS for this app.
 
 ## Secret Management
 
 Future AI provider keys and storage credentials must come from environment variables or a managed secret store. Secrets must never be committed, bundled into frontend code, returned in API responses, or written to logs.
 
-## Image Uploads
+## Food Mock Metadata
 
-The first backend implementation should use a direct `multipart/form-data` POST to `/api/v0/food/analyze` with one image file and optional client metadata. This keeps MVP v0 small and avoids object storage, signed URLs, authentication, or persistent media records.
+The mock food milestone sends JSON file metadata only to `POST /api/v0/food/analyze/mock`. The frontend validates one selected image file locally and sends filename, content type, size in bytes, and last modified time. Image bytes are not uploaded or stored.
+
+The backend returns structured mock `FoodAnalysis` JSON and validates metadata with the same type and size boundaries. The endpoint must not use `UploadFile`, `multipart/form-data`, storage, AI calls, authentication, or database writes.
+
+## Future Image Uploads
+
+A later backend implementation may use a direct `multipart/form-data` POST to `/api/v0/food/analyze` with one image file and optional client metadata. This should remain separate from the mock metadata endpoint.
 
 Backend validation should enforce file type and size limits before mock or AI analysis. Future production versions may move to signed object-storage uploads when media retention, user accounts, and larger files are intentionally introduced.
 
@@ -114,6 +124,8 @@ Food analysis should use structured JSON. A future schema should include:
   "analysis_id": "string",
   "schema_version": "food_analysis.v1",
   "mode": "mock|ai",
+  "analyzed_at": "ISO-8601 string",
+  "items_count": 0,
   "items": [
     {
       "item_id": "string",
@@ -165,6 +177,15 @@ Food analysis should use structured JSON. A future schema should include:
 ```
 
 MVP v0 can use deterministic mock data that follows this shape. The schema should be treated as the product contract even before real AI exists.
+
+Mock endpoint errors use a structured envelope:
+
+```json
+{
+  "code": "invalid_file_type",
+  "message": "Only JPEG, PNG, WebP, and HEIC images are supported."
+}
+```
 
 ## Correction Object Sub-Schema
 

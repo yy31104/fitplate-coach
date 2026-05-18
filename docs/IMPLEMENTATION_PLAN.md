@@ -33,7 +33,7 @@ Exit criteria:
 
 Status: started with the minimal scaffold milestone.
 
-Application scaffolding has been explicitly requested for the approved minimal milestone only.
+Application scaffolding has been explicitly requested for the approved minimal milestone, and the food photo mock analysis milestone is now approved.
 
 This phase still preserves the v0 rule: no auth, no database, no real AI call, no video processing, and no native mobile app.
 
@@ -55,11 +55,12 @@ Ordered tasks:
    - Add root run/test scripts.
    - Do not add frontend API calls, uploads, AI, auth, database, video processing, Docker, or extra UI libraries.
 3. Frontend shell with hardcoded mock data:
-   - Scaffold Next.js with TypeScript only after approval.
-   - Add mobile-first layout.
-   - Add food image selection UI.
-   - Use hardcoded in-memory mock analysis data only.
-   - Do not call a backend yet.
+   - Add `/food/new`.
+   - Add mobile-first one-image selection UI.
+   - Validate file metadata locally.
+   - Send JSON metadata only to `POST /api/v0/food/analyze/mock`.
+   - Display structured mock analysis results from the backend.
+   - Do not upload image bytes or use storage.
 4. Frontend correction loop:
    - Use the canonical correction object from [Architecture](ARCHITECTURE.md#correction-object-sub-schema).
    - Use the deterministic mock recomputation algorithm from [Architecture](ARCHITECTURE.md#mock-calorie-recalculation).

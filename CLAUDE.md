@@ -13,7 +13,7 @@ The project should feel like a production-style portfolio project, not an AI toy
 
 ## Current Scope
 
-The first code milestone is approved for implementation. Keep it limited to a minimal monorepo scaffold with a static web home page and a backend health endpoint.
+The food photo mock analysis milestone is approved for implementation. Keep it limited to a metadata-only mock flow with a static file selection UI and a structured mock backend response.
 
 Allowed now:
 
@@ -25,19 +25,23 @@ Allowed now:
 - Implementation planning.
 - `apps/web`: Next.js, TypeScript, Tailwind home page only.
 - `apps/api`: FastAPI backend with `GET /api/v0/health` only.
-- Package manifests, lockfiles, and dependency installation required for this scaffold.
-- Minimal tests and run scripts for the scaffold.
+- `apps/web`: `/food/new` route for one-image metadata selection, local validation, mock result display, and inline error/loading states.
+- `apps/api`: `POST /api/v0/food/analyze/mock` accepting JSON file metadata only.
+- Backend tests for the mock food analysis endpoint.
 
 Do not create:
 
 - Database schema.
 - Auth flows.
 - Real AI calls.
-- Upload flows.
+- Real image upload bytes or `multipart/form-data`.
+- File storage.
 - Video processing pipeline.
 - Native mobile app.
 - Docker.
 - Extra UI libraries, shadcn, Supabase, or environment secrets.
+- Frontend test framework.
+- Correction UI or recompute endpoint.
 
 ## Transition to Implementation
 
@@ -61,6 +65,15 @@ Approved first code milestone:
 - Root npm workspace scripts for running and testing the web and API apps.
 - No frontend API integration yet.
 - No upload flow, food analysis mock, correction loop, AI, database, auth, or video routes.
+
+Approved food photo mock analysis milestone:
+
+- Frontend route: `/food/new`.
+- Backend endpoint: `POST /api/v0/food/analyze/mock`.
+- Frontend sends JSON metadata only: filename, content type, size in bytes, and last modified time.
+- Backend returns mocked `FoodAnalysis` JSON with `mode: "mock"` and `schema_version: "food_analysis.v1"`.
+- Frontend displays calorie ranges, items, confidence, assumptions, safety flags, and a calm nutrition disclaimer.
+- No real file upload, storage, AI, database, auth, video processing, Docker, extra UI library, correction UI, or recompute endpoint.
 
 ## Planned Stack
 
@@ -121,3 +134,11 @@ Document prompt changes, schema changes, and model behavior changes. Future prod
 - Keep documentation consistent across README, PRD, architecture, safety, and implementation plan.
 - Do not introduce code or dependencies unless the user explicitly asks for implementation.
 - When implementation begins later, keep mock behavior clearly separate from production AI integration.
+
+## AI Agent Working Principles
+
+- Think before coding: state assumptions, surface ambiguity, and ask before expanding scope.
+- Simplicity first: implement the minimum code needed for the approved milestone.
+- Surgical changes: touch only files required by the current task; no drive-by refactors.
+- Goal-driven execution: every task must define verification commands and pass them before completion.
+- If a task is ambiguous, stop and ask instead of guessing.

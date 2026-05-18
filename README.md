@@ -26,13 +26,15 @@ Current scaffold scope:
 - Minimal monorepo.
 - `apps/web` with Next.js, TypeScript, Tailwind, and a static home page only.
 - `apps/api` with FastAPI and `GET /api/v0/health` only.
+- `/food/new` for metadata-only mock food photo analysis.
+- `POST /api/v0/food/analyze/mock` for structured mock `FoodAnalysis` JSON.
 
 Not implemented:
 
 - Real AI provider integration.
 - Authentication.
 - Database.
-- Upload flow.
+- Real image upload bytes or file storage.
 - Video processing.
 - Native mobile app.
 
@@ -110,6 +112,14 @@ Expected response:
 ```json
 {"status":"ok","service":"fitplate-api","version":"0.1.0"}
 ```
+
+Food mock analysis:
+
+```text
+http://127.0.0.1:3000/food/new
+```
+
+The browser sends file metadata only to `POST /api/v0/food/analyze/mock`; image bytes are not uploaded or stored.
 
 Run checks:
 

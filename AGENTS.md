@@ -18,7 +18,7 @@ The MVP v0 is documentation-first and implementation-light:
 
 ## Current Repository Rule
 
-The first code milestone is approved for implementation. Keep the milestone limited to a minimal monorepo scaffold with a static web home page and a backend health endpoint.
+The food photo mock analysis milestone is approved for implementation. Keep the milestone limited to a metadata-only mock flow with a static file selection UI and a structured mock backend response.
 
 Allowed in the current phase:
 
@@ -29,18 +29,22 @@ Allowed in the current phase:
 - Implementation planning.
 - `apps/web`: Next.js, TypeScript, Tailwind home page only.
 - `apps/api`: FastAPI backend with `GET /api/v0/health` only.
-- Package manifests, lockfiles, and dependency installation required for this scaffold.
-- Minimal tests and run scripts for the scaffold.
+- `apps/web`: `/food/new` route for one-image metadata selection, local validation, mock result display, and inline error/loading states.
+- `apps/api`: `POST /api/v0/food/analyze/mock` accepting JSON file metadata only.
+- Backend tests for the mock food analysis endpoint.
 
 Not allowed in the current phase:
 
 - AI provider integration.
 - Database setup.
 - Authentication.
-- Upload flows.
+- Real image upload bytes or `multipart/form-data`.
+- File storage.
 - Video processing implementation.
 - Docker.
 - Extra UI libraries, shadcn, Supabase, or environment secrets.
+- Frontend test framework.
+- Correction UI or recompute endpoint.
 
 ## Transition to Implementation
 
@@ -64,6 +68,15 @@ Approved first code milestone:
 - Root npm workspace scripts for web and API run/test commands.
 - No frontend API integration yet.
 - No upload flow, food analysis mock, correction loop, AI, database, auth, or video routes.
+
+Approved food photo mock analysis milestone:
+
+- Frontend route: `/food/new`.
+- Backend endpoint: `POST /api/v0/food/analyze/mock`.
+- Frontend sends JSON metadata only: filename, content type, size in bytes, and last modified time.
+- Backend returns mocked `FoodAnalysis` JSON with `mode: "mock"` and `schema_version: "food_analysis.v1"`.
+- Frontend displays calorie ranges, items, confidence, assumptions, safety flags, and a calm nutrition disclaimer.
+- No real file upload, storage, AI, database, auth, video processing, Docker, extra UI library, correction UI, or recompute endpoint.
 
 ## Engineering Principles
 
@@ -120,10 +133,20 @@ Exercise feedback outputs should include:
 
 ## Verification
 
-For documentation-only changes, verify with:
+For the current scaffold and food mock analysis milestone, verify with:
 
 - `git status`
 - `rg --files`
-- Manual review of changed Markdown files
+- `npm run test:api`
+- `npm run lint:web`
+- `npm run build:web`
 
-Do not run package managers or framework commands unless application code has been intentionally introduced.
+Do not add package manager or framework commands beyond the approved milestone scope.
+
+## AI Agent Working Principles
+
+- Think before coding: state assumptions, surface ambiguity, and ask before expanding scope.
+- Simplicity first: implement the minimum code needed for the approved milestone.
+- Surgical changes: touch only files required by the current task; no drive-by refactors.
+- Goal-driven execution: every task must define verification commands and pass them before completion.
+- If a task is ambiguous, stop and ask instead of guessing.

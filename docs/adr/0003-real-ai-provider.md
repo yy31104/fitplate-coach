@@ -46,7 +46,7 @@ re-tested on SDK upgrades.
 
 Normal tests and CI remain free of real network calls and API cost. A
 `real_provider` pytest marker exists for an opt-in local smoke test that skips
-unless an API key is present.
+unless an API key is present and `FITPLATE_RUN_REAL_PROVIDER_TEST=1` is set.
 
 Deferred work includes multi-provider routing, persistent cost accounting,
 retry policy, object storage, EXIF handling, auth, database-backed model runs,

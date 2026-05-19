@@ -69,7 +69,7 @@ test("page renders the file selection UI", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Select a food photo to estimate calories." })).toBeVisible();
   await expect(page.getByText("Choose a photo")).toBeVisible();
   await expect(page.getByText("JPEG, PNG, WebP, and HEIC. Maximum 10 MB.")).toBeVisible();
-  await expect(page.getByText("Select a food photo to see a structured mock analysis here.")).toBeVisible();
+  await expect(page.getByText("Select a food photo to see a structured food analysis here.")).toBeVisible();
 });
 
 test("selecting an invalid file type shows the inline validation error and does not show Analyze", async ({
@@ -87,7 +87,7 @@ test("selecting an invalid file type shows the inline validation error and does 
   await expect(page.getByRole("button", { name: "Analyze" })).toHaveCount(0);
 });
 
-test("selecting a valid JPEG and clicking Analyze shows a mock result", async ({ page }) => {
+test("selecting a valid JPEG and clicking Analyze shows an analysis result", async ({ page }) => {
   await mockFoodEndpoints(page);
   await page.goto("/food/new");
 
@@ -95,7 +95,7 @@ test("selecting a valid JPEG and clicking Analyze shows a mock result", async ({
   await page.getByRole("button", { name: "Analyze" }).click();
 
   await expect(page.getByRole("heading", { name: "Food photo estimate" })).toBeVisible();
-  await expect(page.getByText("Mock analysis", { exact: true })).toBeVisible();
+  await expect(page.getByText("Analysis", { exact: true })).toBeVisible();
   await expect(page.getByText("Chicken breast")).toBeVisible();
   await expect(page.getByText("~150g · 180-220 kcal")).toBeVisible();
 });
@@ -125,7 +125,7 @@ test("applying a correction updates the display with a corrected badge and user-
   await page.getByLabel("Portion in grams").fill("250");
   await page.getByRole("button", { name: "Apply" }).click();
 
-  await expect(page.getByText("Mock analysis — user corrected")).toBeVisible();
+  await expect(page.getByText("Analysis — user corrected")).toBeVisible();
   await expect(page.getByText("corrected", { exact: true })).toBeVisible();
   await expect(page.getByText("~250g · 300-400 kcal")).toBeVisible();
   await expect(page.getByText("Original: 150g")).toBeVisible();

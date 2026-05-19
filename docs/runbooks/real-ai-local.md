@@ -87,6 +87,7 @@ Export real-AI local environment variables:
 export FITPLATE_AI_MODE=ai
 export FITPLATE_AI_PROVIDER=openai
 export FITPLATE_AI_PROVIDER_API_KEY="sk-..."
+export FITPLATE_RUN_REAL_PROVIDER_TEST=1
 export FITPLATE_AI_MODEL=gpt-5.4-mini
 export FITPLATE_MONTHLY_COST_CAP_USD=1.00
 export FITPLATE_AI_REQUEST_TIMEOUT_SECONDS=30
@@ -107,12 +108,15 @@ Export the environment variables from the setup section in the same shell before
 running this command.
 
 ```bash
+export FITPLATE_AI_PROVIDER_API_KEY="sk-..."
+export FITPLATE_RUN_REAL_PROVIDER_TEST=1
 cd apps/api
 ./.venv/bin/pytest -m real_provider
 ```
 
-Without `FITPLATE_AI_PROVIDER_API_KEY`, this test skips. With a key, it makes a
-real provider call and may spend money.
+Without both `FITPLATE_AI_PROVIDER_API_KEY` and
+`FITPLATE_RUN_REAL_PROVIDER_TEST=1`, this test skips. The extra flag prevents
+accidental spending when an API key is already present in your shell.
 
 Option 2: run a manual multipart upload:
 
@@ -138,6 +142,7 @@ Unset real-AI environment variables:
 unset FITPLATE_AI_MODE
 unset FITPLATE_AI_PROVIDER
 unset FITPLATE_AI_PROVIDER_API_KEY
+unset FITPLATE_RUN_REAL_PROVIDER_TEST
 unset FITPLATE_AI_MODEL
 unset FITPLATE_MONTHLY_COST_CAP_USD
 unset FITPLATE_AI_REQUEST_TIMEOUT_SECONDS

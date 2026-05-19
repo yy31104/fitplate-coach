@@ -222,7 +222,7 @@ export default function NewFoodAnalysisPage() {
           </Link>
           <div className="max-w-3xl space-y-3">
             <p className="text-sm font-semibold tracking-[0.18em] text-stone-600 uppercase">
-              Food photo mock analysis
+              Food photo analysis
             </p>
             <h1 className="text-3xl font-semibold sm:text-4xl">
               Select a food photo to estimate calories.
@@ -290,7 +290,7 @@ export default function NewFoodAnalysisPage() {
                   </label>
                   <p className="text-xs leading-5 text-stone-500">
                     Metadata-only remains default. Upload sends the actual file to the
-                    backend. No real AI provider is active.
+                    backend when enabled.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-3">

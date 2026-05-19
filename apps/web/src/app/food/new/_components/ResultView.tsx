@@ -49,7 +49,7 @@ export function ResultView({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-3">
           <span className="inline-flex rounded-full border border-stone-300 bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-700">
-            {hasAnyCorrection ? "Mock analysis — user corrected" : "Mock analysis"}
+            {hasAnyCorrection ? "Analysis — user corrected" : "Analysis"}
           </span>
           <div>
             <h2 className="text-2xl font-semibold">
@@ -157,7 +157,7 @@ export function EmptyResult() {
   return (
     <div className="flex min-h-80 items-center justify-center text-center">
       <p className="max-w-sm text-sm leading-6 text-stone-600">
-        Select a food photo to see a structured mock analysis here.
+        Select a food photo to see a structured food analysis here.
       </p>
     </div>
   );

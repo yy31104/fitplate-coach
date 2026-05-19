@@ -3,6 +3,7 @@ import json
 import os
 import struct
 import zlib
+from collections.abc import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -14,9 +15,16 @@ from app.main import app
 client = TestClient(app)
 
 
+@pytest.fixture(autouse=True)
+def clear_settings_cache() -> Iterator[None]:
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
+
+
 @pytest.mark.real_provider
 def test_real_openai_provider_upload_flow(tmp_path, monkeypatch) -> None:
-    """Spends real OpenAI API money when explicitly enabled."""
+    """Spends money only with FITPLATE_AI_PROVIDER_API_KEY and FITPLATE_RUN_REAL_PROVIDER_TEST=1."""
     api_key = os.environ.get("FITPLATE_AI_PROVIDER_API_KEY")
     if not api_key:
         pytest.skip("FITPLATE_AI_PROVIDER_API_KEY is not set")

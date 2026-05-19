@@ -6,11 +6,11 @@ FitPlate Coach is a mobile-first food photo calorie estimation app that treats A
 
 ## Project Overview
 
-The current app lets a user select one food image in the browser. The frontend validates the file locally, sends metadata only to the backend, and never uploads or stores image bytes. The backend returns a deterministic mock `FoodAnalysis` JSON response with food items, portion assumptions, calorie ranges, confidence levels, and safety flags.
+The current app lets a user select one food image in the browser. The default development flow uses deterministic mock and fake-provider paths, while an explicit local upload flow can send image bytes to the backend for analysis. The backend returns a structured `FoodAnalysis` JSON response with food items, portion assumptions, calorie ranges, confidence levels, and safety flags.
 
 After the mock result appears, the user can correct an item's portion in grams. The backend mock correction endpoint recomputes that item's calorie range from corrected grams, the original calorie density, and the original confidence margin, then the frontend updates the display from the returned `UserCorrection`.
 
-There is no real model call yet. That is intentional: the project is built around the production contract first, so a future AI integration can sit behind the same schema and safety boundaries instead of forcing a UI rewrite.
+Real OpenAI image analysis is available for local demos behind explicit feature flags and a server-side API key. Normal CI does not call OpenAI or spend API money, and the project remains local-demo-ready rather than production SaaS.
 
 ## Engineering Discipline Over Demo Shortcuts
 
@@ -66,11 +66,11 @@ The future exercise feedback track follows the same safety policy: non-clinical 
 
 ## What The AI Layer Will And Will Not Do
 
-Current mode is mock. The backend returns deterministic structured data derived from request metadata; no AI provider is called.
+Default development mode is mock. The backend can return deterministic structured data without calling a paid provider, and fake-provider paths exercise the AI adapter without network calls.
 
-The next AI-related work is AI-readiness, not simply "turn on a model." Before a real multimodal endpoint exists, the project needs prompt versioning, model run logging, an evaluation set, and cost tracking.
+Real OpenAI analysis is available behind explicit local feature flags, a server-side API key, and cost controls. Normal CI does not call OpenAI or spend API money.
 
-A later real endpoint can return `mode: "ai"` using the same `FoodAnalysis` schema. Estimates should still be ranges, not exact numbers, and user corrections should continue to use the same `UserCorrection` contract.
+Real and mock paths use the same `FoodAnalysis` schema. Estimates should still be ranges, not exact numbers, and user corrections should continue to use the same `UserCorrection` contract.
 
 ## Tech Stack
 
@@ -206,6 +206,7 @@ Safety flags are typed schema values. A backend can emit a safety flag and the f
 ## Documentation Map
 
 - [Product Requirements](docs/PRD.md)
+- [Portfolio Engineering Summary](docs/PORTFOLIO_NOTES.md)
 - [API Contract](docs/API_CONTRACT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [AI Safety](docs/AI_SAFETY.md)

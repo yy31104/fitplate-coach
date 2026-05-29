@@ -214,5 +214,6 @@ Safety flags are typed schema values. A backend can emit a safety flag and the f
 - [Architecture](docs/ARCHITECTURE.md)
 - [AI Safety](docs/AI_SAFETY.md)
 - [Data Map](docs/DATA_MAP.md)
+- [Evaluation Maintenance Runbook](docs/runbooks/eval-maintenance.md)
 - [Real AI Local Runbook](docs/runbooks/real-ai-local.md)
 - [Implementation Plan](docs/IMPLEMENTATION_PLAN.md)

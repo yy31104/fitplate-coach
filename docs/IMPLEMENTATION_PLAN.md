@@ -198,6 +198,7 @@ Deliverables:
 - `apps/api/app/evaluation/__main__.py`.
 - `docs/evaluation/REPORT.md`.
 - `apps/api/evaluation/report.json`.
+- `docs/runbooks/eval-maintenance.md`.
 - Root `npm run eval:api`.
 - CI step running `npm run eval:api` after API tests.
 

@@ -210,6 +210,7 @@ Safety flags are typed schema values. A backend can emit a safety flag and the f
 
 - [Product Requirements](docs/PRD.md)
 - [Portfolio Engineering Summary](docs/PORTFOLIO_NOTES.md)
+- [Portfolio Walkthrough](docs/PORTFOLIO_WALKTHROUGH.md)
 - [API Contract](docs/API_CONTRACT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [AI Safety](docs/AI_SAFETY.md)

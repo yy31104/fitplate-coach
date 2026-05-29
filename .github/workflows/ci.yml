@@ -52,6 +52,9 @@ jobs:
       - name: Run API evaluation
         run: npm run eval:api
 
+      - name: Check eval report freshness
+        run: git diff --exit-code docs/evaluation/REPORT.md apps/api/evaluation/report.json
+
       - name: Install Playwright browsers
         run: npm exec --workspace apps/web playwright install --with-deps chromium
 

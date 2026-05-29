@@ -39,6 +39,9 @@ npm run test:api
 Before committing, review the report summary and commit the case changes,
 `REPORT.md`, and `report.json` together.
 
+CI reruns `npm run eval:api` and fails if either generated report has an
+uncommitted diff.
+
 ## Hard Boundaries
 
 Evaluation must remain local, deterministic, and free to run:

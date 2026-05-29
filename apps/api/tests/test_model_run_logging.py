@@ -46,6 +46,20 @@ def test_successful_analyze_writes_one_valid_jsonl_record(tmp_path, monkeypatch)
     assert records[0].cost_usd == 0.0
 
 
+def test_analyze_long_filename_is_truncated_in_model_run(tmp_path, monkeypatch) -> None:
+    log_path = _use_log_path(tmp_path, monkeypatch)
+    filename = f"{'a' * 300}.jpg"
+
+    response = client.post(
+        "/api/v0/food/analyze/mock",
+        json=_analyze_payload(filename=filename),
+    )
+
+    assert response.status_code == 200
+    record = _read_records(log_path)[0]
+    assert len(record.input_summary["filename"]) == 255
+
+
 def test_successful_correction_writes_one_valid_jsonl_record(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
 
@@ -264,9 +278,9 @@ def _read_records(log_path: Path) -> list[ModelRun]:
     ]
 
 
-def _analyze_payload() -> dict[str, object]:
+def _analyze_payload(filename: str = "lunch-photo.jpg") -> dict[str, object]:
     return {
-        "filename": "lunch-photo.jpg",
+        "filename": filename,
         "content_type": "image/jpeg",
         "size_bytes": 345678,
         "last_modified_ms": 1710000000000,

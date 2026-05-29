@@ -2,7 +2,7 @@
 
 ## Overview
 
-FitPlate Coach is planned as a mobile-first web app with a Next.js frontend and FastAPI backend. The first implementation milestone will use mock food analysis only, while preserving interfaces that can later support real AI calls, persistence, evaluation, and async video processing.
+FitPlate Coach is a mobile-first web app with a Next.js frontend and FastAPI backend. The current implementation is local-demo-ready: deterministic mock analysis is the default, fake-provider analysis exercises the AI adapter without network calls, and real OpenAI analysis is available only behind explicit local flags, a server-side key, and a cost cap.
 
 The architecture should keep these concerns separate:
 
@@ -19,12 +19,14 @@ The architecture should keep these concerns separate:
 
 The repository currently contains the first minimal monorepo scaffold:
 
-- `apps/web`: static Next.js, TypeScript, Tailwind home page.
+- `apps/web`: Next.js, TypeScript, Tailwind home page and `/food/new` flow.
 - `apps/api`: FastAPI app exposing `GET /api/v0/health`.
-- `apps/web`: `/food/new` metadata-only mock food analysis route.
-- `apps/api`: `POST /api/v0/food/analyze/mock` and multipart `POST /api/v0/food/analyze`.
+- `apps/web`: `/food/new` food analysis and correction flow.
+- `apps/api`: `POST /api/v0/food/analyze/mock`, multipart `POST /api/v0/food/analyze`, and `POST /api/v0/food/corrections/mock`.
+- Analyzer adapter with mock, fake-provider, and local-demo OpenAI provider paths.
+- Prompt registry, summary-only `model_run.v1` JSONL logs, cost cap, and deterministic evaluation cases.
 
-There is no AI integration, database, authentication, real file upload, file storage, video processing, Docker setup, or environment secret requirement.
+There is no authentication, database, persistent file storage, video processing, Docker setup, production deployment, or real provider call in CI.
 
 ## Planned High-Level System
 
@@ -87,7 +89,7 @@ Future FastAPI responsibilities:
 - Route v0 requests to mock analyzers.
 - Route v1+ requests to AI provider adapters.
 - Apply safety checks.
-- Log model runs when real AI is introduced.
+- Log summary-only model runs for analysis and correction routes.
 - Store user corrections when persistence is introduced.
 - Keep provider-specific details behind service boundaries.
 
@@ -97,7 +99,7 @@ All first backend endpoints should live under `/api/v0/`. The initial scaffold e
 
 Do not expose unversioned endpoints. If request or response schemas change incompatibly later, introduce a new API version instead of silently changing `/api/v0/` behavior.
 
-For local development, the API allows CORS from `http://127.0.0.1:3000` only. Do not use wildcard CORS for this app.
+For local development, the API allows CORS from `http://127.0.0.1:3000` and `http://localhost:3000`. Do not use wildcard CORS for this app.
 
 ## Secret Management
 
@@ -115,7 +117,7 @@ The backend returns structured mock `FoodAnalysis` JSON and validates metadata w
 
 The upload route uses a multipart spool threshold above the 10 MB app-level cap, so accepted uploads within that cap stay in memory at the framework parser layer. Application code then reads bytes synchronously with a hard size cap, validates the declared content type and actual byte count, and discards the byte buffer at request scope end. It never persists image bytes and never writes them to disk, model-run logs, responses, or errors. Filenames are not used as filesystem paths and are truncated before logging.
 
-In this PR, the analyzer still receives a metadata-shaped `FoodAnalyzeMockRequest` built from the upload: filename, content type, actual byte count, and `last_modified_ms=0`. `ImageRef` is not extended with bytes yet, and no real provider receives image content. Future production versions may move to signed object-storage uploads when media retention, user accounts, and larger files are intentionally introduced.
+The analyzer receives a metadata-shaped `FoodAnalyzeMockRequest` built from the upload: filename, content type, actual byte count, and `last_modified_ms=0`. It also receives an `ImageRef` with request-scoped bytes. Mock and fake-provider paths remain deterministic; the OpenAI provider can receive those bytes only when local-demo real AI flags and a server-side key are configured. Future production versions may move to signed object-storage uploads when media retention, user accounts, and larger files are intentionally introduced.
 
 ## Food Analysis Contract
 
@@ -206,7 +208,7 @@ The correction object is the canonical contract for v0 food corrections.
 | `correction_timestamp` | string | yes | ISO-8601 timestamp. |
 | `correction_source` | string | yes | For v0, always `user`. |
 
-Future versions may add optional fields for prompt version, model id, or evaluation consent. Do not add those to MVP v0 because v0 has no real AI call, auth, or database.
+Future versions may add optional fields for prompt version, model id, or evaluation consent. Do not add those to MVP v0 correction payloads because v0 has no auth, database, or persisted correction records.
 
 ## Mock Calorie Recalculation
 
@@ -273,7 +275,7 @@ Production uses:
 
 ## Prompt Versioning
 
-When real AI is introduced, prompts should be versioned like application code.
+Real AI prompts should be versioned like application code.
 
 Each AI request should record:
 
@@ -359,10 +361,9 @@ with route, mode, model, timing, summarized inputs, summarized outputs, safety
 flags, token placeholders, cost placeholders, and error details when a route
 fails unexpectedly.
 
-The log exists before real AI integration so prompt observability, latency
-tracking, cost tracking, and schema validation can attach to an existing
-contract later. Current mock runs use `model: "mock"`, zero token counts, and
-zero cost.
+The log exists so prompt observability, latency tracking, cost tracking, and
+schema validation attach to one stable contract. Current mock and fake-provider
+runs use zero token counts and zero cost.
 
 Privacy boundary: model run logs store summaries only. They must not store raw
 media, raw full request bodies, raw full responses, secrets, or provider keys.

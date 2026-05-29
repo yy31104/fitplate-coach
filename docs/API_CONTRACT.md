@@ -9,7 +9,7 @@ Current live endpoints:
 - `POST /api/v0/food/analyze/mock`
 - `POST /api/v0/food/corrections/mock`
 
-The food analysis endpoints do not store uploaded files, authenticate users, or call a real AI model. `POST /api/v0/food/analyze/mock` accepts JSON metadata only. `POST /api/v0/food/analyze` accepts one multipart image, keeps accepted uploads within the 10 MB cap in memory via the configured multipart spool threshold, summarizes metadata for logging, and discards bytes before returning. By default both routes use deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, they use a local fake provider path for AI-readiness testing.
+The food analysis endpoints do not store uploaded files or authenticate users. `POST /api/v0/food/analyze/mock` accepts JSON metadata only. `POST /api/v0/food/analyze` accepts one multipart image, keeps accepted uploads within the 10 MB cap in memory via the configured multipart spool threshold, summarizes metadata for logging, and discards bytes before returning. By default both routes use deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, they use the configured provider. `FITPLATE_AI_PROVIDER=fake` stays deterministic and local. `FITPLATE_AI_PROVIDER=openai` is local-demo-only behind a server-side API key and cost cap, and is not used in CI.
 
 ## Base URL and Versioning
 
@@ -27,7 +27,7 @@ Do not rely on unversioned routes. Incompatible request or response changes shou
 
 Local CORS configuration allows:
 
-- Origin: `http://127.0.0.1:3000`
+- Origins: `http://127.0.0.1:3000`, `http://localhost:3000`
 - Methods: `GET`, `POST`
 - Credentials: disabled
 - Headers: all request headers
@@ -846,7 +846,7 @@ The metadata mock endpoint does not receive image bytes. The multipart upload en
 
 The API has no authentication in v0. It must not be exposed on a public host until authentication is added.
 
-CORS is restricted to `http://127.0.0.1:3000` in the development configuration. Do not deploy with wildcard CORS origins.
+CORS is restricted to `http://127.0.0.1:3000` and `http://localhost:3000` in the development configuration. Do not deploy with wildcard CORS origins.
 
 ## Planned Endpoints
 

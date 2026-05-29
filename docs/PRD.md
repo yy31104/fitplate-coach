@@ -30,7 +30,7 @@ The product is designed around uncertainty, correction, and safety. It should he
 
 ## MVP v0 Scope
 
-MVP v0 is the first app implementation target, not the current documentation-only repository state.
+MVP v0 is the current local-demo implementation target, not production SaaS.
 
 Features:
 
@@ -46,11 +46,12 @@ Features:
 
 Technical boundaries:
 
-- Next.js frontend later.
-- FastAPI backend later.
-- No real AI API calls.
+- Next.js frontend.
+- FastAPI backend.
+- No real AI in CI; real AI remains local-demo-only behind explicit flags, a server-side key, and a cost cap.
 - No authentication.
 - No database.
+- No persistent image storage.
 - No video processing.
 - No native mobile app.
 

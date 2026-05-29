@@ -456,7 +456,7 @@ def _validate_metadata(
 
 def _analyze_input_summary(payload: FoodAnalyzeMockRequest) -> dict[str, object]:
     return {
-        "filename": payload.filename,
+        "filename": _truncate_filename(payload.filename),
         "content_type": payload.content_type,
         "size_bytes": payload.size_bytes,
     }

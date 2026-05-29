@@ -13,9 +13,9 @@ The project should feel like a production-style portfolio project, not an AI toy
 
 ## Current Scope
 
-The food photo mock analysis milestone is approved for implementation. Keep it limited to a metadata-only mock flow with a static file selection UI and a structured mock backend response.
+The current repository state is local-demo-ready AI, not production SaaS. Default behavior is deterministic mock analysis; the fake provider exercises the AI adapter without network calls; real OpenAI image analysis is local-demo-only behind explicit flags, a server-side API key, and a cost cap.
 
-Allowed now:
+Implemented and allowed now:
 
 - Documentation.
 - Repo rules.
@@ -23,10 +23,17 @@ Allowed now:
 - Architecture notes.
 - AI safety constraints.
 - Implementation planning.
-- `apps/web`: Next.js, TypeScript, Tailwind home page only.
-- `apps/api`: FastAPI backend with `GET /api/v0/health` only.
-- `apps/web`: `/food/new` route for one-image metadata selection, local validation, mock result display, and inline error/loading states.
+- `apps/web`: Next.js, TypeScript, Tailwind home page and `/food/new`.
+- `apps/web`: one-image selection, local validation, mock analysis display, multipart upload transport, grams correction UI, inline error/loading states, and Playwright E2E coverage.
+- `apps/api`: FastAPI backend with `GET /api/v0/health`.
 - `apps/api`: `POST /api/v0/food/analyze/mock` accepting JSON file metadata only.
+- `apps/api`: `POST /api/v0/food/analyze` accepting one request-scoped multipart image, validating it, and discarding bytes without persistence.
+- `apps/api`: `POST /api/v0/food/corrections/mock` returning deterministic `UserCorrection` data.
+- Analyzer adapter boundary with mock, fake AI, and OpenAI provider implementations.
+- Versioned prompt registry under `apps/api/prompts/`.
+- Append-only local `model_run.v1` JSONL logs with summary fields only.
+- Monthly cost cap checks before real provider calls.
+- Deterministic food-analysis evaluation cases and local evidence reports using mock and fake-provider paths only.
 - Backend tests for the mock food analysis endpoint.
 - Real OpenAI calls only when explicitly requested and all required flags are set:
   `FITPLATE_AI_MODE=ai`, `FITPLATE_AI_PROVIDER=openai`, a server-side
@@ -34,22 +41,25 @@ Allowed now:
 
 Do not create:
 
+- Authentication flows.
 - Database schema.
-- Auth flows.
-- Unapproved real AI calls.
-- Real image upload bytes or `multipart/form-data`.
-- File storage.
+- Persistent image storage or object storage.
+- Production SaaS hosting, deployment/IaC, public API exposure, abuse controls, billing, or multi-tenant operations.
 - Video processing pipeline.
 - Native mobile app.
 - Docker.
 - Extra UI libraries, shadcn, Supabase, or environment secrets.
 - Frontend test framework.
-- Correction UI or recompute endpoint.
+- Real provider calls in CI.
+- Real provider tests in CI.
+- Unflagged or client-side AI provider calls.
+- Raw image bytes, base64 payloads, API keys, raw provider responses, or full prompt bodies in logs.
 
 Real AI remains forbidden unless the user explicitly approves that work for the
-current task. Even when real AI is approved, do not add auth, a database, file
-storage, video processing, async pipelines, or frontend real-AI UX redesign
-unless those are separately requested.
+current task. Even when real AI is approved, it remains local-demo-only behind
+flags, server-side key handling, and cost controls. Do not add auth, a database,
+persistent file storage, video processing, async pipelines, production hosting,
+or frontend real-AI UX redesign unless those are separately requested.
 
 ## Transition to Implementation
 
@@ -61,9 +71,11 @@ For MVP v0, keep these constraints unless the user explicitly changes them:
 
 - No authentication.
 - No database.
-- No real AI API call.
+- No real AI in CI.
+- Real AI is local-demo-only behind explicit flags, a server-side key, and a cost cap.
 - No video processing.
 - No native mobile app.
+- No production SaaS scope.
 
 Approved first code milestone:
 
@@ -83,6 +95,24 @@ Approved food photo mock analysis milestone:
 - Frontend displays calorie ranges, items, confidence, assumptions, safety flags, and a calm nutrition disclaimer.
 - No real file upload, storage, AI, database, auth, video processing, Docker, extra UI library, correction UI, or recompute endpoint.
 
+Approved local-demo AI milestone:
+
+- Multipart `POST /api/v0/food/analyze` with request-scoped bytes only.
+- Mock correction endpoint and frontend grams correction flow.
+- Analyzer adapter with mock, fake AI, and OpenAI provider implementations.
+- Versioned prompt registry and prompt log.
+- Summary-only `model_run.v1` JSONL logging.
+- Monthly cost cap for real provider calls.
+- Real OpenAI provider local-demo-only behind flags and server-side key.
+- No real provider calls in CI and no production SaaS expansion.
+
+Approved M1 eval/privacy/governance milestone:
+
+- Align governance docs with implemented local-demo-ready AI state.
+- Add `docs/DATA_MAP.md`.
+- Add deterministic local evaluation evidence using only mock analyzer and `FakeAIProvider`.
+- Add `npm run eval:api` and CI evaluation step without OpenAI credentials.
+
 ## Planned Stack
 
 The intended future stack is:
@@ -100,7 +130,7 @@ These are documented intentions, not current implementation requirements.
 - Show uncertainty clearly.
 - Invite user correction instead of pretending AI estimates are exact.
 - Keep AI output structured and auditable.
-- Separate mock analysis from real AI integration.
+- Separate mock analysis, fake-provider tests/evals, and local-demo real AI integration.
 - Keep safety language visible but calm.
 - Treat privacy, cost, evaluation, and observability as first-class production concerns.
 

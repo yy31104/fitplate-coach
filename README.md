@@ -19,9 +19,9 @@ Real OpenAI image analysis is available for local demos behind explicit feature 
 - **Mock mode is observable:** the endpoint is explicitly named `POST /api/v0/food/analyze/mock`, and every response includes `mode: "mock"`.
 - **Corrections are product data:** `UserCorrection` records original and corrected values, timestamps, item IDs, and source. In v0 it stays in React state; later it becomes evaluation data.
 - **Model runs are observable:** current mock food routes append summary-only `model_run.v1` records to local JSONL logs without storing raw media or full responses.
-- **Prompts and evals are versioned early:** a future food-analysis prompt registry and fixed mock evaluation cases are in place before any real AI provider call exists.
+- **Prompts and evals are versioned early:** the food-analysis prompt registry and fixed evaluation cases are in place before production AI is treated as default behavior.
 - **Safety is typed:** safety flags are named schema values, not unstructured UI copy.
-- **CI checks the basics:** GitHub Actions runs web lint, web build, backend API tests, and Playwright E2E tests on every push.
+- **CI checks the basics:** GitHub Actions runs web lint, web build, backend API tests, deterministic API evaluation, and Playwright E2E tests on every push.
 
 ## Current Features
 
@@ -29,11 +29,13 @@ Real OpenAI image analysis is available for local demos behind explicit feature 
 - Local validation for image type, size, and empty files.
 - Metadata-only request containing filename, content type, size in bytes, and last modified time.
 - `POST /api/v0/food/analyze/mock` returning structured mock `FoodAnalysis` JSON.
+- `POST /api/v0/food/analyze` accepting one request-scoped multipart image without persistence.
 - Food item display with portion estimates, calorie ranges, confidence, assumptions, and safety flags.
 - Grams-only correction flow with original estimate preserved beside the corrected estimate.
 - `POST /api/v0/food/corrections/mock` recomputing corrected calorie ranges from corrected grams, original density, and confidence margin.
 - Append-only JSONL model run logs for food mock analysis and correction routes.
-- GitHub Actions CI for `npm run lint:web`, `npm run build:web`, `npm run test:api`, and `npm run test:e2e`.
+- Deterministic local evaluation evidence for mock and fake-provider paths.
+- GitHub Actions CI for `npm run lint:web`, `npm run build:web`, `npm run test:api`, `npm run eval:api`, and `npm run test:e2e`.
 
 ## Architecture
 
@@ -42,9 +44,9 @@ FitPlate Coach is a small monorepo:
 - `apps/web`: Next.js frontend using TypeScript and Tailwind.
 - `apps/api`: FastAPI backend using Pydantic models.
 
-The browser sends JSON metadata to the API; it does not send multipart image data in v0. API routes are versioned under `/api/v0/`, and `FoodAnalysis` is the integration contract between the frontend and backend.
+The browser can send JSON metadata to the mock endpoint or one multipart image to the upload endpoint. API routes are versioned under `/api/v0/`, and `FoodAnalysis` is the integration contract between the frontend and backend.
 
-Correction recomputation is handled by the backend mock correction endpoint. It uses `calorie_density_kcal_per_gram`, corrected grams, and the original confidence margin for high, medium, or low confidence. CORS is restricted to `http://127.0.0.1:3000` in local development.
+Correction recomputation is handled by the backend mock correction endpoint. It uses `calorie_density_kcal_per_gram`, corrected grams, and the original confidence margin for high, medium, or low confidence. CORS allows `http://127.0.0.1:3000` and `http://localhost:3000` in local development.
 
 For the full system design, see [Architecture](docs/ARCHITECTURE.md).
 
@@ -60,7 +62,7 @@ The system is designed not to:
 - Encourage extreme dieting, dehydration, purging, or overtraining.
 - Process images classified as sensitive or NSFW.
 
-Privacy in v0 is deliberately narrow: image bytes are never sent to the backend or stored. There are no user accounts, no database persistence, no session storage, and no analytics.
+Privacy in v0 is deliberately narrow: metadata-only mock requests send no image bytes, multipart upload bytes are request-scoped and discarded, and there are no user accounts, database persistence, session storage, or analytics.
 
 The future exercise feedback track follows the same safety policy: non-clinical technique cues only, with escalation language for pain or injury concerns.
 
@@ -79,7 +81,7 @@ Real and mock paths use the same `FoodAnalysis` schema. Estimates should still b
 - **Monorepo:** npm workspaces at the root, with a Python virtual environment in `apps/api/.venv`.
 - **CI:** GitHub Actions with Node 22 and Python 3.12.
 
-No database, authentication, AI provider, upload storage, Docker, or video processing exists in v0. Those are deferred until the schema contract and correction loop are stable.
+No database, authentication, upload storage, Docker, video processing, or production deployment exists in v0. The real AI provider path is local-demo-only behind explicit flags, a server-side key, and cost controls.
 
 ## Local Development
 
@@ -155,19 +157,20 @@ Run all checks:
 npm run lint:web
 npm run build:web
 npm run test:api
+npm run eval:api
 npm run test:e2e
 ```
 
 CI runs the same commands on every push and on pull requests to `main`. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
-The backend currently has pytest coverage for health, mock food analysis, mock correction, and model run logging. Playwright E2E covers the current `/food/new` browser flow with mocked API calls.
+The backend currently has pytest coverage for health, mock food analysis, multipart upload, mock correction, analyzer/provider seams, cost cap, prompt registry, model run logging, and evaluation. Playwright E2E covers the current `/food/new` browser flow with mocked API calls.
 
 ## Current Limitations
 
-- **Mock analysis only:** calorie values come from deterministic mock scenarios and a small static density table, not from image recognition or nutrition databases.
+- **Mock-first development:** normal development and CI use deterministic mock and fake-provider paths; production image recognition is not enabled by default.
 - **No persistence:** analyses and corrections live in React state. A page reload clears them.
 - **No authentication:** API requests are not associated with users.
-- **No image content analysis:** the backend receives metadata only and cannot verify whether the selected image actually contains food.
+- **No production image content analysis:** default mock and fake-provider paths do not verify whether the selected image actually contains food. Real OpenAI image analysis is local-demo-only.
 - **Grams-only correction:** users can correct portion size in grams, but not the food name. Name correction needs a density lookup flow.
 - **No exercise feedback:** squat video feedback is documented as a future track but not implemented.
 
@@ -175,8 +178,8 @@ The backend currently has pytest coverage for health, mock food analysis, mock c
 
 Next:
 
-- AI-readiness work: prompt versioning, model run logging, evaluation examples, and cost tracking.
-- A separate real multimodal food analysis endpoint that can return `mode: "ai"` without changing the `FoodAnalysis` contract.
+- M1 eval/privacy/governance evidence: deterministic evaluation report, data map, and governance alignment.
+- Keep real AI local-demo-only while privacy, auth, storage, and production controls remain deferred.
 
 Near-term:
 
@@ -210,5 +213,6 @@ Safety flags are typed schema values. A backend can emit a safety flag and the f
 - [API Contract](docs/API_CONTRACT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [AI Safety](docs/AI_SAFETY.md)
+- [Data Map](docs/DATA_MAP.md)
 - [Real AI Local Runbook](docs/runbooks/real-ai-local.md)
 - [Implementation Plan](docs/IMPLEMENTATION_PLAN.md)

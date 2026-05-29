@@ -154,6 +154,8 @@ Food images and exercise videos can reveal sensitive personal context. Future pr
 - Support deletion when persistent accounts exist.
 - Review GDPR/CCPA-style access, export, and deletion obligations before adding accounts or persistent personal data.
 
+The current local-demo data handling boundary is documented in [Data Map](DATA_MAP.md).
+
 ## Prompt and Model Governance
 
 Future AI changes should be tracked with:

@@ -1,0 +1,46 @@
+{
+  "error_count": 1,
+  "error_rate": 0.1667,
+  "errors_by_code": {
+    "analysis_failed": 1
+  },
+  "latency_ms": {
+    "count": 6,
+    "max": 55,
+    "mean": 26.7,
+    "min": 8
+  },
+  "mean_cost_usd": 0.00325,
+  "runs_by_mode": {
+    "ai": 3,
+    "mock": 3
+  },
+  "runs_by_model": {
+    "fake-food-vision-v1": 3,
+    "mock": 3
+  },
+  "runs_by_prompt": {
+    "food_analysis@v1": 3,
+    "none": 3
+  },
+  "runs_by_route": {
+    "POST /api/v0/food/analyze": 1,
+    "POST /api/v0/food/analyze/mock": 4,
+    "POST /api/v0/food/corrections/mock": 1
+  },
+  "runs_with_any_safety_flag": 3,
+  "safety_flag_counts": {
+    "low_confidence": 1,
+    "non_food_image": 1,
+    "schema_validation_failed": 1
+  },
+  "schema_version": "model_run_metrics.v1",
+  "schema_versions_seen": [
+    "model_run.v1"
+  ],
+  "success_rate": 0.8333,
+  "total_cost_usd": 0.0195,
+  "total_input_tokens": 360,
+  "total_output_tokens": 95,
+  "total_runs": 6
+}

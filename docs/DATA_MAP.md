@@ -56,6 +56,10 @@ only; refreshing the page clears it.
 until a developer manually deletes it. Generated evaluation reports are
 deterministic project evidence and do not contain user media or credentials.
 
+The model-run metrics reporter uses committed synthetic fixtures only, emits
+aggregate-only reports, and never reads the real local `model_runs.jsonl` into
+committed artifacts.
+
 ## Deletion and Export
 
 There are no accounts, user ids, sessions, database records, or stored media, so

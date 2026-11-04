@@ -41,21 +41,9 @@ Requires Git, Node.js 22+, and Python 3.12.
 
 ```bash
 git clone https://github.com/yy31104/fitplate-coach.git
-```
-
-```bash
 cd fitplate-coach
-```
-
-```bash
 npm ci
-```
-
-```bash
 python3.12 -m venv apps/api/.venv
-```
-
-```bash
 apps/api/.venv/bin/python -m pip install -e "apps/api[dev]"
 ```
 
@@ -77,21 +65,9 @@ Checks take about a minute after dependency installation:
 
 ```bash
 npm run lint:web
-```
-
-```bash
 npm run build:web
-```
-
-```bash
 npm run test:api
-```
-
-```bash
 npm run eval:api
-```
-
-```bash
 npm run metrics:api
 ```
 
@@ -99,9 +75,6 @@ Install the browser once before running the browser checks:
 
 ```bash
 npm exec --workspace apps/web playwright install chromium
-```
-
-```bash
 npm run test:e2e
 ```
 

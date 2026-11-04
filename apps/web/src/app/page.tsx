@@ -1,4 +1,6 @@
-const boundaries = ["No AI", "No database", "No auth", "No uploads", "No video"];
+import Link from "next/link";
+
+const features = ["Calorie ranges", "Editable portions", "Optional photo upload"];
 
 export default function Home() {
   return (
@@ -9,7 +11,7 @@ export default function Home() {
             FitPlate Coach
           </p>
           <p className="rounded-full border border-stone-300 px-3 py-1 text-sm text-stone-700">
-            Scaffold v0
+            Local demo
           </p>
         </header>
 
@@ -17,25 +19,27 @@ export default function Home() {
           <div className="space-y-7">
             <div className="space-y-4">
               <p className="text-sm font-medium text-emerald-800">
-                Minimal monorepo milestone
+                Food photo estimates
               </p>
               <h1 className="max-w-3xl text-4xl font-semibold text-stone-950 sm:text-5xl">
-                Production-shaped foundations for food and form coaching.
+                Food estimates you can adjust.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-stone-700">
-                This first screen is intentionally static. The next milestones
-                will add food photo mock analysis, correction loops, and safe
-                uncertainty-first product behavior.
+                Choose a photo to review a sample calorie range, then adjust
+                portions in grams.{" "}
+                <Link className="font-medium text-emerald-800 underline" href="/food/new">
+                  Try the food photo demo.
+                </Link>
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {boundaries.map((boundary) => (
+              {features.map((feature) => (
                 <span
-                  key={boundary}
+                  key={feature}
                   className="rounded-full border border-stone-300 bg-white/70 px-3 py-1 text-sm font-medium text-stone-700"
                 >
-                  {boundary}
+                  {feature}
                 </span>
               ))}
             </div>
@@ -52,17 +56,17 @@ export default function Home() {
             </div>
             <div className="mt-6 space-y-2 text-center">
               <h2 className="text-lg font-semibold text-stone-950">
-                Static home page only
+                Choose, review, adjust
               </h2>
               <p className="text-sm leading-6 text-stone-600">
-                The frontend does not call the API in this milestone.
+                Change portions in grams and compare the updated range with the original estimate.
               </p>
             </div>
           </div>
         </div>
 
         <footer className="text-sm text-stone-600">
-          Health endpoint available at <code>/api/v0/health</code>.
+          The default demo uses preset food data.
         </footer>
       </section>
     </main>

@@ -53,13 +53,13 @@ jobs:
         run: npm run eval:api
 
       - name: Check eval report freshness
-        run: git diff --exit-code docs/evaluation/REPORT.md apps/api/evaluation/report.json
+        run: git diff --exit-code devlog/evidence/evaluation/REPORT.md devlog/evidence/evaluation/report.json
 
       - name: Run metrics report
         run: npm run metrics:api
 
       - name: Check metrics report freshness
-        run: git diff --exit-code docs/observability/METRICS_REPORT.md apps/api/observability/metrics_report.json
+        run: git diff --exit-code devlog/evidence/metrics/METRICS_REPORT.md devlog/evidence/metrics/metrics_report.json
 
       - name: Install Playwright browsers
         run: npm exec --workspace apps/web playwright install --with-deps chromium

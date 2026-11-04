@@ -9,7 +9,7 @@ Current live endpoints:
 - `POST /api/v0/food/analyze/mock`
 - `POST /api/v0/food/corrections/mock`
 
-The food analysis endpoints do not store uploaded files or authenticate users. `POST /api/v0/food/analyze/mock` accepts JSON metadata only. `POST /api/v0/food/analyze` accepts one multipart image, keeps accepted uploads within the 10 MB cap in memory via the configured multipart spool threshold, summarizes metadata for logging, and discards bytes before returning. By default both routes use deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, they use the configured provider. `FITPLATE_AI_PROVIDER=fake` stays deterministic and local. `FITPLATE_AI_PROVIDER=openai` is local-demo-only behind a server-side API key and cost cap, and is not used in CI.
+The food analysis endpoints do not store uploaded files or authenticate users. `POST /api/v0/food/analyze/mock` accepts JSON metadata only. `POST /api/v0/food/analyze` accepts one multipart image, keeps accepted uploads within the 10 MB cap in memory via the configured multipart spool threshold, summarizes metadata for logging, and discards bytes before returning. By default both routes use deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, they use the configured provider. `FITPLATE_AI_PROVIDER=fake` stays deterministic and local. `FITPLATE_AI_PROVIDER=openai` uses a server-side API key for local demos. A positive `FITPLATE_MONTHLY_COST_CAP_USD` enables the local spending check; zero disables it. CI uses mock and fake providers.
 
 ## Base URL and Versioning
 
@@ -56,7 +56,7 @@ The multipart upload endpoint:
 - Receives one image file field named `image`.
 - Keeps accepted uploads within the `10485760` byte cap in memory via the configured multipart spool threshold and enforces that cap on actual bytes read.
 - Does not persist, log, hash, fingerprint, or return image bytes.
-- Passes metadata-shaped input to the analyzer adapter in this PR.
+- Passes request metadata and an in-memory `ImageRef` containing the image bytes to the analyzer adapter.
 
 Datetime values in responses are ISO-8601 strings with timezone information.
 

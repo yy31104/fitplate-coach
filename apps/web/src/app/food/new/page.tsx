@@ -228,8 +228,8 @@ export default function NewFoodAnalysisPage() {
               Select a food photo to estimate calories.
             </h1>
             <p className="text-base leading-7 text-stone-700">
-              Metadata-only remains the default. Upload transport can send image bytes
-              to the backend when enabled.
+              Try a sample estimate, then change the portions in grams. The
+              calorie range updates with each correction.
             </p>
           </div>
         </header>
@@ -286,11 +286,10 @@ export default function NewFoodAnalysisPage() {
                       type="checkbox"
                       onChange={handleUploadTransportChange}
                     />
-                    Send image bytes to backend (upload transport)
+                    Send the actual photo
                   </label>
                   <p className="text-xs leading-5 text-stone-500">
-                    Metadata-only remains default. Upload sends the actual file to the
-                    backend when enabled.
+                    Off: send file details only. On: upload the photo to the server.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-3">

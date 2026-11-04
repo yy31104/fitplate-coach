@@ -25,7 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Node / Next.js future artifacts
+# Node / Next.js output
 node_modules/
 .next/
 out/
@@ -35,7 +35,7 @@ coverage/
 playwright-report/
 test-results/
 
-# Python / FastAPI future artifacts
+# Python / FastAPI output
 __pycache__/
 *.py[cod]
 *.pyo
@@ -47,7 +47,6 @@ __pycache__/
 venv/
 env/
 apps/api/logs/*
-!apps/api/logs/.gitkeep
 
 # Local data and generated media
 uploads/
@@ -62,3 +61,13 @@ temp/
 .vercel/
 .cache/
 *.tsbuildinfo
+
+# Generated Next.js types and obsolete report locations.
+next-env.d.ts
+/apps/api/evaluation/report.json
+/apps/api/observability/metrics_report.json
+/docs/evaluation/REPORT.md
+/docs/observability/METRICS_REPORT.md
+
+# Private portfolio preparation is kept outside the repository.
+/docs/PORTFOLIO_*

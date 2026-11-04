@@ -12,8 +12,8 @@ from app.observability.model_run import ModelRun
 API_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = API_ROOT.parents[1]
 SAMPLE_PATH = API_ROOT / "observability_samples" / "model_runs.sample.jsonl"
-MARKDOWN_REPORT_PATH = REPO_ROOT / "docs" / "observability" / "METRICS_REPORT.md"
-JSON_REPORT_PATH = API_ROOT / "observability" / "metrics_report.json"
+MARKDOWN_REPORT_PATH = REPO_ROOT / "devlog" / "evidence" / "metrics" / "METRICS_REPORT.md"
+JSON_REPORT_PATH = REPO_ROOT / "devlog" / "evidence" / "metrics" / "metrics_report.json"
 
 
 def test_load_model_runs_parses_valid_jsonl() -> None:

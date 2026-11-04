@@ -143,7 +143,7 @@ test("upload transport sends multipart file bytes and displays analysis", async 
     buffer: Buffer.from(`fake-jpeg-${UPLOAD_SENTINEL}`),
   });
   await page
-    .getByRole("checkbox", { name: "Send image bytes to backend (upload transport)" })
+    .getByRole("checkbox", { name: "Send the actual photo" })
     .check();
   await page.getByRole("button", { name: "Analyze" }).click();
 

@@ -15,8 +15,8 @@ from app.schemas.food import FoodAnalysis, FoodAnalyzeMockRequest
 
 API_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = API_ROOT.parents[1]
-DEFAULT_MARKDOWN_REPORT_PATH = REPO_ROOT / "docs" / "evaluation" / "REPORT.md"
-DEFAULT_JSON_REPORT_PATH = API_ROOT / "evaluation" / "report.json"
+DEFAULT_MARKDOWN_REPORT_PATH = REPO_ROOT / "devlog" / "evidence" / "evaluation" / "REPORT.md"
+DEFAULT_JSON_REPORT_PATH = REPO_ROOT / "devlog" / "evidence" / "evaluation" / "report.json"
 
 AnalyzeCallable = Callable[[FoodAnalyzeMockRequest], FoodAnalysis | AnalyzerResult]
 

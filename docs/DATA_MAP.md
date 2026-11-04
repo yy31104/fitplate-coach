@@ -78,5 +78,6 @@ or durable media storage.
   `http://localhost:3000`.
 - Do not expose the API on a public host without authentication, abuse controls,
   and a fresh privacy review.
-- Real OpenAI calls are local-demo-only behind explicit flags, a server-side key,
-  and a cost cap; CI uses deterministic mock and fake-provider paths only.
+- Real OpenAI calls use explicit local-demo flags and a server-side key. A
+  positive `FITPLATE_MONTHLY_COST_CAP_USD` enables the local spending check; zero
+  disables it. CI uses deterministic mock and fake-provider paths only.

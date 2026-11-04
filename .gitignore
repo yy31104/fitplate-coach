@@ -62,12 +62,8 @@ temp/
 .cache/
 *.tsbuildinfo
 
-# Generated Next.js types and obsolete report locations.
+# Generated Next.js types.
 next-env.d.ts
-/apps/api/evaluation/report.json
-/apps/api/observability/metrics_report.json
-/docs/evaluation/REPORT.md
-/docs/observability/METRICS_REPORT.md
 
 # Private portfolio preparation is kept outside the repository.
 /docs/PORTFOLIO_*

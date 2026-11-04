@@ -34,7 +34,6 @@ Mock, fake-provider, and optional real-provider paths share the response schema.
 | `apps/api/tests/` | API, correction, and provider behavior | [Correction tests](apps/api/tests/test_food_corrections_mock.py) |
 | `apps/web/e2e/` | Browser flow checks | [Food analysis](apps/web/e2e/food-analysis.spec.ts) |
 | `docs/` | API contract, architecture, and data handling | [API contract](docs/API_CONTRACT.md) |
-| `devlog/` | Development records and generated check reports | [Index](devlog/README.md) |
 
 ## Run locally
 

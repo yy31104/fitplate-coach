@@ -25,10 +25,10 @@ Run the deterministic evaluation:
 npm run eval:api
 ```
 
-This regenerates both committed evidence files:
+This regenerates both committed reports:
 
-- `devlog/evidence/evaluation/REPORT.md`
-- `devlog/evidence/evaluation/report.json`
+- `docs/evaluation/REPORT.md`
+- `apps/api/evaluation/report.json`
 
 Then run the backend test suite:
 

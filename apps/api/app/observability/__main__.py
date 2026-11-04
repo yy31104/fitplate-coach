@@ -11,8 +11,8 @@ from app.observability.metrics import (
 API_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = API_ROOT.parents[1]
 SAMPLE_PATH = API_ROOT / "observability_samples" / "model_runs.sample.jsonl"
-DEFAULT_MARKDOWN_REPORT_PATH = REPO_ROOT / "devlog" / "evidence" / "metrics" / "METRICS_REPORT.md"
-DEFAULT_JSON_REPORT_PATH = REPO_ROOT / "devlog" / "evidence" / "metrics" / "metrics_report.json"
+DEFAULT_MARKDOWN_REPORT_PATH = REPO_ROOT / "docs" / "observability" / "METRICS_REPORT.md"
+DEFAULT_JSON_REPORT_PATH = API_ROOT / "observability" / "metrics_report.json"
 
 
 def main() -> None:

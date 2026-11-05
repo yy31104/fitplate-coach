@@ -1,0 +1,1588 @@
+{
+  "schema_version": "nutrition5k_eval.v1",
+  "dataset": "Nutrition5k",
+  "license": {
+    "name": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "source": "https://github.com/google-research-datasets/Nutrition5k",
+    "attribution": "Nutrition5k dataset by Google Research (Thames, Karpur, Norris, Xia, Panait, Weyand, Sim), CVPR 2021. Images are not stored in this repository; the manifest lists dish ids and metadata values only.",
+    "citation": "Thames, Q., Karpur, A., Norris, W., Xia, F., Panait, L., Weyand, T., Sim, J. Nutrition5k: Towards Automatic Nutritional Understanding of Generic Food. CVPR 2021."
+  },
+  "split_file": "dish_ids/splits/depth_test_ids.txt",
+  "image": "imagery/realsense_overhead/<dish_id>/rgb.png",
+  "provider": "fake",
+  "model": "fake-food-vision-v1",
+  "usage": {
+    "cost_usd": 0.0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "stopped_for_cost_cap": false
+  },
+  "metrics": {
+    "dishes": 100,
+    "scored": 100,
+    "failed": 0,
+    "failure_reasons": {},
+    "calories": {
+      "mae_kcal": 325.0,
+      "mae_pct": 127.5,
+      "median_ape_pct": 137.2,
+      "mean_true_kcal": 254.8
+    },
+    "interval_coverage": {
+      "high": {
+        "dishes": 0,
+        "covered": 0,
+        "coverage_pct": null,
+        "mean_width_pct_of_true": null
+      },
+      "medium": {
+        "dishes": 0,
+        "covered": 0,
+        "coverage_pct": null,
+        "mean_width_pct_of_true": null
+      },
+      "low": {
+        "dishes": 100,
+        "covered": 10,
+        "coverage_pct": 10.0,
+        "mean_width_pct_of_true": 414.0
+      },
+      "no_items": {
+        "dishes": 0,
+        "covered": 0,
+        "coverage_pct": null,
+        "mean_width_pct_of_true": null
+      },
+      "all": {
+        "dishes": 100,
+        "covered": 10,
+        "coverage_pct": 10.0,
+        "mean_width_pct_of_true": 414.0
+      }
+    },
+    "large_portion_bias": {
+      "threshold_mass_g": 277.0,
+      "large": {
+        "dishes": 26,
+        "mean_signed_error_kcal": 41.6,
+        "mean_signed_error_pct": 32.6,
+        "mean_signed_mass_error_g": 18.4,
+        "over_pct": 65.4,
+        "under_pct": 34.6,
+        "direction": "over"
+      },
+      "rest": {
+        "dishes": 74,
+        "mean_signed_error_kcal": 365.4,
+        "mean_signed_error_pct": 1638.4,
+        "mean_signed_mass_error_g": 303.3,
+        "over_pct": 97.3,
+        "under_pct": 2.7,
+        "direction": "over"
+      }
+    }
+  },
+  "predictions": [
+    {
+      "dish_id": "dish_1558461431",
+      "true_calories": 1.1,
+      "true_mass_g": 5.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563897938",
+      "true_calories": 54.1,
+      "true_mass_g": 10.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1557937574",
+      "true_calories": 5.6,
+      "true_mass_g": 13.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565810969",
+      "true_calories": 4.6,
+      "true_mass_g": 20.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1564675380",
+      "true_calories": 87.3,
+      "true_mass_g": 23.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558113430",
+      "true_calories": 7.8,
+      "true_mass_g": 28.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558110385",
+      "true_calories": 52.9,
+      "true_mass_g": 34.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562099053",
+      "true_calories": 98.4,
+      "true_mass_g": 37.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559157919",
+      "true_calories": 37.1,
+      "true_mass_g": 39.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559239151",
+      "true_calories": 9.2,
+      "true_mass_g": 40.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558718587",
+      "true_calories": 10.2,
+      "true_mass_g": 41.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562085672",
+      "true_calories": 122.1,
+      "true_mass_g": 46.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565118700",
+      "true_calories": 16.7,
+      "true_mass_g": 49.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1560526408",
+      "true_calories": 67.1,
+      "true_mass_g": 51.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1566501575",
+      "true_calories": 251.7,
+      "true_mass_g": 54.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559934477",
+      "true_calories": 25.1,
+      "true_mass_g": 57.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558639818",
+      "true_calories": 20.1,
+      "true_mass_g": 59.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562099076",
+      "true_calories": 110.2,
+      "true_mass_g": 61.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563909469",
+      "true_calories": 72.4,
+      "true_mass_g": 64.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562776428",
+      "true_calories": 33.7,
+      "true_mass_g": 66.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1560526447",
+      "true_calories": 88.6,
+      "true_mass_g": 70.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562168673",
+      "true_calories": 56.4,
+      "true_mass_g": 73.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565894889",
+      "true_calories": 257.8,
+      "true_mass_g": 74.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562774129",
+      "true_calories": 73.1,
+      "true_mass_g": 77.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559844272",
+      "true_calories": 462.5,
+      "true_mass_g": 80.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559841979",
+      "true_calories": 39.3,
+      "true_mass_g": 85.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558722125",
+      "true_calories": 497.2,
+      "true_mass_g": 86.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563565289",
+      "true_calories": 93.4,
+      "true_mass_g": 88.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563998210",
+      "true_calories": 148.1,
+      "true_mass_g": 91.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1560801797",
+      "true_calories": 25.7,
+      "true_mass_g": 96.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1564160043",
+      "true_calories": 245.0,
+      "true_mass_g": 98.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559850314",
+      "true_calories": 296.6,
+      "true_mass_g": 100.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558030289",
+      "true_calories": 38.5,
+      "true_mass_g": 107.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562009810",
+      "true_calories": 119.9,
+      "true_mass_g": 108.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559233715",
+      "true_calories": 83.6,
+      "true_mass_g": 110.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1561663541",
+      "true_calories": 124.3,
+      "true_mass_g": 112.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558635546",
+      "true_calories": 60.8,
+      "true_mass_g": 117.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1566502472",
+      "true_calories": 132.9,
+      "true_mass_g": 119.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1566416701",
+      "true_calories": 198.5,
+      "true_mass_g": 122.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558461607",
+      "true_calories": 87.6,
+      "true_mass_g": 127.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559850338",
+      "true_calories": 307.1,
+      "true_mass_g": 130.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562617939",
+      "true_calories": 235.0,
+      "true_mass_g": 133.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1560368395",
+      "true_calories": 49.3,
+      "true_mass_g": 137.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562168696",
+      "true_calories": 95.1,
+      "true_mass_g": 141.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558114086",
+      "true_calories": 74.4,
+      "true_mass_g": 143.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1566838286",
+      "true_calories": 72.5,
+      "true_mass_g": 145.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565117429",
+      "true_calories": 390.9,
+      "true_mass_g": 147.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563565323",
+      "true_calories": 229.5,
+      "true_mass_g": 152.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1564588820",
+      "true_calories": 81.1,
+      "true_mass_g": 156.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558722207",
+      "true_calories": 83.2,
+      "true_mass_g": 160.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1561393741",
+      "true_calories": 188.8,
+      "true_mass_g": 165.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1560800951",
+      "true_calories": 102.8,
+      "true_mass_g": 168.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1564428144",
+      "true_calories": 205.2,
+      "true_mass_g": 171.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1567785739",
+      "true_calories": 168.6,
+      "true_mass_g": 177.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562774180",
+      "true_calories": 164.1,
+      "true_mass_g": 181.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563566909",
+      "true_calories": 222.5,
+      "true_mass_g": 187.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559578599",
+      "true_calories": 230.0,
+      "true_mass_g": 193.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563389548",
+      "true_calories": 438.8,
+      "true_mass_g": 194.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562009894",
+      "true_calories": 244.8,
+      "true_mass_g": 200.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558549806",
+      "true_calories": 782.0,
+      "true_mass_g": 203.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562776465",
+      "true_calories": 173.4,
+      "true_mass_g": 212.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565638550",
+      "true_calories": 277.7,
+      "true_mass_g": 215.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558030435",
+      "true_calories": 246.9,
+      "true_mass_g": 221.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1561405389",
+      "true_calories": 266.0,
+      "true_mass_g": 223.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563305513",
+      "true_calories": 606.3,
+      "true_mass_g": 228.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562788568",
+      "true_calories": 289.2,
+      "true_mass_g": 230.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563898019",
+      "true_calories": 344.0,
+      "true_mass_g": 237.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1567007848",
+      "true_calories": 100.3,
+      "true_mass_g": 243.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558718906",
+      "true_calories": 282.6,
+      "true_mass_g": 247.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565035802",
+      "true_calories": 69.2,
+      "true_mass_g": 250.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1561577848",
+      "true_calories": 413.3,
+      "true_mass_g": 254.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562703447",
+      "true_calories": 384.4,
+      "true_mass_g": 259.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565898193",
+      "true_calories": 291.9,
+      "true_mass_g": 268.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562774206",
+      "true_calories": 298.8,
+      "true_mass_g": 272.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558375886",
+      "true_calories": 1050.5,
+      "true_mass_g": 277.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563565415",
+      "true_calories": 303.5,
+      "true_mass_g": 284.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562788601",
+      "true_calories": 413.2,
+      "true_mass_g": 287.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562172561",
+      "true_calories": 150.8,
+      "true_mass_g": 290.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1560975628",
+      "true_calories": 348.3,
+      "true_mass_g": 296.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1561663580",
+      "true_calories": 432.1,
+      "true_mass_g": 307.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565030391",
+      "true_calories": 609.3,
+      "true_mass_g": 313.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558031394",
+      "true_calories": 237.4,
+      "true_mass_g": 318.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563565454",
+      "true_calories": 350.8,
+      "true_mass_g": 322.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1559849097",
+      "true_calories": 495.9,
+      "true_mass_g": 325.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1564773903",
+      "true_calories": 316.8,
+      "true_mass_g": 336.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1561663606",
+      "true_calories": 474.5,
+      "true_mass_g": 347.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565118782",
+      "true_calories": 557.5,
+      "true_mass_g": 353.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562172600",
+      "true_calories": 263.6,
+      "true_mass_g": 370.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1562700593",
+      "true_calories": 385.8,
+      "true_mass_g": 384.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1558720236",
+      "true_calories": 887.8,
+      "true_mass_g": 407.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565811139",
+      "true_calories": 902.2,
+      "true_mass_g": 416.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563898107",
+      "true_calories": 440.7,
+      "true_mass_g": 424.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1560368570",
+      "true_calories": 555.9,
+      "true_mass_g": 452.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563984140",
+      "true_calories": 245.4,
+      "true_mass_g": 472.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1565020926",
+      "true_calories": 398.5,
+      "true_mass_g": 489.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1566590056",
+      "true_calories": 815.6,
+      "true_mass_g": 519.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563551220",
+      "true_calories": 561.7,
+      "true_mass_g": 558.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1563998513",
+      "true_calories": 757.5,
+      "true_mass_g": 599.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1566316726",
+      "true_calories": 409.5,
+      "true_mass_g": 685.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    },
+    {
+      "dish_id": "dish_1566920365",
+      "true_calories": 490.4,
+      "true_mass_g": 871.0,
+      "predicted_min": 452,
+      "predicted_max": 620,
+      "predicted_point": 536,
+      "predicted_mass_g": 430,
+      "item_confidences": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "error": null
+    }
+  ]
+}

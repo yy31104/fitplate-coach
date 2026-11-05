@@ -40,7 +40,17 @@ All metrics are per dish, using the analysis's `total_calories`.
 | **Interval coverage** | Share of dishes with `min ≤ true ≤ max`, grouped by **dish confidence**. Dish confidence is the lowest item confidence: a plate with one `low` item is `low`. Plates with no items form a `no_items` group. Mean interval width (% of true) is reported next to it. Calibrated ranges cover about equally often in every group while getting narrower as confidence rises. Low coverage at `high` means the ranges are overconfident. |
 | **Large-portion bias** | Large means true mass ≥ the 75th percentile of the scored dishes. For large plates and for the rest: mean signed error (predicted − true) in kcal, in %, and in grams (sum of item `grams_estimate` − true mass); the share over- and under-estimated; and the direction (`over` / `under`). |
 
-A dish whose analysis raises an error, or whose image is missing, counts as `failed` and is excluded from scoring. The reason is counted.
+A dish whose analysis raises an error, or whose image is missing, counts as `failed` and is excluded from scoring. The report counts failures by reason:
+
+| Reason | Meaning |
+| --- | --- |
+| `invalid_model_output` | The model's JSON failed `ModelFoodOutput` validation, e.g. grams outside 1–2000 or density outside (0, 9] |
+| `consistency_check_failed` | The server-built analysis failed `check_analysis_consistency`. This should never happen; it is a bug. |
+| `image_required` | The provider needs image bytes and got none |
+| `provider_error` | Timeout, API error, or unsupported image type |
+| `image_missing` | `rgb.png` is not in the data folder; run `download` |
+
+**Where the numbers come from.** The model returns only names, grams, category or density, and confidence. The server computes every calorie range with `calorie_range_from_density`, using a fixed margin per confidence (high ±10 %, medium ±20 %, low ±30 %). Coverage by confidence is therefore a direct test of whether those margins are wide enough for a given provider. The report also records the prompt version and how many analyses pass `check_analysis_consistency`.
 
 ## Commands
 
@@ -78,4 +88,4 @@ FITPLATE_AI_PROVIDER_API_KEY=<your key> ./.venv/bin/python -m app.nutrition5k ev
 
 ## Sample report
 
-[`sample_fake/REPORT.md`](../../apps/api/evaluation/nutrition5k/sample_fake/REPORT.md) is the fake provider on all 100 dishes. **It checks the pipeline; it is not an accuracy result.** The fake picks a canned plate from file size (every subset PNG is < 700 KB, so every dish gets the same chicken/rice/salad plate) and never looks at the image. The test `test_committed_sample_report_metrics_match_its_predictions` recomputes the report's metrics from its stored predictions.
+[`sample_fake/REPORT.md`](../../apps/api/evaluation/nutrition5k/sample_fake/REPORT.md) is the fake provider on all 100 dishes. **It checks the pipeline; it is not an accuracy result.** The fake picks a canned plate from file size (every subset PNG is < 700 KB, so every dish gets the same chicken/rice/salad plate) and never looks at the image. It runs through the same server-side computation as a real provider: prompt v3, `build_food_analysis`, and the consistency check (100 of 100 pass). The calorie numbers are the same as before that computation moved to the server, because the fake's plate and the density table did not change. The test `test_committed_sample_report_metrics_match_its_predictions` recomputes the report's metrics from its stored predictions.

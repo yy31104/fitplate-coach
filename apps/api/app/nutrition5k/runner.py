@@ -8,7 +8,10 @@ from pathlib import Path
 
 from app.ai.analyzer import AIFoodAnalyzer, FoodAnalyzer, MockFoodAnalyzer
 from app.ai.openai_provider import OpenAIProvider
-from app.ai.provider import AIAnalysisError, FakeAIProvider, ImageRef
+from pydantic import ValidationError
+
+from app.ai.provider import AIAnalysisError, FakeAIProvider, ImageRef, ImageRequiredError
+from app.nutrition import AnalysisConsistencyError, check_analysis_consistency
 from app.nutrition5k.dataset import Manifest, rgb_path
 from app.nutrition5k.metrics import CONFIDENCE_GROUPS, DishPrediction, compute_metrics
 from app.schemas.food import FoodAnalyzeMockRequest
@@ -96,7 +99,7 @@ def run_subset(
                     dish_id=dish.dish_id,
                     true_calories=dish.total_calories,
                     true_mass_g=dish.total_mass_g,
-                    error=type(exc).__name__,
+                    error=failure_reason(exc),
                 )
             else:
                 analysis = result.analysis
@@ -112,6 +115,7 @@ def run_subset(
                     predicted_point=analysis.total_calories.point_estimate,
                     predicted_mass_g=sum(item.portion.grams_estimate for item in analysis.items),
                     item_confidences=tuple(item.confidence for item in analysis.items),
+                    consistent=not check_analysis_consistency(analysis),
                 )
 
         predictions.append(prediction)
@@ -127,11 +131,23 @@ def run_subset(
     return predictions, usage
 
 
+def failure_reason(exc: AIAnalysisError) -> str:
+    """Name why an analysis failed, so a real-provider report shows what to fix."""
+    if isinstance(exc, ImageRequiredError):
+        return "image_required"
+    if isinstance(exc.__cause__, ValidationError):
+        return "invalid_model_output"
+    if isinstance(exc.__cause__, AnalysisConsistencyError):
+        return "consistency_check_failed"
+    return "provider_error"
+
+
 def build_report(
     *,
     manifest: Manifest,
     provider: str,
     model: str,
+    prompt_version: str | None = None,
     predictions: list[DishPrediction],
     usage: dict[str, float | int | bool],
 ) -> dict[str, object]:
@@ -143,6 +159,7 @@ def build_report(
         "image": manifest.image,
         "provider": provider,
         "model": model,
+        "prompt_version": prompt_version,
         "usage": usage,
         "metrics": compute_metrics(predictions),
         "predictions": [asdict(prediction) for prediction in predictions],
@@ -188,7 +205,10 @@ def render_markdown(report: dict[str, object]) -> str:
         "| --- | --- |",
         f"| Dataset | {report['dataset']} (`{report['split_file']}`, overhead `rgb.png`) |",
         f"| Provider / model | `{report['provider']}` / `{report['model']}` |",
+        f"| Prompt | {_prompt_cell(report.get('prompt_version'))} |",
         f"| Dishes | {metrics['dishes']} ({metrics['scored']} scored, {metrics['failed']} failed) |",  # type: ignore[index]
+        f"| Server consistency check | {metrics['consistent_analyses']} of {metrics['scored']} analyses pass "  # type: ignore[index]
+        "(items_count, item = grams × density, total = sum, point_estimate in [min, max]) |",
         f"| Cost | ${usage['cost_usd']:.4f} ({usage['input_tokens']} input / {usage['output_tokens']} output tokens) |",  # type: ignore[index]
         "",
     ]
@@ -250,6 +270,10 @@ def render_markdown(report: dict[str, object]) -> str:
         "",
     ]
     return "\n".join(lines)
+
+
+def _prompt_cell(version: object) -> str:
+    return "none (mock analyzer)" if version is None else f"`food_analysis` {version}"
 
 
 def _fmt(value: object) -> str:

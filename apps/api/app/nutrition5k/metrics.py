@@ -31,6 +31,9 @@ class DishPrediction:
     predicted_mass_g: int | None = None
     item_confidences: tuple[str, ...] = ()
     error: str | None = None
+    # Result of check_analysis_consistency on the returned analysis; None
+    # when there was no analysis.
+    consistent: bool | None = None
 
     @property
     def scored(self) -> bool:
@@ -64,6 +67,7 @@ def compute_metrics(predictions: list[DishPrediction]) -> dict[str, object]:
         "scored": len(scored),
         "failed": len(failed),
         "failure_reasons": _count(prediction.error or "no prediction" for prediction in failed),
+        "consistent_analyses": sum(1 for prediction in scored if prediction.consistent),
         "calories": _calorie_error(scored),
         "interval_coverage": _coverage(scored),
         "large_portion_bias": _large_portion_bias(scored),

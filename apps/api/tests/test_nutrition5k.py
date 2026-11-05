@@ -7,7 +7,10 @@ from pathlib import Path
 import pytest
 
 import app.nutrition5k.runner as runner
-from app.ai.analyzer import AnalyzerResult, MockFoodAnalyzer, ProviderUsage
+from app.ai.analyzer import AIFoodAnalyzer, AnalyzerResult, MockFoodAnalyzer, ProviderUsage
+from app.ai.prompts import ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION
+from app.ai.provider import AIAnalysisError, ImageRef, ImageRequiredError, ProviderResult
+from app.nutrition import AnalysisConsistencyError
 from app.nutrition5k import __main__ as cli
 from app.nutrition5k.dataset import (
     BUCKET_URL,
@@ -28,6 +31,7 @@ from app.nutrition5k.metrics import DishPrediction, compute_metrics
 from app.nutrition5k.runner import (
     PaidCallNotConfirmedError,
     build_analyzer,
+    failure_reason,
     build_report,
     render_markdown,
     run_subset,
@@ -294,9 +298,11 @@ def test_pipeline_runs_end_to_end_without_network(tmp_path: Path, provider: str)
 
     predictions, usage = run_subset(manifest, data_dir=tmp_path, analyzer=analyzer)
     report = build_report(manifest=manifest, provider=provider, model=analyzer.model,
+                          prompt_version=getattr(analyzer, "prompt_version", None),
                           predictions=predictions, usage=usage)
 
     assert report["metrics"]["scored"] == 3
+    assert report["metrics"]["consistent_analyses"] == 3
     assert usage["cost_usd"] == 0.0
     markdown = render_markdown(report)
     for heading in ("## Calorie error", "## Interval coverage by confidence", "## Bias on large portions"):
@@ -351,6 +357,63 @@ def test_cost_cap_stops_new_requests(tmp_path: Path) -> None:
     assert Priced.calls == 2
     assert len(predictions) == 2
     assert usage["stopped_for_cost_cap"] is True
+
+
+def test_report_records_the_prompt_version(tmp_path: Path) -> None:
+    manifest = _manifest_with_images(tmp_path, count=1)
+    reports = {}
+    for provider in ("fake", "mock"):
+        analyzer = build_analyzer(provider)
+        predictions, usage = run_subset(manifest, data_dir=tmp_path, analyzer=analyzer)
+        reports[provider] = build_report(
+            manifest=manifest, provider=provider, model=analyzer.model,
+            prompt_version=getattr(analyzer, "prompt_version", None),
+            predictions=predictions, usage=usage,
+        )
+
+    assert reports["fake"]["prompt_version"] == ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION
+    assert f"| Prompt | `food_analysis` {ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION} |" in render_markdown(reports["fake"])
+    assert reports["mock"]["prompt_version"] is None
+    assert "| Prompt | none (mock analyzer) |" in render_markdown(reports["mock"])
+
+
+class _RawProvider:
+    name = "raw"
+    model = "raw-model"
+    requires_image_bytes = True
+
+    def __init__(self, raw: dict[str, object]) -> None:
+        self.raw = raw
+
+    def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
+        return ProviderResult(raw_analysis=self.raw, input_tokens=0, output_tokens=0, cost_usd=0.0)
+
+
+def test_invalid_model_output_is_named_in_the_report(tmp_path: Path) -> None:
+    manifest = _manifest_with_images(tmp_path, count=1)
+    bad = {"items": [{"name": "Rice", "grams": 0, "category": "rice_cooked",
+                      "density_kcal_per_gram": None, "confidence": "high"}],
+           "uncertainty_notes": [], "safety_flags": []}
+
+    predictions, _ = run_subset(manifest, data_dir=tmp_path,
+                                analyzer=AIFoodAnalyzer(provider=_RawProvider(bad)))
+
+    assert predictions[0].error == "invalid_model_output"
+    assert predictions[0].consistent is None
+
+
+def test_failure_reasons_cover_each_cause() -> None:
+    def caused_by(cause: Exception) -> AIAnalysisError:
+        try:
+            raise AIAnalysisError("failed") from cause
+        except AIAnalysisError as exc:
+            return exc
+
+    assert failure_reason(ImageRequiredError("needs bytes")) == "image_required"
+    assert failure_reason(caused_by(AnalysisConsistencyError(["items_count 2 != 1"]))) == (
+        "consistency_check_failed"
+    )
+    assert failure_reason(AIAnalysisError("AI provider timed out", safety_flags=[])) == "provider_error"
 
 
 # --- the paid provider is never reached without consent -------------------------
@@ -413,5 +476,7 @@ def test_committed_sample_report_metrics_match_its_predictions() -> None:
     ]
 
     assert report["provider"] == "fake"
+    assert report["prompt_version"] == ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION
     assert len(predictions) == 100
     assert compute_metrics(predictions) == report["metrics"]
+    assert report["metrics"]["consistent_analyses"] == report["metrics"]["scored"] == 100

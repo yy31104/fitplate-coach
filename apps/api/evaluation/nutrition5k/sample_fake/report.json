@@ -12,6 +12,7 @@
   "image": "imagery/realsense_overhead/<dish_id>/rgb.png",
   "provider": "fake",
   "model": "fake-food-vision-v1",
+  "prompt_version": "v3",
   "usage": {
     "cost_usd": 0.0,
     "input_tokens": 0,
@@ -23,6 +24,7 @@
     "scored": 100,
     "failed": 0,
     "failure_reasons": {},
+    "consistent_analyses": 100,
     "calories": {
       "mae_kcal": 325.0,
       "mae_pct": 127.5,
@@ -97,7 +99,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563897938",
@@ -112,7 +115,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1557937574",
@@ -127,7 +131,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565810969",
@@ -142,7 +147,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1564675380",
@@ -157,7 +163,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558113430",
@@ -172,7 +179,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558110385",
@@ -187,7 +195,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562099053",
@@ -202,7 +211,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559157919",
@@ -217,7 +227,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559239151",
@@ -232,7 +243,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558718587",
@@ -247,7 +259,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562085672",
@@ -262,7 +275,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565118700",
@@ -277,7 +291,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1560526408",
@@ -292,7 +307,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1566501575",
@@ -307,7 +323,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559934477",
@@ -322,7 +339,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558639818",
@@ -337,7 +355,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562099076",
@@ -352,7 +371,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563909469",
@@ -367,7 +387,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562776428",
@@ -382,7 +403,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1560526447",
@@ -397,7 +419,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562168673",
@@ -412,7 +435,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565894889",
@@ -427,7 +451,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562774129",
@@ -442,7 +467,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559844272",
@@ -457,7 +483,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559841979",
@@ -472,7 +499,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558722125",
@@ -487,7 +515,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563565289",
@@ -502,7 +531,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563998210",
@@ -517,7 +547,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1560801797",
@@ -532,7 +563,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1564160043",
@@ -547,7 +579,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559850314",
@@ -562,7 +595,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558030289",
@@ -577,7 +611,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562009810",
@@ -592,7 +627,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559233715",
@@ -607,7 +643,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1561663541",
@@ -622,7 +659,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558635546",
@@ -637,7 +675,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1566502472",
@@ -652,7 +691,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1566416701",
@@ -667,7 +707,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558461607",
@@ -682,7 +723,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559850338",
@@ -697,7 +739,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562617939",
@@ -712,7 +755,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1560368395",
@@ -727,7 +771,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562168696",
@@ -742,7 +787,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558114086",
@@ -757,7 +803,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1566838286",
@@ -772,7 +819,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565117429",
@@ -787,7 +835,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563565323",
@@ -802,7 +851,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1564588820",
@@ -817,7 +867,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558722207",
@@ -832,7 +883,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1561393741",
@@ -847,7 +899,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1560800951",
@@ -862,7 +915,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1564428144",
@@ -877,7 +931,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1567785739",
@@ -892,7 +947,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562774180",
@@ -907,7 +963,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563566909",
@@ -922,7 +979,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559578599",
@@ -937,7 +995,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563389548",
@@ -952,7 +1011,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562009894",
@@ -967,7 +1027,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558549806",
@@ -982,7 +1043,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562776465",
@@ -997,7 +1059,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565638550",
@@ -1012,7 +1075,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558030435",
@@ -1027,7 +1091,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1561405389",
@@ -1042,7 +1107,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563305513",
@@ -1057,7 +1123,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562788568",
@@ -1072,7 +1139,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563898019",
@@ -1087,7 +1155,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1567007848",
@@ -1102,7 +1171,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558718906",
@@ -1117,7 +1187,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565035802",
@@ -1132,7 +1203,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1561577848",
@@ -1147,7 +1219,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562703447",
@@ -1162,7 +1235,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565898193",
@@ -1177,7 +1251,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562774206",
@@ -1192,7 +1267,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558375886",
@@ -1207,7 +1283,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563565415",
@@ -1222,7 +1299,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562788601",
@@ -1237,7 +1315,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562172561",
@@ -1252,7 +1331,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1560975628",
@@ -1267,7 +1347,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1561663580",
@@ -1282,7 +1363,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565030391",
@@ -1297,7 +1379,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558031394",
@@ -1312,7 +1395,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563565454",
@@ -1327,7 +1411,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1559849097",
@@ -1342,7 +1427,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1564773903",
@@ -1357,7 +1443,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1561663606",
@@ -1372,7 +1459,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565118782",
@@ -1387,7 +1475,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562172600",
@@ -1402,7 +1491,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1562700593",
@@ -1417,7 +1507,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1558720236",
@@ -1432,7 +1523,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565811139",
@@ -1447,7 +1539,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563898107",
@@ -1462,7 +1555,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1560368570",
@@ -1477,7 +1571,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563984140",
@@ -1492,7 +1587,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1565020926",
@@ -1507,7 +1603,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1566590056",
@@ -1522,7 +1619,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563551220",
@@ -1537,7 +1635,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1563998513",
@@ -1552,7 +1651,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1566316726",
@@ -1567,7 +1667,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     },
     {
       "dish_id": "dish_1566920365",
@@ -1582,7 +1683,8 @@
         "high",
         "low"
       ],
-      "error": null
+      "error": null,
+      "consistent": true
     }
   ]
 }

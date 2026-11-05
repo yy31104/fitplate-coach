@@ -98,6 +98,7 @@ def main(argv: list[str] | None = None) -> int:
         on_progress=progress,
     )
     report = build_report(manifest=manifest, provider=args.provider, model=analyzer.model,
+                          prompt_version=getattr(analyzer, "prompt_version", None),
                           predictions=predictions, usage=usage)
     out_dir = args.out_dir or DEFAULT_RUNS_DIR / args.provider
     json_path, markdown_path = write_report(report, out_dir)

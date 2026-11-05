@@ -98,4 +98,5 @@ Mock and fake providers make the correction flow and failure cases repeatable. L
 - [API contract](docs/API_CONTRACT.md)
 - [Data map](docs/DATA_MAP.md)
 - [Evaluation workflow](docs/runbooks/eval-maintenance.md)
+- [Nutrition5k subset evaluation](docs/evaluation/NUTRITION5K.md)
 - [Optional real-provider setup](docs/runbooks/real-ai-local.md)

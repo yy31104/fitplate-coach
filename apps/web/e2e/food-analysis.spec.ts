@@ -163,7 +163,7 @@ type UploadRequestCapture = {
 };
 
 async function mockFoodEndpoints(page: Page) {
-  await page.route("**/api/v0/food/analyze/mock", async (route) => {
+  await page.route("**/api/v0/food/analyze/metadata", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",

@@ -6,10 +6,11 @@ Current live endpoints:
 
 - `GET /api/v0/health`
 - `POST /api/v0/food/analyze`
-- `POST /api/v0/food/analyze/mock`
+- `POST /api/v0/food/analyze/metadata`
+- `POST /api/v0/food/analyze/mock` (deprecated alias of `/analyze/metadata`)
 - `POST /api/v0/food/corrections/mock`
 
-The food analysis endpoints do not store uploaded files or authenticate users. `POST /api/v0/food/analyze/mock` accepts JSON metadata only. `POST /api/v0/food/analyze` accepts one multipart image, keeps accepted uploads within the 10 MB cap in memory via the configured multipart spool threshold, summarizes metadata for logging, and discards bytes before returning. By default both routes use deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, they use the configured provider. `FITPLATE_AI_PROVIDER=fake` stays deterministic and local. `FITPLATE_AI_PROVIDER=openai` uses a server-side API key for local demos. A positive `FITPLATE_MONTHLY_COST_CAP_USD` enables the local spending check; zero disables it. CI uses mock and fake providers.
+The food analysis endpoints do not store uploaded files or authenticate users. `POST /api/v0/food/analyze/metadata` accepts JSON metadata only. `POST /api/v0/food/analyze` accepts one multipart image, keeps accepted uploads within the 10 MB cap in memory via the configured multipart spool threshold, summarizes metadata for logging, and discards bytes before returning. By default both routes use deterministic mock analysis; when `FITPLATE_AI_MODE=ai`, they use the configured provider. `FITPLATE_AI_PROVIDER=fake` stays deterministic and local. `FITPLATE_AI_PROVIDER=openai` uses a server-side API key for local demos. A positive `FITPLATE_MONTHLY_COST_CAP_USD` enables the local spending check; zero disables it. CI uses mock and fake providers.
 
 ## Base URL and Versioning
 
@@ -83,7 +84,7 @@ Current `ErrorResponse.code` values are:
 
 FastAPI request validation errors return HTTP `422 Unprocessable Entity` using FastAPI's standard validation response body. They are not wrapped in the project `ErrorResponse` envelope.
 
-The one `422` that does use `ErrorResponse` is `image_required`: in AI mode, a provider that needs image bytes (the OpenAI provider) is never called without them. The metadata-only `POST /api/v0/food/analyze/mock` therefore returns `422` with `image_required` when `FITPLATE_AI_MODE=ai` and `FITPLATE_AI_PROVIDER=openai`; upload the photo through `POST /api/v0/food/analyze` instead. The fake provider works from metadata and is unaffected.
+The one `422` that does use `ErrorResponse` is `image_required`: in AI mode, a provider that needs image bytes (the OpenAI provider) is never called without them. The metadata-only `POST /api/v0/food/analyze/metadata` (and its alias `/analyze/mock`) therefore returns `422` with `image_required` when `FITPLATE_AI_MODE=ai` and `FITPLATE_AI_PROVIDER=openai`; upload the photo through `POST /api/v0/food/analyze` instead. The fake provider works from metadata and is unaffected.
 
 ## Endpoints
 
@@ -192,7 +193,7 @@ Success status: `200 OK`
 
 Response schema: `FoodAnalysis`
 
-The response shape is the same as `POST /api/v0/food/analyze/mock`.
+The response shape is the same as `POST /api/v0/food/analyze/metadata`.
 
 Default behavior uses mock mode. Example response shape for a non-food scenario:
 
@@ -318,11 +319,22 @@ Emitted only if an unexpected exception occurs during analyzer execution.
 - Filenames are truncated to 255 characters in model-run logs.
 - Model-run input summaries include only `transport`, `filename`, `content_type`, and `size_bytes`.
 - This route does not perform EXIF parsing, magic-byte sniffing, object storage upload, rate limiting, or async job creation.
-- `/api/v0/food/analyze/mock` remains available and is not deprecated.
+- `/api/v0/food/analyze/metadata` remains available for metadata-only requests.
 
-### POST /api/v0/food/analyze/mock
+### POST /api/v0/food/analyze/metadata
 
-Purpose: return deterministic mock food analysis JSON from file metadata.
+Purpose: return food analysis JSON from file metadata. In the default `FITPLATE_AI_MODE=mock` the result is deterministic mock data. In `FITPLATE_AI_MODE=ai` the configured provider runs: the fake provider works from metadata, and a provider that needs image bytes (OpenAI) returns `422 image_required` without being called.
+
+#### Deprecated alias: POST /api/v0/food/analyze/mock
+
+`/analyze/mock` is the old name of this route. It was renamed because it is not always a mock: in AI mode it reaches the configured provider. The alias runs the same handler with the same request and response bodies, and adds two headers to every response, success or error:
+
+```http
+Deprecation: true
+Link: </api/v0/food/analyze/metadata>; rel="successor-version"
+```
+
+Model-run logs record the path that was called (`POST /api/v0/food/analyze/mock` or `POST /api/v0/food/analyze/metadata`), so alias traffic can be counted before the alias is removed. OpenAPI marks the alias `deprecated: true`.
 
 Authentication: none.
 
@@ -344,7 +356,7 @@ Fields:
 Request example:
 
 ```http
-POST /api/v0/food/analyze/mock HTTP/1.1
+POST /api/v0/food/analyze/metadata HTTP/1.1
 Host: 127.0.0.1:8000
 Content-Type: application/json
 
@@ -796,7 +808,7 @@ The full set exists in the v0 schema so clients can handle future safety flags w
 
 ## Mock Mode Behavior
 
-The metadata-only mock food analysis endpoint is explicitly named `/analyze/mock`. Default deterministic mock responses include `mode: "mock"`; the opt-in fake-provider AI-readiness path uses the same schema with `mode: "ai"` and still makes no real provider call. The multipart `/analyze` endpoint reuses the same analyzer adapter but obtains filename, content type, and byte size from the uploaded file.
+The metadata-only food analysis endpoint is `/analyze/metadata` (deprecated alias `/analyze/mock`). It is named for its input, not its analyzer, because AI mode also serves it. Default deterministic mock responses include `mode: "mock"`; the opt-in fake-provider AI-readiness path uses the same schema with `mode: "ai"` and still makes no real provider call. The multipart `/analyze` endpoint reuses the same analyzer adapter but obtains filename, content type, and byte size from the uploaded file.
 
 Mock scenario selection is deterministic per filename:
 

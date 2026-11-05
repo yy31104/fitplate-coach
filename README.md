@@ -18,7 +18,7 @@ Local mock flow with a generated sample image and a portion correction.
 
 ## How it works
 
-1. [food/new/page.tsx](apps/web/src/app/food/new/page.tsx) validates the image and sends file details to the default mock endpoint, or image bytes when upload is selected.
+1. [food/new/page.tsx](apps/web/src/app/food/new/page.tsx) validates the image and sends file details to the metadata endpoint, or image bytes when upload is selected.
 2. [routers/food.py](apps/api/app/routers/food.py) selects the analyzer and validates its [FoodAnalysis](apps/api/app/schemas/food.py) response.
 3. [ResultView.tsx](apps/web/src/app/food/new/_components/ResultView.tsx) shows items, calorie ranges, confidence, and portion assumptions.
 4. [FoodItemRow.tsx](apps/web/src/app/food/new/_components/FoodItemRow.tsx) submits corrected grams; the API recomputes the range from grams, calorie density, and the original confidence margin.

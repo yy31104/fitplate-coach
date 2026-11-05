@@ -25,12 +25,12 @@ def clear_settings_cache() -> None:
 def test_successful_analyze_writes_one_valid_jsonl_record(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
 
-    response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_analyze_payload())
 
     assert response.status_code == 200
     records = _read_records(log_path)
     assert len(records) == 1
-    assert records[0].route == "POST /api/v0/food/analyze/mock"
+    assert records[0].route == "POST /api/v0/food/analyze/metadata"
     assert records[0].mode == "mock"
     assert records[0].model == "mock"
     assert records[0].input_summary == {
@@ -51,7 +51,7 @@ def test_analyze_long_filename_is_truncated_in_model_run(tmp_path, monkeypatch) 
     filename = f"{'a' * 300}.jpg"
 
     response = client.post(
-        "/api/v0/food/analyze/mock",
+        "/api/v0/food/analyze/metadata",
         json=_analyze_payload(filename=filename),
     )
 
@@ -85,7 +85,7 @@ def test_n_requests_produce_n_json_lines(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
 
     for _ in range(3):
-        response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+        response = client.post("/api/v0/food/analyze/metadata", json=_analyze_payload())
         assert response.status_code == 200
 
     assert len(log_path.read_text(encoding="utf-8").splitlines()) == 3
@@ -94,7 +94,7 @@ def test_n_requests_produce_n_json_lines(tmp_path, monkeypatch) -> None:
 def test_each_line_is_valid_json_and_validates_as_model_run(tmp_path, monkeypatch) -> None:
     log_path = _use_log_path(tmp_path, monkeypatch)
 
-    client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+    client.post("/api/v0/food/analyze/metadata", json=_analyze_payload())
     client.post("/api/v0/food/corrections/mock", json=_correction_payload())
 
     for line in log_path.read_text(encoding="utf-8").splitlines():
@@ -117,7 +117,7 @@ def test_analyze_forced_exception_writes_error_log(tmp_path, monkeypatch) -> Non
 
     monkeypatch.setattr(food_router, "select_food_analyzer", lambda: FailingAnalyzer())
 
-    response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_analyze_payload())
 
     assert response.status_code == 500
     record = _read_records(log_path)[0]
@@ -148,7 +148,7 @@ def test_correction_forced_exception_writes_error_log(tmp_path, monkeypatch) -> 
 def test_logging_failure_does_not_break_successful_route_response(tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(log_writer, "LOG_PATH", tmp_path)
 
-    response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_analyze_payload())
 
     assert response.status_code == 200
     assert response.json()["mode"] == "mock"
@@ -157,7 +157,7 @@ def test_logging_failure_does_not_break_successful_route_response(tmp_path, monk
 def test_build_model_run_preserves_prompt_fields_when_passed() -> None:
     record = build_model_run(
         request_id="request-001",
-        route="POST /api/v0/food/analyze/mock",
+        route="POST /api/v0/food/analyze/metadata",
         started_at=now_utc(),
         input_summary={},
         output_summary={},
@@ -172,7 +172,7 @@ def test_build_model_run_preserves_prompt_fields_when_passed() -> None:
 def test_build_model_run_prompt_fields_default_to_none() -> None:
     record = build_model_run(
         request_id="request-001",
-        route="POST /api/v0/food/analyze/mock",
+        route="POST /api/v0/food/analyze/metadata",
         started_at=now_utc(),
         input_summary={},
         output_summary={},
@@ -185,7 +185,7 @@ def test_build_model_run_prompt_fields_default_to_none() -> None:
 def test_build_model_run_preserves_usage_when_passed() -> None:
     record = build_model_run(
         request_id="request-001",
-        route="POST /api/v0/food/analyze/mock",
+        route="POST /api/v0/food/analyze/metadata",
         started_at=now_utc(),
         input_summary={},
         output_summary={},
@@ -202,7 +202,7 @@ def test_build_model_run_preserves_usage_when_passed() -> None:
 def test_build_model_run_usage_defaults_to_zero() -> None:
     record = build_model_run(
         request_id="request-001",
-        route="POST /api/v0/food/analyze/mock",
+        route="POST /api/v0/food/analyze/metadata",
         started_at=now_utc(),
         input_summary={},
         output_summary={},
@@ -218,7 +218,7 @@ def test_ai_mode_analyze_log_records_fake_provider_and_prompt(tmp_path, monkeypa
     monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
     get_settings.cache_clear()
 
-    response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_analyze_payload())
 
     assert response.status_code == 200
     record = _read_records(log_path)[0]
@@ -242,7 +242,7 @@ def test_malformed_ai_provider_output_logs_schema_validation_flag(
     analyzer = AIFoodAnalyzer(provider=MalformedProvider())
     monkeypatch.setattr(food_router, "select_food_analyzer", lambda: analyzer)
 
-    response = client.post("/api/v0/food/analyze/mock", json=_analyze_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_analyze_payload())
 
     assert response.status_code == 500
     record = _read_records(log_path)[0]

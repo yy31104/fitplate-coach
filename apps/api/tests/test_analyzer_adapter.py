@@ -140,7 +140,7 @@ def test_analyze_route_with_ai_mode_returns_ai_food_analysis(monkeypatch) -> Non
     monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
     _clear_settings_cache()
 
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     assert response.status_code == 200
     assert response.json()["mode"] == "ai"
@@ -151,7 +151,7 @@ def test_model_run_log_records_ai_mode_on_ai_analyzer_success(tmp_path, monkeypa
     monkeypatch.setenv("FITPLATE_AI_MODE", "ai")
     _clear_settings_cache()
 
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     assert response.status_code == 200
     record = _read_records(log_path)[0]

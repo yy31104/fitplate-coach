@@ -25,10 +25,10 @@ export class FoodAnalysisApiError extends Error {
   }
 }
 
-export async function analyzeFoodMock(
+export async function analyzeFoodMetadata(
   metadata: FoodAnalyzeMockRequest,
 ): Promise<FoodAnalysis> {
-  const response = await fetch(`${apiBaseUrl}/api/v0/food/analyze/mock`, {
+  const response = await fetch(`${apiBaseUrl}/api/v0/food/analyze/metadata`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

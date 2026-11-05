@@ -16,13 +16,13 @@ client = TestClient(app)
 
 
 def test_analyze_valid_jpeg_metadata_returns_200() -> None:
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     assert response.status_code == 200
 
 
 def test_analyze_response_schema_fields_present() -> None:
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     body = response.json()
 
@@ -42,20 +42,20 @@ def test_analyze_response_schema_fields_present() -> None:
 
 
 def test_analyze_mode_is_mock() -> None:
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     assert response.json()["mode"] == "mock"
 
 
 def test_analyze_schema_version() -> None:
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     assert response.json()["schema_version"] == "food_analysis.v1"
 
 
 def test_analyze_rejects_text_file() -> None:
     response = client.post(
-        "/api/v0/food/analyze/mock",
+        "/api/v0/food/analyze/metadata",
         json=_payload(content_type="text/plain"),
     )
 
@@ -65,7 +65,7 @@ def test_analyze_rejects_text_file() -> None:
 
 def test_analyze_rejects_oversized_file() -> None:
     response = client.post(
-        "/api/v0/food/analyze/mock",
+        "/api/v0/food/analyze/metadata",
         json=_payload(size_bytes=10 * 1024 * 1024 + 1),
     )
 
@@ -75,7 +75,7 @@ def test_analyze_rejects_oversized_file() -> None:
 
 def test_analyze_rejects_empty_file() -> None:
     response = client.post(
-        "/api/v0/food/analyze/mock",
+        "/api/v0/food/analyze/metadata",
         json=_payload(size_bytes=0),
     )
 
@@ -85,7 +85,7 @@ def test_analyze_rejects_empty_file() -> None:
 
 def test_analyze_rejects_negative_file_size_as_invalid_body() -> None:
     response = client.post(
-        "/api/v0/food/analyze/mock",
+        "/api/v0/food/analyze/metadata",
         json=_payload(size_bytes=-1),
     )
 
@@ -93,7 +93,7 @@ def test_analyze_rejects_negative_file_size_as_invalid_body() -> None:
 
 
 def test_analyze_calorie_totals_consistent() -> None:
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     body = response.json()
     items = body["items"]
@@ -106,7 +106,7 @@ def test_analyze_calorie_totals_consistent() -> None:
 
 
 def test_analyze_confidence_range_proportional() -> None:
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     for item in response.json()["items"]:
         calories = item["calories"]
@@ -118,7 +118,7 @@ def test_analyze_confidence_range_proportional() -> None:
 
 
 def test_analyze_safety_flags_are_known_values() -> None:
-    response = client.post("/api/v0/food/analyze/mock", json=_payload(filename=_filename_for_bucket(7)))
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload(filename=_filename_for_bucket(7)))
 
     assert set(response.json()["safety_flags"]).issubset(KNOWN_SAFETY_FLAGS)
 
@@ -126,15 +126,15 @@ def test_analyze_safety_flags_are_known_values() -> None:
 def test_analyze_analysis_id_unique_across_calls() -> None:
     payload = _payload()
 
-    first = client.post("/api/v0/food/analyze/mock", json=payload).json()
-    second = client.post("/api/v0/food/analyze/mock", json=payload).json()
+    first = client.post("/api/v0/food/analyze/metadata", json=payload).json()
+    second = client.post("/api/v0/food/analyze/metadata", json=payload).json()
 
     assert first["analysis_id"] != second["analysis_id"]
 
 
 def test_analyze_non_food_scenario_returns_empty_items() -> None:
     response = client.post(
-        "/api/v0/food/analyze/mock",
+        "/api/v0/food/analyze/metadata",
         json=_payload(filename=_filename_for_bucket(8)),
     )
 
@@ -169,7 +169,7 @@ def test_analyze_mock_cost_cap_exceeded_returns_503_and_logs(tmp_path, monkeypat
     )
     get_settings.cache_clear()
 
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     assert response.status_code == 503
     assert response.json()["code"] == "cost_cap_exceeded"

@@ -225,7 +225,7 @@ def test_ai_mode_analyze_log_records_fake_provider_and_prompt(tmp_path, monkeypa
     assert record.mode == "ai"
     assert record.model == "fake-food-vision-v1"
     assert record.prompt_name == "food_analysis"
-    assert record.prompt_version == "v1"
+    assert record.prompt_version == "v2"
     assert record.input_tokens == 0
     assert record.output_tokens == 0
     assert record.cost_usd == 0.0
@@ -255,6 +255,8 @@ def test_malformed_ai_provider_output_logs_schema_validation_flag(
 class MalformedProvider:
     name = "malformed"
     model = "malformed-model"
+    # Exercises output validation through the metadata route, like the fake.
+    requires_image_bytes = False
 
     def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
         return ProviderResult(

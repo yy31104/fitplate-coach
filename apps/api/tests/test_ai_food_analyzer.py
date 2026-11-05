@@ -55,7 +55,7 @@ def test_ai_food_analyzer_exposes_prompt_name_and_version() -> None:
     analyzer = AIFoodAnalyzer(provider=FakeAIProvider())
 
     assert analyzer.prompt_name == "food_analysis"
-    assert analyzer.prompt_version == "v1"
+    assert analyzer.prompt_version == "v2"
 
 
 def test_ai_food_analyzer_returns_zero_usage_for_fake_provider() -> None:
@@ -128,6 +128,8 @@ class RecordingProvider(FakeAIProvider):
 class MalformedProvider:
     name = "malformed"
     model = "malformed-model"
+    # Exercises output validation through the metadata route, like the fake.
+    requires_image_bytes = False
 
     def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
         return ProviderResult(

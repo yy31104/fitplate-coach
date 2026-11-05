@@ -141,7 +141,7 @@ def test_upload_ai_mode_uses_fake_provider_and_logs_prompt(
     assert record.mode == "ai"
     assert record.model == "fake-food-vision-v1"
     assert record.prompt_name == "food_analysis"
-    assert record.prompt_version == "v1"
+    assert record.prompt_version == "v2"
 
 
 def test_upload_ai_mode_passes_bytes_to_provider_without_logging_them(

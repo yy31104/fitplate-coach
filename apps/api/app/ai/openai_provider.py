@@ -26,6 +26,7 @@ MODEL_PRICING_PER_MILLION_TOKENS = {
 
 class OpenAIProvider:
     name = "openai"
+    requires_image_bytes = True
 
     def __init__(
         self,

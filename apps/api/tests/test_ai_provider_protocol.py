@@ -1,12 +1,12 @@
 from app.ai.provider import AIProvider, FakeAIProvider, ImageRef, ProviderResult
-from app.schemas.food import FoodAnalysis
+from app.nutrition import ModelFoodOutput
 
 
 def test_fake_ai_provider_satisfies_protocol() -> None:
     assert isinstance(FakeAIProvider(), AIProvider)
 
 
-def test_fake_ai_provider_returns_valid_food_analysis_for_each_scenario() -> None:
+def test_fake_ai_provider_returns_valid_model_output_for_each_scenario() -> None:
     provider = FakeAIProvider()
 
     scenarios = [
@@ -18,13 +18,13 @@ def test_fake_ai_provider_returns_valid_food_analysis_for_each_scenario() -> Non
 
     for size_bytes, items_count, safety_flags in scenarios:
         result = provider.call("prompt", ImageRef(content_type="image/jpeg", size_bytes=size_bytes))
-        analysis = FoodAnalysis.model_validate(result.raw_analysis)
+        output = ModelFoodOutput.model_validate(result.raw_analysis)
 
         assert isinstance(result, ProviderResult)
-        assert analysis.schema_version == "food_analysis.v1"
-        assert analysis.mode == "ai"
-        assert analysis.items_count == items_count
-        assert analysis.safety_flags == safety_flags
+        assert len(output.items) == items_count
+        assert output.safety_flags == safety_flags
+        # Like the real provider's schema: no calorie numbers from the provider.
+        assert set(result.raw_analysis) == {"items", "uncertainty_notes", "safety_flags"}
 
 
 def test_fake_ai_provider_result_usage_fields_are_zero() -> None:
@@ -55,9 +55,7 @@ def test_image_ref_data_does_not_change_fake_provider_scenario() -> None:
         ),
     )
 
-    assert FoodAnalysis.model_validate(with_data.raw_analysis).items_count == (
-        FoodAnalysis.model_validate(without_data.raw_analysis).items_count
-    )
+    assert with_data.raw_analysis == without_data.raw_analysis
 
 
 def test_fake_ai_provider_ignores_api_key_environment(monkeypatch) -> None:
@@ -68,4 +66,4 @@ def test_fake_ai_provider_ignores_api_key_environment(monkeypatch) -> None:
         ImageRef(content_type="image/jpeg", size_bytes=345_678),
     )
 
-    assert FoodAnalysis.model_validate(result.raw_analysis).items_count == 3
+    assert len(ModelFoodOutput.model_validate(result.raw_analysis).items) == 3

@@ -851,6 +851,12 @@ Confidence margins:
 
 `total_calories` is the sum of all item `min`, `max`, and `point_estimate` values independently. All calorie values are integers.
 
+### Who computes the numbers
+
+In every mode (mock, fake provider, OpenAI provider) the model or mock reports only, per item, `name`, `grams`, `category` (a key of the density table) or `density_kcal_per_gram` (0 < d ≤ 9), and `confidence`, plus `uncertainty_notes` and `safety_flags`. The server then computes each item's `calories` with `calorie_range_from_density(grams, density, confidence)`, the function `POST /api/v0/food/corrections/mock` uses, and computes `items_count` and `total_calories` from the items. A known `category` takes precedence over a model density; with neither, `generic_mixed_food` is used. The density source is written to the item's `portion.assumptions`. Calorie fields a provider sends anyway are ignored. Grams outside 1–2000 or a density outside (0, 9] fail validation (`500 analysis_failed`, `schema_validation_failed`).
+
+Before an analysis is returned, `check_analysis_consistency` re-derives every number and rejects the analysis if `items_count` differs from the number of items, a `point_estimate` lies outside its `[min, max]`, an item's range differs from `grams × density` at its confidence, or `total_calories` differs from the item sum. The evaluation runner applies the same check to every case.
+
 ## Safety and Privacy Notes
 
 FitPlate Coach does not provide medical, clinical, dietary, or therapeutic advice. Calorie estimates are reflective aids, not medical claims.

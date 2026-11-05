@@ -141,7 +141,7 @@ def test_upload_ai_mode_uses_fake_provider_and_logs_prompt(
     assert record.mode == "ai"
     assert record.model == "fake-food-vision-v1"
     assert record.prompt_name == "food_analysis"
-    assert record.prompt_version == "v2"
+    assert record.prompt_version == "v3"
 
 
 def test_upload_ai_mode_passes_bytes_to_provider_without_logging_them(
@@ -330,30 +330,15 @@ def _openai_response(input_tokens: int, output_tokens: int):
     return SimpleNamespace(
         output_text=json.dumps(
             {
-                "items_count": 1,
                 "items": [
                     {
-                        "item_id": "openai-item-1",
                         "name": "Chicken breast",
-                        "portion": {
-                            "description": "~150g",
-                            "grams_estimate": 150,
-                            "assumptions": ["Estimated from image."],
-                        },
-                        "calories": {
-                            "min": 198,
-                            "max": 298,
-                            "point_estimate": 248,
-                        },
-                        "calorie_density_kcal_per_gram": 1.65,
+                        "grams": 150,
+                        "category": "chicken_breast",
+                        "density_kcal_per_gram": None,
                         "confidence": "medium",
                     }
                 ],
-                "total_calories": {
-                    "min": 198,
-                    "max": 298,
-                    "point_estimate": 248,
-                },
                 "uncertainty_notes": ["Estimated with uncertainty."],
                 "safety_flags": [],
             }

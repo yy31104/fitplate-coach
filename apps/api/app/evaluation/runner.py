@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from app.ai.analyzer import AIFoodAnalyzer, AnalyzerResult, MockFoodAnalyzer
 from app.ai.provider import FakeAIProvider
+from app.nutrition import check_analysis_consistency
 from app.schemas.food import FoodAnalysis, FoodAnalyzeMockRequest, SafetyFlag
 
 _CASES_PATH = Path(__file__).resolve().parents[2] / "evaluation" / "food_analysis" / "cases.json"
@@ -121,6 +122,8 @@ def _run_case(
         diffs.append(
             f"total_calories.max {total_calories.max} > max_at_most {max_ceiling}"
         )
+
+    diffs.extend(f"consistency: {problem}" for problem in check_analysis_consistency(analysis))
 
     return CaseResult(
         case_id=case.case_id,

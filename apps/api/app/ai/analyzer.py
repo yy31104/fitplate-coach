@@ -16,6 +16,7 @@ from app.ai.provider import (
 )
 from app.config import get_settings
 from app.mock.food_analyzer import analyze_food_metadata
+from app.nutrition import AnalysisConsistencyError, ModelFoodOutput, build_food_analysis
 from app.schemas.food import FoodAnalysis, FoodAnalyzeMockRequest
 
 
@@ -108,20 +109,28 @@ class AIFoodAnalyzer:
             )
         provider_result = self.provider.call(self.prompt_record.body, effective_image_ref)
 
+        # The provider only reports names, grams, category or density, and
+        # confidence. Calories, items_count and totals are computed here, with
+        # the same function the correction route uses; anything the provider
+        # sends for those fields is ignored.
         try:
-            analysis = FoodAnalysis.model_validate(provider_result.raw_analysis)
+            model_output = ModelFoodOutput.model_validate(provider_result.raw_analysis)
         except ValidationError as exc:
             raise AIAnalysisError("AI provider returned invalid food analysis output.") from exc
 
+        try:
+            analysis = build_food_analysis(
+                model_output,
+                mode="ai",
+                analysis_id=str(uuid4()),
+                analyzed_at=datetime.now(UTC),
+                item_ids=[str(uuid4()) for _ in model_output.items],
+            )
+        except AnalysisConsistencyError as exc:
+            raise AIAnalysisError(f"Food analysis failed consistency checks: {exc}") from exc
+
         return AnalyzerResult(
-            analysis=analysis.model_copy(
-                update={
-                    "analysis_id": str(uuid4()),
-                    "schema_version": "food_analysis.v1",
-                    "mode": "ai",
-                    "analyzed_at": datetime.now(UTC),
-                }
-            ),
+            analysis=analysis,
             usage=ProviderUsage(
                 input_tokens=provider_result.input_tokens,
                 output_tokens=provider_result.output_tokens,

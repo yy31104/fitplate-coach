@@ -1,6 +1,7 @@
 import pytest
 
 from app.ai.prompts import ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION, get_prompt
+from app.nutrition import FOOD_CATEGORIES
 
 
 def test_prompt_registry_keeps_food_analysis_v1_as_deprecated() -> None:
@@ -11,10 +12,14 @@ def test_prompt_registry_keeps_food_analysis_v1_as_deprecated() -> None:
     assert record.status == "deprecated"
 
 
-def test_active_food_analysis_prompt_is_v2() -> None:
+def test_prompt_registry_keeps_food_analysis_v2_as_deprecated() -> None:
+    assert get_prompt("food_analysis", "v2").status == "deprecated"
+
+
+def test_active_food_analysis_prompt_is_v3() -> None:
     record = get_prompt("food_analysis", ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION)
 
-    assert ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION == "v2"
+    assert ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION == "v3"
     assert record.status == "active"
     assert record.schema_version == "food_analysis.v1"
 
@@ -48,3 +53,20 @@ def test_get_prompt_raises_for_unknown_name() -> None:
 def test_get_prompt_raises_for_unknown_version() -> None:
     with pytest.raises(KeyError, match="v99"):
         get_prompt("food_analysis", "v99")
+
+
+def test_active_prompt_lists_exactly_the_server_categories() -> None:
+    """The prompt's category list must match the density table the server uses."""
+    body = get_prompt("food_analysis", ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION).body
+    listed = body.split("Categories:", 1)[1].split("\n\n", 1)[0]
+    names = {name.strip().rstrip(".") for name in listed.replace("\n", " ").split(",")}
+
+    assert names == set(FOOD_CATEGORIES)
+
+
+def test_active_prompt_does_not_ask_the_model_for_calorie_numbers() -> None:
+    body = get_prompt("food_analysis", ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION).body
+
+    assert "Do not return calories" in body
+    assert "total_calories" not in body
+    assert "items_count" not in body

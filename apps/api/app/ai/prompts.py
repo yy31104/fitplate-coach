@@ -42,11 +42,14 @@ PROMPT_REGISTRY: dict[str, dict[str, PromptRecord]] = {
         # v1 is kept for log replay; it told the model it was a "future" model
         # that the live route does not call, which was no longer true.
         "v1": _load_prompt("food_analysis", "v1", created_at="2026-05-18", status="deprecated"),
-        "v2": _load_prompt("food_analysis", "v2", created_at="2026-11-05", status="active"),
+        "v2": _load_prompt("food_analysis", "v2", created_at="2026-11-05", status="deprecated"),
+        # v3: the model returns names, grams, category or density, and
+        # confidence only; the server computes every calorie number.
+        "v3": _load_prompt("food_analysis", "v3", created_at="2026-11-05", status="active"),
     },
 }
 
-ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION = "v2"
+ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION = "v3"
 
 
 def get_prompt(name: str, version: str) -> PromptRecord:

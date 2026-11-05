@@ -6,6 +6,7 @@ from typing import Any, get_args
 from openai import APIError, APITimeoutError, AuthenticationError, OpenAI
 
 from app.ai.provider import AIAnalysisError, ImageRef, ProviderResult
+from app.nutrition import FOOD_CATEGORIES
 from app.schemas.food import SafetyFlag
 
 logger = logging.getLogger(__name__)
@@ -100,14 +101,9 @@ class OpenAIProvider:
 
         input_tokens, output_tokens = _usage_tokens(response)
         return ProviderResult(
-            raw_analysis={
-                **structured_output,
-                "analysis_id": "00000000-0000-0000-0000-000000000000",
-                "schema_version": "food_analysis.v1",
-                "mode": "ai",
-                "analyzed_at": "2000-01-01T00:00:00+00:00",
-                "user_corrections": [],
-            },
+            # Names, grams, category or density, confidence. The analyzer
+            # computes calories, items_count and totals.
+            raw_analysis=structured_output,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
             cost_usd=_cost_usd(self._model, input_tokens, output_tokens),
@@ -178,46 +174,19 @@ def _cost_usd(model: str, input_tokens: int, output_tokens: int) -> float:
 
 
 def _food_analysis_model_output_schema() -> dict[str, object]:
-    calorie_range_schema: dict[str, object] = {
-        "type": "object",
-        "additionalProperties": False,
-        "required": ["min", "max", "point_estimate"],
-        "properties": {
-            "min": {"type": "integer"},
-            "max": {"type": "integer"},
-            "point_estimate": {"type": "integer"},
-        },
-    }
-    portion_schema: dict[str, object] = {
-        "type": "object",
-        "additionalProperties": False,
-        "required": ["description", "grams_estimate", "assumptions"],
-        "properties": {
-            "description": {"type": "string"},
-            "grams_estimate": {"type": "integer"},
-            "assumptions": {
-                "type": "array",
-                "items": {"type": "string"},
-            },
-        },
-    }
+    """Strict schema for what the model may decide. No calorie numbers."""
     item_schema: dict[str, object] = {
         "type": "object",
         "additionalProperties": False,
-        "required": [
-            "item_id",
-            "name",
-            "portion",
-            "calories",
-            "calorie_density_kcal_per_gram",
-            "confidence",
-        ],
+        "required": ["name", "grams", "category", "density_kcal_per_gram", "confidence"],
         "properties": {
-            "item_id": {"type": "string"},
             "name": {"type": "string"},
-            "portion": portion_schema,
-            "calories": calorie_range_schema,
-            "calorie_density_kcal_per_gram": {"type": "number"},
+            "grams": {"type": "integer"},
+            "category": {
+                "type": ["string", "null"],
+                "enum": [*FOOD_CATEGORIES, None],
+            },
+            "density_kcal_per_gram": {"type": ["number", "null"]},
             "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
         },
     }
@@ -225,20 +194,12 @@ def _food_analysis_model_output_schema() -> dict[str, object]:
     return {
         "type": "object",
         "additionalProperties": False,
-        "required": [
-            "items_count",
-            "items",
-            "total_calories",
-            "uncertainty_notes",
-            "safety_flags",
-        ],
+        "required": ["items", "uncertainty_notes", "safety_flags"],
         "properties": {
-            "items_count": {"type": "integer"},
             "items": {
                 "type": "array",
                 "items": item_schema,
             },
-            "total_calories": calorie_range_schema,
             "uncertainty_notes": {
                 "type": "array",
                 "items": {"type": "string"},

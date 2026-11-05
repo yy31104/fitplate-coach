@@ -59,6 +59,13 @@ class AIAnalysisError(Exception):
         )
 
 
+class ImageRequiredError(AIAnalysisError):
+    """Raised before a provider call when the provider needs image bytes and has none."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message, safety_flags=[])
+
+
 @runtime_checkable
 class AIProvider(Protocol):
     name: str
@@ -71,6 +78,8 @@ class AIProvider(Protocol):
 class FakeAIProvider:
     name: ClassVar[str] = "fake"
     model: ClassVar[str] = "fake-food-vision-v1"
+    # The fake chooses a scenario from file metadata, so it can run without bytes.
+    requires_image_bytes: ClassVar[bool] = False
 
     def call(self, prompt: str, image_ref: ImageRef) -> ProviderResult:
         if image_ref.size_bytes < 700_000:

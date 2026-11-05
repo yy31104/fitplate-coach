@@ -79,8 +79,11 @@ Current `ErrorResponse.code` values are:
 - `analysis_failed`
 - `correction_failed`
 - `cost_cap_exceeded`
+- `image_required`
 
 FastAPI request validation errors return HTTP `422 Unprocessable Entity` using FastAPI's standard validation response body. They are not wrapped in the project `ErrorResponse` envelope.
+
+The one `422` that does use `ErrorResponse` is `image_required`: in AI mode, a provider that needs image bytes (the OpenAI provider) is never called without them. The metadata-only `POST /api/v0/food/analyze/mock` therefore returns `422` with `image_required` when `FITPLATE_AI_MODE=ai` and `FITPLATE_AI_PROVIDER=openai`; upload the photo through `POST /api/v0/food/analyze` instead. The fake provider works from metadata and is unaffected.
 
 ## Endpoints
 

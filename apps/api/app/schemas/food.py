@@ -27,6 +27,7 @@ ErrorCode = Literal[
     "analysis_failed",
     "correction_failed",
     "cost_cap_exceeded",
+    "image_required",
 ]
 
 KNOWN_SAFETY_FLAGS: set[str] = set(get_args(SafetyFlag))

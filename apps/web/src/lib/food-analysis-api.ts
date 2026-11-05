@@ -15,6 +15,7 @@ type FoodAnalysisApiErrorCode =
   | "empty_file"
   | "analysis_failed"
   | "correction_failed"
+  | "image_required"
   | "invalid_response";
 
 export class FoodAnalysisApiError extends Error {
@@ -112,7 +113,8 @@ function toApiError(
       body.code === "file_too_large" ||
       body.code === "empty_file" ||
       body.code === "analysis_failed" ||
-      body.code === "correction_failed"
+      body.code === "correction_failed" ||
+      body.code === "image_required"
     ) {
       return new FoodAnalysisApiError(body.message, body.code);
     }

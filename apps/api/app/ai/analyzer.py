@@ -5,9 +5,15 @@ from uuid import uuid4
 
 from pydantic import ValidationError
 
-from app.ai.prompts import PromptRecord, get_prompt
+from app.ai.prompts import ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION, PromptRecord, get_prompt
 from app.ai.openai_provider import OpenAIProvider
-from app.ai.provider import AIAnalysisError, AIProvider, FakeAIProvider, ImageRef
+from app.ai.provider import (
+    AIAnalysisError,
+    AIProvider,
+    FakeAIProvider,
+    ImageRef,
+    ImageRequiredError,
+)
 from app.config import get_settings
 from app.mock.food_analyzer import analyze_food_metadata
 from app.schemas.food import FoodAnalysis, FoodAnalyzeMockRequest
@@ -68,7 +74,7 @@ class AIFoodAnalyzer:
         self.prompt_record = (
             prompt_record
             if prompt_record is not None
-            else get_prompt("food_analysis", "v1")
+            else get_prompt("food_analysis", ACTIVE_FOOD_ANALYSIS_PROMPT_VERSION)
         )
 
     @property
@@ -93,6 +99,13 @@ class AIFoodAnalyzer:
             content_type=payload.content_type,
             size_bytes=payload.size_bytes,
         )
+        # A real vision provider given no bytes would be billed for a request
+        # with an empty image. Refuse before the call; providers that work from
+        # metadata (the fake) opt out explicitly. Unknown providers need bytes.
+        if getattr(self.provider, "requires_image_bytes", True) and not effective_image_ref.data:
+            raise ImageRequiredError(
+                "This AI provider needs the photo itself. Turn on photo upload and try again."
+            )
         provider_result = self.provider.call(self.prompt_record.body, effective_image_ref)
 
         try:

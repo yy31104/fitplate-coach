@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, Response, UploadFile
 from fastapi.responses import JSONResponse
 
 import app.observability.log_writer as log_writer
@@ -34,22 +34,61 @@ MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
 UPLOAD_READ_CHUNK_BYTES = 64 * 1024
 MAX_LOGGED_FILENAME_LENGTH = 255
 ANALYZE_UPLOAD_ROUTE = "POST /api/v0/food/analyze"
-ANALYZE_MOCK_ROUTE = "POST /api/v0/food/analyze/mock"
+ANALYZE_METADATA_ROUTE = "POST /api/v0/food/analyze/metadata"
+# Deprecated alias. The route was called "mock" before AI mode existed; with
+# FITPLATE_AI_MODE=ai it can reach a real provider, so the name was misleading.
+# Kept so existing clients and scripts keep working; logs record which path
+# was hit so alias traffic can be measured before removal.
+ANALYZE_MOCK_ALIAS_ROUTE = "POST /api/v0/food/analyze/mock"
+DEPRECATED_ALIAS_HEADERS = {
+    "Deprecation": "true",
+    "Link": '</api/v0/food/analyze/metadata>; rel="successor-version"',
+}
 CORRECTION_MOCK_ROUTE = "POST /api/v0/food/corrections/mock"
+
+
+_ANALYZE_RESPONSES: dict[int | str, dict[str, object]] = {
+    400: {"model": ErrorResponse},
+    413: {"model": ErrorResponse},
+    422: {"description": "Invalid request body, or image_required (ErrorResponse)"},
+    503: {"model": ErrorResponse},
+    500: {"model": ErrorResponse},
+}
+
+
+@router.post(
+    "/analyze/metadata",
+    response_model=FoodAnalysis,
+    responses=_ANALYZE_RESPONSES,
+)
+def analyze_food_metadata(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONResponse:
+    """Analyze from file metadata. Uses the configured analyzer (mock or AI)."""
+    return _analyze_from_metadata(payload, route=ANALYZE_METADATA_ROUTE)
 
 
 @router.post(
     "/analyze/mock",
     response_model=FoodAnalysis,
-    responses={
-        400: {"model": ErrorResponse},
-        413: {"model": ErrorResponse},
-        422: {"description": "Invalid request body, or image_required (ErrorResponse)"},
-        503: {"model": ErrorResponse},
-        500: {"model": ErrorResponse},
-    },
+    responses=_ANALYZE_RESPONSES,
+    deprecated=True,
 )
-def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONResponse:
+def analyze_food_mock(
+    payload: FoodAnalyzeMockRequest,
+    response: Response,
+) -> FoodAnalysis | JSONResponse:
+    """Deprecated alias of POST /api/v0/food/analyze/metadata. Same behavior."""
+    result = _analyze_from_metadata(payload, route=ANALYZE_MOCK_ALIAS_ROUTE)
+    # A returned JSONResponse bypasses the injected Response, so set both.
+    target = result if isinstance(result, JSONResponse) else response
+    target.headers.update(DEPRECATED_ALIAS_HEADERS)
+    return result
+
+
+def _analyze_from_metadata(
+    payload: FoodAnalyzeMockRequest,
+    *,
+    route: str,
+) -> FoodAnalysis | JSONResponse:
     request_id = str(uuid4())
     started_at = now_utc()
     input_summary = _analyze_input_summary(payload)
@@ -59,7 +98,7 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         write_model_run(
             build_model_run(
                 request_id=request_id,
-                route=ANALYZE_MOCK_ROUTE,
+                route=route,
                 started_at=started_at,
                 input_summary=input_summary,
                 output_summary={},
@@ -78,7 +117,7 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         write_model_run(
             build_model_run(
                 request_id=request_id,
-                route=ANALYZE_MOCK_ROUTE,
+                route=route,
                 mode="ai",
                 model="cost-cap",
                 started_at=started_at,
@@ -106,7 +145,7 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         write_model_run(
             build_model_run(
                 request_id=request_id,
-                route=ANALYZE_MOCK_ROUTE,
+                route=route,
                 mode=analyzer_mode,
                 model=analyzer_model,
                 prompt_name=analyzer_prompt_name,
@@ -126,7 +165,7 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         write_model_run(
             build_model_run(
                 request_id=request_id,
-                route=ANALYZE_MOCK_ROUTE,
+                route=route,
                 mode=analyzer_mode,
                 model=analyzer_model,
                 prompt_name=analyzer_prompt_name,
@@ -147,7 +186,7 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         write_model_run(
             build_model_run(
                 request_id=request_id,
-                route=ANALYZE_MOCK_ROUTE,
+                route=route,
                 mode=analyzer_mode,
                 model=analyzer_model,
                 prompt_name=analyzer_prompt_name,
@@ -169,7 +208,7 @@ def analyze_food_mock(payload: FoodAnalyzeMockRequest) -> FoodAnalysis | JSONRes
         write_model_run(
             build_model_run(
                 request_id=request_id,
-                route=ANALYZE_MOCK_ROUTE,
+                route=route,
                 mode=analyzer_mode,
                 model=analyzer_model,
                 prompt_name=analyzer_prompt_name,

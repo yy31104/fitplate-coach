@@ -4,7 +4,7 @@ import { type ChangeEvent, type FormEvent, useMemo, useRef, useState } from "rea
 import Link from "next/link";
 
 import {
-  analyzeFoodMock,
+  analyzeFoodMetadata,
   FoodAnalysisApiError,
   submitFoodAnalyzeUpload,
   submitFoodCorrectionMock,
@@ -105,7 +105,7 @@ export default function NewFoodAnalysisPage() {
       const [result] = await Promise.all([
         useUploadTransport
           ? submitFoodAnalyzeUpload(file)
-          : analyzeFoodMock(foodPhotoMetadata(file)),
+          : analyzeFoodMetadata(foodPhotoMetadata(file)),
         delay(450),
       ]);
       setAnalysis(result);

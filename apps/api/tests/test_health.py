@@ -41,7 +41,7 @@ def test_local_web_origins_are_allowed_for_cors(origin: str) -> None:
     client = TestClient(app)
 
     response = client.options(
-        "/api/v0/food/analyze/mock",
+        "/api/v0/food/analyze/metadata",
         headers={
             "Origin": origin,
             "Access-Control-Request-Method": "POST",

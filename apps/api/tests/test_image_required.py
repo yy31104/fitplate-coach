@@ -1,6 +1,6 @@
 """A vision provider must never be called without image bytes.
 
-The web client's default flow sends only file metadata to /analyze/mock. In AI
+The web client's default flow sends only file metadata to /analyze/metadata. In AI
 mode with the OpenAI provider, that used to send `data:image/jpeg;base64,` (an
 empty image) to a paid API. These tests use a stub client that counts calls; no
 network request is made and no key is real.
@@ -72,7 +72,7 @@ def _metadata() -> dict[str, object]:
 
 
 def test_metadata_route_in_openai_mode_returns_422_without_calling_provider(openai_mode) -> None:
-    response = client.post("/api/v0/food/analyze/mock", json=_metadata())
+    response = client.post("/api/v0/food/analyze/metadata", json=_metadata())
 
     assert response.status_code == 422
     body = response.json()
@@ -82,7 +82,7 @@ def test_metadata_route_in_openai_mode_returns_422_without_calling_provider(open
 
 
 def test_metadata_route_logs_image_required(openai_mode, tmp_path) -> None:
-    client.post("/api/v0/food/analyze/mock", json=_metadata())
+    client.post("/api/v0/food/analyze/metadata", json=_metadata())
 
     log = (tmp_path / "model_runs.jsonl").read_text(encoding="utf-8")
     assert '"error_code":"image_required"' in log.replace(" ", "")

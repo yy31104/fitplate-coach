@@ -22,7 +22,7 @@ The repository currently contains the first minimal monorepo scaffold:
 - `apps/web`: Next.js, TypeScript, Tailwind home page and `/food/new` flow.
 - `apps/api`: FastAPI app exposing `GET /api/v0/health`.
 - `apps/web`: `/food/new` food analysis and correction flow.
-- `apps/api`: `POST /api/v0/food/analyze/mock`, multipart `POST /api/v0/food/analyze`, and `POST /api/v0/food/corrections/mock`.
+- `apps/api`: `POST /api/v0/food/analyze/metadata` (deprecated alias `/analyze/mock`), multipart `POST /api/v0/food/analyze`, and `POST /api/v0/food/corrections/mock`.
 - Analyzer adapter with mock, fake-provider, and local-demo OpenAI provider paths.
 - Prompt registry, summary-only `model_run.v1` JSONL logs, cost cap, and deterministic evaluation cases.
 
@@ -107,7 +107,7 @@ Future AI provider keys and storage credentials must come from environment varia
 
 ## Food Mock Metadata
 
-The mock food milestone sends JSON file metadata only to `POST /api/v0/food/analyze/mock`. The frontend validates one selected image file locally and sends filename, content type, size in bytes, and last modified time. Image bytes are not uploaded or stored.
+The mock food milestone sends JSON file metadata only to `POST /api/v0/food/analyze/metadata`. The frontend validates one selected image file locally and sends filename, content type, size in bytes, and last modified time. Image bytes are not uploaded or stored.
 
 The backend returns structured mock `FoodAnalysis` JSON and validates metadata with the same type and size boundaries. The endpoint must not use `UploadFile`, `multipart/form-data`, storage, AI calls, authentication, or database writes.
 

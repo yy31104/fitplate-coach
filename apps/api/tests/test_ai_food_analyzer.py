@@ -90,7 +90,7 @@ def test_route_returns_analysis_failed_for_malformed_provider_output(monkeypatch
     analyzer = AIFoodAnalyzer(provider=MalformedProvider())
     monkeypatch.setattr(food_router, "select_food_analyzer", lambda: analyzer)
 
-    response = client.post("/api/v0/food/analyze/mock", json=_payload())
+    response = client.post("/api/v0/food/analyze/metadata", json=_payload())
 
     assert response.status_code == 500
     assert response.json() == {

@@ -153,7 +153,7 @@ Restart `uvicorn` after unsetting variables.
 Verify mock mode:
 
 ```bash
-curl -sS -X POST "http://127.0.0.1:8000/api/v0/food/analyze/mock" \
+curl -sS -X POST "http://127.0.0.1:8000/api/v0/food/analyze/metadata" \
   -H "Content-Type: application/json" \
   -d '{"filename":"lunch-photo.jpg","content_type":"image/jpeg","size_bytes":345678,"last_modified_ms":1710000000000}' \
   | python3 -m json.tool

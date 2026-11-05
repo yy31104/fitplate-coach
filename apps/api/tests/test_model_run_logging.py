@@ -225,7 +225,7 @@ def test_ai_mode_analyze_log_records_fake_provider_and_prompt(tmp_path, monkeypa
     assert record.mode == "ai"
     assert record.model == "fake-food-vision-v1"
     assert record.prompt_name == "food_analysis"
-    assert record.prompt_version == "v2"
+    assert record.prompt_version == "v3"
     assert record.input_tokens == 0
     assert record.output_tokens == 0
     assert record.cost_usd == 0.0

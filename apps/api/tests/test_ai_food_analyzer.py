@@ -55,7 +55,7 @@ def test_ai_food_analyzer_exposes_prompt_name_and_version() -> None:
     analyzer = AIFoodAnalyzer(provider=FakeAIProvider())
 
     assert analyzer.prompt_name == "food_analysis"
-    assert analyzer.prompt_version == "v2"
+    assert analyzer.prompt_version == "v3"
 
 
 def test_ai_food_analyzer_returns_zero_usage_for_fake_provider() -> None:

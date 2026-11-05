@@ -8,7 +8,7 @@ from openai import APIError, APITimeoutError, AuthenticationError
 
 from app.ai.openai_provider import OpenAIProvider
 from app.ai.provider import AIAnalysisError, ImageRef, ProviderResult
-from app.schemas.food import FoodAnalysis
+from app.nutrition import FOOD_CATEGORIES, ModelFoodOutput
 
 
 def test_openai_provider_calls_responses_api_with_image_and_strict_schema() -> None:
@@ -50,7 +50,7 @@ def test_openai_provider_success_returns_provider_result() -> None:
     ).call("prompt", _image_ref())
 
     assert isinstance(result, ProviderResult)
-    assert FoodAnalysis.model_validate(result.raw_analysis).schema_version == "food_analysis.v1"
+    assert ModelFoodOutput.model_validate(result.raw_analysis).items[0].grams == 150
 
 
 def test_openai_provider_usage_tokens_flow_to_provider_result() -> None:
@@ -207,22 +207,15 @@ def _response(input_tokens: int = 10, output_tokens: int = 20):
 
 def _model_output() -> dict[str, object]:
     return {
-        "items_count": 1,
         "items": [
             {
-                "item_id": "openai-item-1",
                 "name": "Chicken breast",
-                "portion": {
-                    "description": "~150g",
-                    "grams_estimate": 150,
-                    "assumptions": ["Estimated from image."],
-                },
-                "calories": {"min": 198, "max": 298, "point_estimate": 248},
-                "calorie_density_kcal_per_gram": 1.65,
+                "grams": 150,
+                "category": "chicken_breast",
+                "density_kcal_per_gram": None,
                 "confidence": "medium",
             }
         ],
-        "total_calories": {"min": 198, "max": 298, "point_estimate": 248},
         "uncertainty_notes": ["Portions are estimated."],
         "safety_flags": [],
     }
@@ -234,3 +227,28 @@ def _image_ref() -> ImageRef:
 
 def _request() -> httpx.Request:
     return httpx.Request("POST", "https://api.openai.com/v1/responses")
+
+
+def test_strict_schema_lets_the_model_return_only_observations() -> None:
+    client = FakeOpenAIClient(_response())
+    OpenAIProvider(
+        api_key="test-key",
+        model="gpt-5.4-mini",
+        timeout_seconds=30,
+        client=client,
+    ).call("prompt", _image_ref())
+
+    schema = client.responses.last_kwargs["text"]["format"]["schema"]
+    item = schema["properties"]["items"]["items"]
+
+    assert set(schema["properties"]) == {"items", "uncertainty_notes", "safety_flags"}
+    assert set(item["properties"]) == {
+        "name",
+        "grams",
+        "category",
+        "density_kcal_per_gram",
+        "confidence",
+    }
+    # Strict mode requires every property to be listed as required.
+    assert set(item["required"]) == set(item["properties"])
+    assert item["properties"]["category"]["enum"] == [*FOOD_CATEGORIES, None]

@@ -1,0 +1,1605 @@
+{
+  "dataset": "Nutrition5k",
+  "license": {
+    "name": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "source": "https://github.com/google-research-datasets/Nutrition5k",
+    "attribution": "Nutrition5k dataset by Google Research (Thames, Karpur, Norris, Xia, Panait, Weyand, Sim), CVPR 2021. Images are not stored in this repository; the manifest lists dish ids and metadata values only.",
+    "citation": "Thames, Q., Karpur, A., Norris, W., Xia, F., Panait, L., Weyand, T., Sim, J. Nutrition5k: Towards Automatic Nutritional Understanding of Generic Food. CVPR 2021."
+  },
+  "split_file": "dish_ids/splits/depth_test_ids.txt",
+  "image": "imagery/realsense_overhead/<dish_id>/rgb.png",
+  "selection": "depth_test_ids with total_calories > 0 and total_mass > 0, sorted by (total_mass, dish_id), taken at evenly spaced ranks",
+  "dishes": [
+    {
+      "dish_id": "dish_1558461431",
+      "total_calories": 1.1,
+      "total_mass_g": 5.0,
+      "ingredients": [
+        "spinach (raw)"
+      ],
+      "rgb_sha256": "fb4f85f0df3cff3b152539ae558357df47841cb98a2ead2accd89f724f3817c5",
+      "rgb_size_bytes": 424782
+    },
+    {
+      "dish_id": "dish_1563897938",
+      "total_calories": 54.1,
+      "total_mass_g": 10.0,
+      "ingredients": [
+        "bacon"
+      ],
+      "rgb_sha256": "f7bd99810d8ceed350a91483436384540f7c254a12f01d230e9acdb90618cef6",
+      "rgb_size_bytes": 284234
+    },
+    {
+      "dish_id": "dish_1557937574",
+      "total_calories": 5.6,
+      "total_mass_g": 13.0,
+      "ingredients": [
+        "blackberries"
+      ],
+      "rgb_sha256": "458bc43cd0b705c5376b9528643b6d6ea1af883f961fa58b35da18472fd4ff92",
+      "rgb_size_bytes": 369301
+    },
+    {
+      "dish_id": "dish_1565810969",
+      "total_calories": 4.6,
+      "total_mass_g": 20.0,
+      "ingredients": [
+        "spinach (raw)"
+      ],
+      "rgb_sha256": "34d543b6e207548d1f82167a4dc5f60e0182aab0025eac47dbbfc9eb31ba1ebb",
+      "rgb_size_bytes": 395974
+    },
+    {
+      "dish_id": "dish_1564675380",
+      "total_calories": 87.3,
+      "total_mass_g": 23.0,
+      "ingredients": [
+        "turkey bacon"
+      ],
+      "rgb_sha256": "6c71e3cce230a1a4abc1c197979ede0e41160c7b967db7daf73184f24e116ef1",
+      "rgb_size_bytes": 265088
+    },
+    {
+      "dish_id": "dish_1558113430",
+      "total_calories": 7.8,
+      "total_mass_g": 28.0,
+      "ingredients": [
+        "mixed greens"
+      ],
+      "rgb_sha256": "405f3446ce6fc90247a41cb530882748ef681bb78a3556c3aaf944fca4d75493",
+      "rgb_size_bytes": 457615
+    },
+    {
+      "dish_id": "dish_1558110385",
+      "total_calories": 52.9,
+      "total_mass_g": 34.0,
+      "ingredients": [
+        "eggs"
+      ],
+      "rgb_sha256": "2f314945d20f59fcb0e9435a9eac0c7062e8c18d5f5a93cf19115e9cef6c2719",
+      "rgb_size_bytes": 419994
+    },
+    {
+      "dish_id": "dish_1562099053",
+      "total_calories": 98.4,
+      "total_mass_g": 37.0,
+      "ingredients": [
+        "cheese pizza"
+      ],
+      "rgb_sha256": "1f5a38627fd92308ac819275ad3824743247582ef820f90cbc13450216ac3c77",
+      "rgb_size_bytes": 241877
+    },
+    {
+      "dish_id": "dish_1559157919",
+      "total_calories": 37.1,
+      "total_mass_g": 39.0,
+      "ingredients": [
+        "pepper",
+        "spinach (raw)",
+        "arugula",
+        "blueberries",
+        "vinegar",
+        "chard",
+        "mustard",
+        "olive oil",
+        "walnuts",
+        "salt"
+      ],
+      "rgb_sha256": "c5ccf1dccca0b4642102e811383b4a9ca7b424ed467bb282b3be191fa58bae4f",
+      "rgb_size_bytes": 555990
+    },
+    {
+      "dish_id": "dish_1559239151",
+      "total_calories": 9.2,
+      "total_mass_g": 40.0,
+      "ingredients": [
+        "spinach (raw)"
+      ],
+      "rgb_sha256": "e8d1fa177e79da9b83d8e430b6b85533296cf5873e10e3b2970ab5a5b7fb60fb",
+      "rgb_size_bytes": 462214
+    },
+    {
+      "dish_id": "dish_1558718587",
+      "total_calories": 10.2,
+      "total_mass_g": 41.0,
+      "ingredients": [
+        "cauliflower"
+      ],
+      "rgb_sha256": "9a78e43ed399fd602d3da300abccd3c3725ee1b416d0d69d80476ad1e6f81a17",
+      "rgb_size_bytes": 405688
+    },
+    {
+      "dish_id": "dish_1562085672",
+      "total_calories": 122.1,
+      "total_mass_g": 46.0,
+      "ingredients": [
+        "bread"
+      ],
+      "rgb_sha256": "bbadb077d9e4f75c63ccd35677e89aa2db3a011000bfeddca833d065abe24a93",
+      "rgb_size_bytes": 320023
+    },
+    {
+      "dish_id": "dish_1565118700",
+      "total_calories": 16.7,
+      "total_mass_g": 49.0,
+      "ingredients": [
+        "chard",
+        "kale"
+      ],
+      "rgb_sha256": "fc19d8d72fd2fc6e2ff15b5bcde8c4256db7fbb40d5a9286d295fa28b01ba80c",
+      "rgb_size_bytes": 258051
+    },
+    {
+      "dish_id": "dish_1560526408",
+      "total_calories": 67.1,
+      "total_mass_g": 51.0,
+      "ingredients": [
+        "blueberries",
+        "parsley",
+        "mustard",
+        "salt",
+        "carrot",
+        "almonds",
+        "spinach (raw)",
+        "vinegar",
+        "olive oil"
+      ],
+      "rgb_sha256": "7124065f6df0e242347ee341714a232c75f114cd70d91bc694d059fc3bf9708f",
+      "rgb_size_bytes": 401836
+    },
+    {
+      "dish_id": "dish_1566501575",
+      "total_calories": 251.7,
+      "total_mass_g": 54.0,
+      "ingredients": [
+        "brownies"
+      ],
+      "rgb_sha256": "64c69d6416da86e9c9a63cf0600d32c984cdc3000aacff762abbc4da7346e620",
+      "rgb_size_bytes": 439839
+    },
+    {
+      "dish_id": "dish_1559934477",
+      "total_calories": 25.1,
+      "total_mass_g": 57.0,
+      "ingredients": [
+        "caesar salad"
+      ],
+      "rgb_sha256": "9f2101d1394113c82abfb89f88214ebb1245bf600e512af6c8ce6414d20305dd",
+      "rgb_size_bytes": 599866
+    },
+    {
+      "dish_id": "dish_1558639818",
+      "total_calories": 20.1,
+      "total_mass_g": 59.0,
+      "ingredients": [
+        "cantaloupe"
+      ],
+      "rgb_sha256": "333154ffcf6f3f1a76a2e90e9d352082de170322bad411a33adbef4b5f0c8718",
+      "rgb_size_bytes": 418915
+    },
+    {
+      "dish_id": "dish_1562099076",
+      "total_calories": 110.2,
+      "total_mass_g": 61.0,
+      "ingredients": [
+        "olive oil",
+        "pepper",
+        "cheese pizza",
+        "salt",
+        "carrot"
+      ],
+      "rgb_sha256": "08020dd3de84fd31cc61ba0ed681bedbcb6f257b1b3728d9bbe9154bb13327fa",
+      "rgb_size_bytes": 250214
+    },
+    {
+      "dish_id": "dish_1563909469",
+      "total_calories": 72.4,
+      "total_mass_g": 64.0,
+      "ingredients": [
+        "tomatoes",
+        "spinach (raw)",
+        "vinegar",
+        "cucumbers",
+        "olive oil",
+        "mustard greens",
+        "mustard",
+        "garlic",
+        "salt"
+      ],
+      "rgb_sha256": "1c6c53de61dad49f1e273eefabb8f904e3321fd204d4c58970fddb940ccae55b",
+      "rgb_size_bytes": 316057
+    },
+    {
+      "dish_id": "dish_1562776428",
+      "total_calories": 33.7,
+      "total_mass_g": 66.0,
+      "ingredients": [
+        "brussels sprouts",
+        "salt",
+        "pepper",
+        "olive oil"
+      ],
+      "rgb_sha256": "4bec45599c78d96cc768ba5f03c5afa470d4589c370cd6e13637574664a91996",
+      "rgb_size_bytes": 294627
+    },
+    {
+      "dish_id": "dish_1560526447",
+      "total_calories": 88.6,
+      "total_mass_g": 70.0,
+      "ingredients": [
+        "salt",
+        "carrot",
+        "cucumbers",
+        "almonds",
+        "mustard greens",
+        "olive oil",
+        "mustard",
+        "parsley",
+        "vinegar",
+        "spinach (raw)",
+        "blueberries",
+        "garlic",
+        "tomatoes"
+      ],
+      "rgb_sha256": "b8dcd3f1123a96b92d065781c86656bfb7bc15251691cc0b6cd3947c343044c9",
+      "rgb_size_bytes": 425001
+    },
+    {
+      "dish_id": "dish_1562168673",
+      "total_calories": 56.4,
+      "total_mass_g": 73.0,
+      "ingredients": [
+        "mixed greens",
+        "blackberries",
+        "raspberries",
+        "honeydew melons",
+        "vinaigrette",
+        "granola"
+      ],
+      "rgb_sha256": "8d8981601b5c73828976cc0d4ad3e21fce86ab388683cfa821e457a125737483",
+      "rgb_size_bytes": 349509
+    },
+    {
+      "dish_id": "dish_1565894889",
+      "total_calories": 257.8,
+      "total_mass_g": 74.0,
+      "ingredients": [
+        "cheese pizza",
+        "cookies"
+      ],
+      "rgb_sha256": "23ed313904d2d27557ee85c228b992547280163eaf54f8d0f5760727aed4de8f",
+      "rgb_size_bytes": 282538
+    },
+    {
+      "dish_id": "dish_1562774129",
+      "total_calories": 73.1,
+      "total_mass_g": 77.0,
+      "ingredients": [
+        "berries",
+        "vinaigrette",
+        "granola",
+        "blackberries",
+        "mixed greens",
+        "raspberries"
+      ],
+      "rgb_sha256": "29d65f8c318b31d81d63a722f5dbd5aaa68e818c3ce1ab74a11bc63debb11588",
+      "rgb_size_bytes": 293425
+    },
+    {
+      "dish_id": "dish_1559844272",
+      "total_calories": 462.5,
+      "total_mass_g": 80.0,
+      "ingredients": [
+        "almonds"
+      ],
+      "rgb_sha256": "b485c2aa3a3e8b26143d023e5b678ba30d712a60960a32ae7d5f4bc5539566b5",
+      "rgb_size_bytes": 371042
+    },
+    {
+      "dish_id": "dish_1559841979",
+      "total_calories": 39.3,
+      "total_mass_g": 85.0,
+      "ingredients": [
+        "broccoli",
+        "mandarin oranges"
+      ],
+      "rgb_sha256": "286a510befca52ff018f3a31599b6f90a052d324d22f8f09adc347d7c1315afb",
+      "rgb_size_bytes": 358343
+    },
+    {
+      "dish_id": "dish_1558722125",
+      "total_calories": 497.2,
+      "total_mass_g": 86.0,
+      "ingredients": [
+        "almonds"
+      ],
+      "rgb_sha256": "f954b3208adfb66a519808b82ec361dd3ef2599f9349e9e4b3cdcc75119fa283",
+      "rgb_size_bytes": 466089
+    },
+    {
+      "dish_id": "dish_1563565289",
+      "total_calories": 93.4,
+      "total_mass_g": 88.0,
+      "ingredients": [
+        "corn on the cob"
+      ],
+      "rgb_sha256": "a404b5d9489ebbb9df82c41faa2130bebfd0a67c522edbc7e5badb90eef2c505",
+      "rgb_size_bytes": 320077
+    },
+    {
+      "dish_id": "dish_1563998210",
+      "total_calories": 148.1,
+      "total_mass_g": 91.0,
+      "ingredients": [
+        "garlic",
+        "olive oil",
+        "thyme",
+        "lemon juice",
+        "butter",
+        "cream",
+        "oregano",
+        "chicken",
+        "pepper",
+        "white wine",
+        "shallots",
+        "arugula",
+        "rosemary",
+        "mushroom",
+        "basil",
+        "wheat berry",
+        "salt"
+      ],
+      "rgb_sha256": "7f1268b41d388c7d62b2f48c779a5347309de46cdd4b4b0dccea247ac873ad70",
+      "rgb_size_bytes": 246162
+    },
+    {
+      "dish_id": "dish_1560801797",
+      "total_calories": 25.7,
+      "total_mass_g": 96.0,
+      "ingredients": [
+        "olive oil",
+        "squash",
+        "salt",
+        "cauliflower"
+      ],
+      "rgb_sha256": "0b3130e57324874f3e5edcbe641896ff380e791defe4c4be00a6c37b1379dc94",
+      "rgb_size_bytes": 546699
+    },
+    {
+      "dish_id": "dish_1564160043",
+      "total_calories": 245.0,
+      "total_mass_g": 98.0,
+      "ingredients": [
+        "bagels"
+      ],
+      "rgb_sha256": "93892cf06babb078fe331284bc0fce57d89b608982456325dcdf03afefd55f88",
+      "rgb_size_bytes": 332963
+    },
+    {
+      "dish_id": "dish_1559850314",
+      "total_calories": 296.6,
+      "total_mass_g": 100.0,
+      "ingredients": [
+        "almonds",
+        "orange"
+      ],
+      "rgb_sha256": "485f74a10381c9e55a05961276c36d77580623608ffac48b735a12cf92075f40",
+      "rgb_size_bytes": 372452
+    },
+    {
+      "dish_id": "dish_1558030289",
+      "total_calories": 38.5,
+      "total_mass_g": 107.0,
+      "ingredients": [
+        "honeydew melons"
+      ],
+      "rgb_sha256": "50b917988fee948804736aa01531d2b1c1097294050f1d58fc5f1af91c467499",
+      "rgb_size_bytes": 411108
+    },
+    {
+      "dish_id": "dish_1562009810",
+      "total_calories": 119.9,
+      "total_mass_g": 108.0,
+      "ingredients": [
+        "brown rice"
+      ],
+      "rgb_sha256": "2c06305c13f6d47d08e2ed09b6333d28621d4185fbaf682843b162ffa2964753",
+      "rgb_size_bytes": 323184
+    },
+    {
+      "dish_id": "dish_1559233715",
+      "total_calories": 83.6,
+      "total_mass_g": 110.0,
+      "ingredients": [
+        "sweet potato"
+      ],
+      "rgb_sha256": "77de5ab333fa103e3ac46ccbc2afd153def115bfc6bcaba2b02fd6402150d549",
+      "rgb_size_bytes": 435894
+    },
+    {
+      "dish_id": "dish_1561663541",
+      "total_calories": 124.3,
+      "total_mass_g": 112.0,
+      "ingredients": [
+        "brown rice"
+      ],
+      "rgb_sha256": "6a5c3e7bad4d4a1df231702f70f6b0e2c8dcd550145295d8727c1ce52324508f",
+      "rgb_size_bytes": 316471
+    },
+    {
+      "dish_id": "dish_1558635546",
+      "total_calories": 60.8,
+      "total_mass_g": 117.0,
+      "ingredients": [
+        "apple"
+      ],
+      "rgb_sha256": "fac2fcf4b62d51a9652745fb3c0bf0bf62a0927f4d38369d9920cf14ad2842c0",
+      "rgb_size_bytes": 396355
+    },
+    {
+      "dish_id": "dish_1566502472",
+      "total_calories": 132.9,
+      "total_mass_g": 119.0,
+      "ingredients": [
+        "sun dried tomatoes",
+        "garlic",
+        "olive oil",
+        "mustard",
+        "cucumbers",
+        "vinegar",
+        "spinach (raw)",
+        "onions",
+        "corn on the cob",
+        "salt"
+      ],
+      "rgb_sha256": "0755e4a63bb9747308fa3e18fff113913957e989c6c0772a691bab87ea1338f4",
+      "rgb_size_bytes": 359307
+    },
+    {
+      "dish_id": "dish_1566416701",
+      "total_calories": 198.5,
+      "total_mass_g": 122.0,
+      "ingredients": [
+        "garlic",
+        "mushroom",
+        "wheat berry",
+        "olive oil",
+        "butter",
+        "salt",
+        "shallots",
+        "white wine",
+        "pepper",
+        "arugula",
+        "cream",
+        "oregano",
+        "thyme",
+        "basil",
+        "rosemary",
+        "lemon juice",
+        "chicken"
+      ],
+      "rgb_sha256": "bd22f3f161d85a740a0489d61651d04a4f8dd012955138ba8e67079c2d667cdc",
+      "rgb_size_bytes": 348728
+    },
+    {
+      "dish_id": "dish_1558461607",
+      "total_calories": 87.6,
+      "total_mass_g": 127.0,
+      "ingredients": [
+        "grapes"
+      ],
+      "rgb_sha256": "c8b6b0c9e23d7d81880156f19124f42f28a87048eba23195774eb98aa2a9b459",
+      "rgb_size_bytes": 437670
+    },
+    {
+      "dish_id": "dish_1559850338",
+      "total_calories": 307.1,
+      "total_mass_g": 130.0,
+      "ingredients": [
+        "almonds",
+        "orange",
+        "broccoli"
+      ],
+      "rgb_sha256": "c247f677eea98cc2215ab6567b3ed0afa4b5d98a887cadf6c7dc2c66668590b0",
+      "rgb_size_bytes": 400951
+    },
+    {
+      "dish_id": "dish_1562617939",
+      "total_calories": 235.0,
+      "total_mass_g": 133.0,
+      "ingredients": [
+        "chickpeas",
+        "salt",
+        "mustard greens",
+        "olive oil",
+        "parsley",
+        "vinegar",
+        "arugula",
+        "pepper"
+      ],
+      "rgb_sha256": "b1919cab325922b312c28136a02f55501edf4f1ecf0a9f47d6ea1857d1921482",
+      "rgb_size_bytes": 321700
+    },
+    {
+      "dish_id": "dish_1560368395",
+      "total_calories": 49.3,
+      "total_mass_g": 137.0,
+      "ingredients": [
+        "honeydew melons"
+      ],
+      "rgb_sha256": "3c77f074e8a7a0302d02a2a3bac83ef3d69d63c9b67adae781c6b92bca26f794",
+      "rgb_size_bytes": 308223
+    },
+    {
+      "dish_id": "dish_1562168696",
+      "total_calories": 95.1,
+      "total_mass_g": 141.0,
+      "ingredients": [
+        "raspberries",
+        "vinaigrette",
+        "berries",
+        "granola",
+        "blackberries",
+        "mixed greens",
+        "honeydew melons"
+      ],
+      "rgb_sha256": "3ee84cb8faca41ef55d011b27141de0c45e6a80fdeb07d362cb1152ef560ed16",
+      "rgb_size_bytes": 371371
+    },
+    {
+      "dish_id": "dish_1558114086",
+      "total_calories": 74.4,
+      "total_mass_g": 143.0,
+      "ingredients": [
+        "deprecated"
+      ],
+      "rgb_sha256": "6f9987978039ecf707fb6209d57cbbcb8ef493b87623f6a2bb75c5a285e9c742",
+      "rgb_size_bytes": 434424
+    },
+    {
+      "dish_id": "dish_1566838286",
+      "total_calories": 72.5,
+      "total_mass_g": 145.0,
+      "ingredients": [
+        "pineapple"
+      ],
+      "rgb_sha256": "de6223278512c4fc420bf38b8c69dd9b6a20a97a393f51ba6397a6b13a77e625",
+      "rgb_size_bytes": 282252
+    },
+    {
+      "dish_id": "dish_1565117429",
+      "total_calories": 390.9,
+      "total_mass_g": 147.0,
+      "ingredients": [
+        "cheese pizza"
+      ],
+      "rgb_sha256": "0e505f0ae64cabd5327312e2e7cca36ee54d1d988d872c1f4de7ed57cf8f7032",
+      "rgb_size_bytes": 361930
+    },
+    {
+      "dish_id": "dish_1563565323",
+      "total_calories": 229.5,
+      "total_mass_g": 152.0,
+      "ingredients": [
+        "eggs",
+        "corn on the cob",
+        "ground turkey",
+        "thyme",
+        "kale",
+        "celery",
+        "salt",
+        "carrot",
+        "white rice",
+        "mushroom",
+        "cream",
+        "onions",
+        "olive oil",
+        "chive",
+        "garlic"
+      ],
+      "rgb_sha256": "c48df9727379a5ead7bb8f83cc604c9f13db7d6e44a30c20bbc4eaffa44d731f",
+      "rgb_size_bytes": 352186
+    },
+    {
+      "dish_id": "dish_1564588820",
+      "total_calories": 81.1,
+      "total_mass_g": 156.0,
+      "ingredients": [
+        "egg whites"
+      ],
+      "rgb_sha256": "1bba4028f1464535bf92fb94f8b83ef0cef3bd09db309ba2a26570f4875a8344",
+      "rgb_size_bytes": 290587
+    },
+    {
+      "dish_id": "dish_1558722207",
+      "total_calories": 83.2,
+      "total_mass_g": 160.0,
+      "ingredients": [
+        "apple"
+      ],
+      "rgb_sha256": "9dc82e4355e2cb2f1e820b331701af124d3c610943aa8a2cd52c57289ae7d6c5",
+      "rgb_size_bytes": 401643
+    },
+    {
+      "dish_id": "dish_1561393741",
+      "total_calories": 188.8,
+      "total_mass_g": 165.0,
+      "ingredients": [
+        "broccoli",
+        "scrambled eggs"
+      ],
+      "rgb_sha256": "f806a7d123e45338139e5c674a407bf81428f6b629276b823568023e152552a7",
+      "rgb_size_bytes": 442623
+    },
+    {
+      "dish_id": "dish_1560800951",
+      "total_calories": 102.8,
+      "total_mass_g": 168.0,
+      "ingredients": [
+        "parsley",
+        "cauliflower",
+        "kale",
+        "lemon juice",
+        "olive oil",
+        "pepper",
+        "bulgur",
+        "chickpeas",
+        "salt"
+      ],
+      "rgb_sha256": "49f2175bd1ec3079ec9269079e8477af3e63bc4a298463ebe9bcfb8a61645f60",
+      "rgb_size_bytes": 639406
+    },
+    {
+      "dish_id": "dish_1564428144",
+      "total_calories": 205.2,
+      "total_mass_g": 171.0,
+      "ingredients": [
+        "garlic",
+        "shallots",
+        "parsley",
+        "salt",
+        "mustard",
+        "pecans",
+        "thyme",
+        "olive oil",
+        "blueberries",
+        "arugula",
+        "vinegar",
+        "chard",
+        "lemon juice",
+        "quinoa"
+      ],
+      "rgb_sha256": "0acfe6f39f26354fbefc496c9e35d2c712b3e23a0b3d452daad6e8dfa3fdd22d",
+      "rgb_size_bytes": 326332
+    },
+    {
+      "dish_id": "dish_1567785739",
+      "total_calories": 168.6,
+      "total_mass_g": 177.0,
+      "ingredients": [
+        "salt",
+        "bell peppers",
+        "garlic",
+        "cucumbers",
+        "olive oil",
+        "mustard",
+        "sweet potato",
+        "vinegar",
+        "berries",
+        "pineapple",
+        "radishes"
+      ],
+      "rgb_sha256": "fd0aa2357384d4ed1546208603c547bcfeeef81c7bcedadd9e684748c01bf434",
+      "rgb_size_bytes": 389339
+    },
+    {
+      "dish_id": "dish_1562774180",
+      "total_calories": 164.1,
+      "total_mass_g": 181.0,
+      "ingredients": [
+        "cantaloupe",
+        "raspberries",
+        "blackberries",
+        "mixed greens",
+        "roasted potatoes",
+        "granola",
+        "vinaigrette",
+        "berries"
+      ],
+      "rgb_sha256": "e8072382195f9f5042f8fb78ddd5e1f6c5478d841491d09c519f9c1a36d989a5",
+      "rgb_size_bytes": 318292
+    },
+    {
+      "dish_id": "dish_1563566909",
+      "total_calories": 222.5,
+      "total_mass_g": 187.0,
+      "ingredients": [
+        "wild rice"
+      ],
+      "rgb_sha256": "55c8f7a87a7ba1e87e288f8c8acf4fb733a75987767a511de4711edaec5708e7",
+      "rgb_size_bytes": 303210
+    },
+    {
+      "dish_id": "dish_1559578599",
+      "total_calories": 230.0,
+      "total_mass_g": 193.0,
+      "ingredients": [
+        "bacon",
+        "strawberries",
+        "sweet potato"
+      ],
+      "rgb_sha256": "9b2d67c42b071835525b0cc5b447f194e484b4a5af083d027025c95d97a5a31e",
+      "rgb_size_bytes": 527862
+    },
+    {
+      "dish_id": "dish_1563389548",
+      "total_calories": 438.8,
+      "total_mass_g": 194.0,
+      "ingredients": [
+        "grilled chicken"
+      ],
+      "rgb_sha256": "bb7971e43076da39b783a637ded5cfc2924e3b34996ffd2c13572c080d5f10af",
+      "rgb_size_bytes": 384593
+    },
+    {
+      "dish_id": "dish_1562009894",
+      "total_calories": 244.8,
+      "total_mass_g": 200.0,
+      "ingredients": [
+        "goat cheese",
+        "olives",
+        "garlic",
+        "vinegar",
+        "brown rice",
+        "olive oil",
+        "mustard",
+        "salt",
+        "pears",
+        "mixed greens"
+      ],
+      "rgb_sha256": "c1de8032d97cd371dbd18b0f0f46690e53dbd5b2eb6616f957967d013d629e90",
+      "rgb_size_bytes": 401681
+    },
+    {
+      "dish_id": "dish_1558549806",
+      "total_calories": 782.0,
+      "total_mass_g": 203.0,
+      "ingredients": [
+        "almonds",
+        "white rice",
+        "spinach (raw)"
+      ],
+      "rgb_sha256": "95c008edb3dad0340d4fd2ab85af16bd344affa1b847f55b236a8c14bfcbd2bc",
+      "rgb_size_bytes": 630980
+    },
+    {
+      "dish_id": "dish_1562776465",
+      "total_calories": 173.4,
+      "total_mass_g": 212.0,
+      "ingredients": [
+        "salt",
+        "pepper",
+        "sweet potato",
+        "olive oil",
+        "brussels sprouts"
+      ],
+      "rgb_sha256": "9bca9e0a95261f8f48efba7695ca9bfd84b299b6283c145b9a9ff1fa56a264f6",
+      "rgb_size_bytes": 333512
+    },
+    {
+      "dish_id": "dish_1565638550",
+      "total_calories": 277.7,
+      "total_mass_g": 215.0,
+      "ingredients": [
+        "salt",
+        "pork",
+        "wheat berry",
+        "arugula",
+        "parsley",
+        "olive oil",
+        "chicken breast",
+        "white rice",
+        "green beans",
+        "onions",
+        "spinach (raw)",
+        "zucchini",
+        "rosemary",
+        "parmesan cheese",
+        "garlic",
+        "thyme",
+        "cherry tomatoes"
+      ],
+      "rgb_sha256": "3c553d34b612a9001f6457d31d4e4c6561e77f026de37fa56483141de52b1a3e",
+      "rgb_size_bytes": 377847
+    },
+    {
+      "dish_id": "dish_1558030435",
+      "total_calories": 246.9,
+      "total_mass_g": 221.0,
+      "ingredients": [
+        "honeydew melons",
+        "potatoes",
+        "bacon"
+      ],
+      "rgb_sha256": "7e8eb093a29f90a7f8b10c6bf423cdde15fd13720e7fbc7c8a56c61b0458784c",
+      "rgb_size_bytes": 547003
+    },
+    {
+      "dish_id": "dish_1561405389",
+      "total_calories": 266.0,
+      "total_mass_g": 223.0,
+      "ingredients": [
+        "white rice",
+        "chickpeas",
+        "soy sauce",
+        "arugula",
+        "ginger",
+        "spinach (raw)",
+        "parsley",
+        "pears",
+        "broccoli",
+        "garlic",
+        "salt",
+        "pepper",
+        "vinegar",
+        "green beans",
+        "olive oil",
+        "lemon juice",
+        "green onions",
+        "chicken"
+      ],
+      "rgb_sha256": "61e83ad2bcb9e9904ea29015e460652e03d9e72b3183625b183784c0de847269",
+      "rgb_size_bytes": 443661
+    },
+    {
+      "dish_id": "dish_1563305513",
+      "total_calories": 606.3,
+      "total_mass_g": 228.0,
+      "ingredients": [
+        "cheese pizza"
+      ],
+      "rgb_sha256": "a248f4bd2d79299597d4a60ef5f5a4e983917dd2fa3300bdbed531c858969b16",
+      "rgb_size_bytes": 344926
+    },
+    {
+      "dish_id": "dish_1562788568",
+      "total_calories": 289.2,
+      "total_mass_g": 230.0,
+      "ingredients": [
+        "garlic",
+        "pilaf",
+        "green onions",
+        "onions",
+        "country rice",
+        "olive oil",
+        "salt",
+        "corn on the cob",
+        "fish"
+      ],
+      "rgb_sha256": "f86f343d8a7d22e13fe752ab5466dc18e5fbf5572fed2daec922eae7b13da686",
+      "rgb_size_bytes": 319179
+    },
+    {
+      "dish_id": "dish_1563898019",
+      "total_calories": 344.0,
+      "total_mass_g": 237.0,
+      "ingredients": [
+        "bacon",
+        "chia seeds",
+        "greek yogurt",
+        "scrambled eggs",
+        "milk"
+      ],
+      "rgb_sha256": "3eaeb4d810d4185a65b4fb4654f40fbe76a3f06af09917960a140dcb0f544ba8",
+      "rgb_size_bytes": 368512
+    },
+    {
+      "dish_id": "dish_1567007848",
+      "total_calories": 100.3,
+      "total_mass_g": 243.0,
+      "ingredients": [
+        "watermelon",
+        "raspberries",
+        "berries",
+        "cantaloupe",
+        "pineapple"
+      ],
+      "rgb_sha256": "5ef634c3b9e348d9e4d1435df6b7d2786763631a66ccb859f564e63b2229c3c4",
+      "rgb_size_bytes": 348308
+    },
+    {
+      "dish_id": "dish_1558718906",
+      "total_calories": 282.6,
+      "total_mass_g": 247.0,
+      "ingredients": [
+        "corn on the cob",
+        "cantaloupe",
+        "cauliflower",
+        "almonds"
+      ],
+      "rgb_sha256": "8e014e3764ecc87caeec14a9e170331256ec7953ccb6f9800d605a317377c855",
+      "rgb_size_bytes": 621572
+    },
+    {
+      "dish_id": "dish_1565035802",
+      "total_calories": 69.2,
+      "total_mass_g": 250.0,
+      "ingredients": [
+        "onions",
+        "cherry tomatoes",
+        "cauliflower",
+        "bell peppers"
+      ],
+      "rgb_sha256": "75af73d1dc593f6a2e3664ad886088e8718d4483f678d15a0444da841fab39b6",
+      "rgb_size_bytes": 326388
+    },
+    {
+      "dish_id": "dish_1561577848",
+      "total_calories": 413.3,
+      "total_mass_g": 254.0,
+      "ingredients": [
+        "salt",
+        "white wine",
+        "cream",
+        "oregano",
+        "arugula",
+        "lemon juice",
+        "olive oil",
+        "pepper",
+        "chicken",
+        "mushroom",
+        "wheat berry",
+        "butter",
+        "rosemary",
+        "thyme",
+        "shallots",
+        "garlic",
+        "basil"
+      ],
+      "rgb_sha256": "43e972f30531a66ecaac6430536f21630bc8a76e491fa41a303dc09eb239d020",
+      "rgb_size_bytes": 381706
+    },
+    {
+      "dish_id": "dish_1562703447",
+      "total_calories": 384.4,
+      "total_mass_g": 259.0,
+      "ingredients": [
+        "salt",
+        "spinach (cooked)",
+        "vinegar",
+        "millet",
+        "berries",
+        "beef",
+        "shallots",
+        "mixed greens",
+        "onions",
+        "olive oil",
+        "pizza",
+        "lemon juice",
+        "parsley",
+        "bok choy",
+        "apple"
+      ],
+      "rgb_sha256": "f2dba1fcf2acd4021f5b4970b88f3670de1ebc43b9cf031ee1a8980c670211e9",
+      "rgb_size_bytes": 345228
+    },
+    {
+      "dish_id": "dish_1565898193",
+      "total_calories": 291.9,
+      "total_mass_g": 268.0,
+      "ingredients": [
+        "brown rice",
+        "jalapenos",
+        "green beans",
+        "salmon",
+        "vinaigrette",
+        "olives",
+        "cilantro",
+        "lime",
+        "garlic",
+        "lemon juice",
+        "bell peppers",
+        "olive oil",
+        "feta cheese",
+        "spinach (raw)",
+        "ginger",
+        "cherry tomatoes",
+        "shallots",
+        "chili",
+        "salt",
+        "lettuce",
+        "onions",
+        "cucumbers"
+      ],
+      "rgb_sha256": "9253be23652ca6461c5ec29c31fb2d64980b127cf7af0125853a963c01c4b8f9",
+      "rgb_size_bytes": 403240
+    },
+    {
+      "dish_id": "dish_1562774206",
+      "total_calories": 298.8,
+      "total_mass_g": 272.0,
+      "ingredients": [
+        "mixed greens",
+        "raspberries",
+        "berries",
+        "scrambled eggs",
+        "roasted potatoes",
+        "vinaigrette",
+        "cantaloupe",
+        "blackberries",
+        "granola"
+      ],
+      "rgb_sha256": "9f501cbb00ec5a35f1f38cc9a85ff349d88a4359e0f206de59a7a6dfa703d908",
+      "rgb_size_bytes": 359893
+    },
+    {
+      "dish_id": "dish_1558375886",
+      "total_calories": 1050.5,
+      "total_mass_g": 277.0,
+      "ingredients": [
+        "almonds",
+        "sausage",
+        "grapes"
+      ],
+      "rgb_sha256": "5c61a439d7367c37ab9a7c794ed0a2961d25fb90f700e66188826d182b5b54a1",
+      "rgb_size_bytes": 586779
+    },
+    {
+      "dish_id": "dish_1563565415",
+      "total_calories": 303.5,
+      "total_mass_g": 284.0,
+      "ingredients": [
+        "lemon juice",
+        "parsley",
+        "cherry tomatoes",
+        "eggs",
+        "corn on the cob",
+        "mushroom",
+        "thyme",
+        "kale",
+        "carrot",
+        "garlic",
+        "bok choy",
+        "fish",
+        "shallots",
+        "ground turkey",
+        "cream",
+        "onions",
+        "celery",
+        "olive oil",
+        "wheat berry",
+        "chive",
+        "chard",
+        "salt",
+        "white rice"
+      ],
+      "rgb_sha256": "cb1c494fd477600bd34df3f176b1ac69ddd2b43d513fdd9044e4eebc3dae5576",
+      "rgb_size_bytes": 401018
+    },
+    {
+      "dish_id": "dish_1562788601",
+      "total_calories": 413.2,
+      "total_mass_g": 287.0,
+      "ingredients": [
+        "fish",
+        "vinegar",
+        "corn on the cob",
+        "brown rice",
+        "country rice",
+        "basil",
+        "green onions",
+        "salt",
+        "cherry tomatoes",
+        "pepper",
+        "pork",
+        "lemon juice",
+        "parsley",
+        "pilaf",
+        "olive oil",
+        "onions",
+        "garlic",
+        "broccoli",
+        "shallots"
+      ],
+      "rgb_sha256": "bff5ff57197d63c46b62109182d1cfba0a90da518fe1a73ed109ecdc20d08b73",
+      "rgb_size_bytes": 330968
+    },
+    {
+      "dish_id": "dish_1562172561",
+      "total_calories": 150.8,
+      "total_mass_g": 290.0,
+      "ingredients": [
+        "egg whites"
+      ],
+      "rgb_sha256": "d493f07308582a1d64a05beceb65a1e62d361f6a97f4d2e765ac45eeb909f375",
+      "rgb_size_bytes": 321332
+    },
+    {
+      "dish_id": "dish_1560975628",
+      "total_calories": 348.3,
+      "total_mass_g": 296.0,
+      "ingredients": [
+        "broccoli",
+        "hominy",
+        "olive oil",
+        "bell peppers",
+        "garlic",
+        "parsley",
+        "caesar salad",
+        "jalapenos",
+        "cabbage",
+        "wheat berry",
+        "tomatoes",
+        "chili",
+        "lime",
+        "salt",
+        "cheese pizza",
+        "lemon juice",
+        "chicken thighs"
+      ],
+      "rgb_sha256": "29a3eeddf59e5081ca4ad7fade4d89fd5b7ff0d28a80fcb7e234f7d522cdc0b3",
+      "rgb_size_bytes": 518996
+    },
+    {
+      "dish_id": "dish_1561663580",
+      "total_calories": 432.1,
+      "total_mass_g": 307.0,
+      "ingredients": [
+        "chicken",
+        "chard",
+        "brown rice",
+        "salt",
+        "parsley",
+        "olive oil",
+        "rosemary",
+        "basil",
+        "lemon juice",
+        "chive",
+        "garlic",
+        "carrot"
+      ],
+      "rgb_sha256": "70b81a49263e9dd88c81974f4725291c1734ddf1cf2f1bc1d0c84f617262c879",
+      "rgb_size_bytes": 385080
+    },
+    {
+      "dish_id": "dish_1565030391",
+      "total_calories": 609.3,
+      "total_mass_g": 313.0,
+      "ingredients": [
+        "white rice",
+        "garlic",
+        "orange juice",
+        "onions",
+        "cucumbers",
+        "kale",
+        "green onions",
+        "lettuce",
+        "soy sauce",
+        "pepper",
+        "cherry tomatoes",
+        "beef",
+        "vinegar",
+        "olive oil",
+        "broccoli",
+        "lime",
+        "salt",
+        "chili",
+        "mixed greens"
+      ],
+      "rgb_sha256": "de9be2ab9b831a515347dd3e3131b73221c7e7bcb4758e0a81711055492664a8",
+      "rgb_size_bytes": 427830
+    },
+    {
+      "dish_id": "dish_1558031394",
+      "total_calories": 237.4,
+      "total_mass_g": 318.0,
+      "ingredients": [
+        "cantaloupe",
+        "deprecated",
+        "potatoes",
+        "yam"
+      ],
+      "rgb_sha256": "caa4b8c00ef0d11b666699bfaa972f6e8f2fb25e83f5b846db74e0304bcb3c57",
+      "rgb_size_bytes": 571817
+    },
+    {
+      "dish_id": "dish_1563565454",
+      "total_calories": 350.8,
+      "total_mass_g": 322.0,
+      "ingredients": [
+        "carrot",
+        "cherry tomatoes",
+        "fish",
+        "chard",
+        "mushroom",
+        "wheat berry",
+        "ground turkey",
+        "thyme",
+        "bok choy",
+        "lemon juice",
+        "kale",
+        "arugula",
+        "salt",
+        "pecans",
+        "blueberries",
+        "mustard",
+        "eggs",
+        "corn on the cob",
+        "vinegar",
+        "cream",
+        "onions",
+        "celery",
+        "olive oil",
+        "parsley",
+        "chive",
+        "shallots",
+        "garlic",
+        "white rice"
+      ],
+      "rgb_sha256": "8812898f18f957c547d42a65569e4075a39efdd1895be57aadea87cb0a928d32",
+      "rgb_size_bytes": 406349
+    },
+    {
+      "dish_id": "dish_1559849097",
+      "total_calories": 495.9,
+      "total_mass_g": 325.0,
+      "ingredients": [
+        "almonds",
+        "pears",
+        "grapes"
+      ],
+      "rgb_sha256": "cd9ab89e16b268c53e1cbf5db6d0160ac4742dfe3947ead876bb9913fed81e4f",
+      "rgb_size_bytes": 398384
+    },
+    {
+      "dish_id": "dish_1564773903",
+      "total_calories": 316.8,
+      "total_mass_g": 336.0,
+      "ingredients": [
+        "cherry tomatoes",
+        "lentils",
+        "salmon",
+        "arugula",
+        "pineapple",
+        "parsley",
+        "kale",
+        "olive oil",
+        "shallots",
+        "pepper",
+        "pickles",
+        "salt",
+        "mayonnaise",
+        "lemon juice",
+        "broccoli",
+        "garlic",
+        "chive"
+      ],
+      "rgb_sha256": "c81c0ddd6c219226a4cac9744e0af96020f9f9f94ea2008feafc4ea72297276f",
+      "rgb_size_bytes": 361641
+    },
+    {
+      "dish_id": "dish_1561663606",
+      "total_calories": 474.5,
+      "total_mass_g": 347.0,
+      "ingredients": [
+        "garlic",
+        "carrot",
+        "parsley",
+        "olive oil",
+        "basil",
+        "rosemary",
+        "lemon juice",
+        "brown rice",
+        "chard",
+        "salt",
+        "corn on the cob",
+        "chicken",
+        "chive"
+      ],
+      "rgb_sha256": "92a786dc99ea9e8b6102ba59d0193ca3e5d052fe9d935f999b86fc591d1940fb",
+      "rgb_size_bytes": 409822
+    },
+    {
+      "dish_id": "dish_1565118782",
+      "total_calories": 557.5,
+      "total_mass_g": 353.0,
+      "ingredients": [
+        "shallots",
+        "salt",
+        "kale",
+        "olive oil",
+        "onions",
+        "chard",
+        "vinegar",
+        "beef",
+        "apple",
+        "mixed greens",
+        "spinach (cooked)",
+        "lemon juice",
+        "parsley",
+        "bok choy",
+        "millet"
+      ],
+      "rgb_sha256": "cf9c066043ed48f487ef749df38790331fd2eff643807f21ee5fea7df5f67df1",
+      "rgb_size_bytes": 423718
+    },
+    {
+      "dish_id": "dish_1562172600",
+      "total_calories": 263.6,
+      "total_mass_g": 370.0,
+      "ingredients": [
+        "egg whites",
+        "roasted potatoes"
+      ],
+      "rgb_sha256": "f38c5476ac7b6256a0f104e8b722129923704b11d87c5decb7cbe8ef863bbc81",
+      "rgb_size_bytes": 342670
+    },
+    {
+      "dish_id": "dish_1562700593",
+      "total_calories": 385.8,
+      "total_mass_g": 384.0,
+      "ingredients": [
+        "chive",
+        "apple",
+        "millet",
+        "cauliflower",
+        "pepper",
+        "vinegar",
+        "shallots",
+        "onions",
+        "snow peas",
+        "olive oil",
+        "lemon juice",
+        "mixed greens",
+        "artichokes",
+        "spinach (cooked)",
+        "fish",
+        "corn",
+        "lentils",
+        "arugula",
+        "parsley",
+        "bok choy",
+        "garlic",
+        "salt",
+        "beef"
+      ],
+      "rgb_sha256": "198d1eed30af2b27726c845a803ed05de1e09eaf20f57838ef688aeaeac98e65",
+      "rgb_size_bytes": 426695
+    },
+    {
+      "dish_id": "dish_1558720236",
+      "total_calories": 887.8,
+      "total_mass_g": 407.0,
+      "ingredients": [
+        "apple",
+        "carrot",
+        "cauliflower",
+        "almonds"
+      ],
+      "rgb_sha256": "89c190213bbacfc5c6839ca4bc60e40781f77e3c0c317e1a8fa97fdecd3598a4",
+      "rgb_size_bytes": 584876
+    },
+    {
+      "dish_id": "dish_1565811139",
+      "total_calories": 902.2,
+      "total_mass_g": 416.0,
+      "ingredients": [
+        "carrot",
+        "goat cheese",
+        "olive oil",
+        "broccoli",
+        "spinach (raw)",
+        "chicken"
+      ],
+      "rgb_sha256": "380e29ea308b6d9bb45597ffb49781b87ff6dded4daeb9f0a59a1d6916a3e7fe",
+      "rgb_size_bytes": 510266
+    },
+    {
+      "dish_id": "dish_1563898107",
+      "total_calories": 440.7,
+      "total_mass_g": 424.0,
+      "ingredients": [
+        "raspberries",
+        "greek yogurt",
+        "blueberries",
+        "bacon",
+        "pineapple",
+        "milk",
+        "chia seeds",
+        "scrambled eggs"
+      ],
+      "rgb_sha256": "f7522fd5fa4b6d6f05b308dca1c231ba086e154eebc6725ab00e3297582210ad",
+      "rgb_size_bytes": 428838
+    },
+    {
+      "dish_id": "dish_1560368570",
+      "total_calories": 555.9,
+      "total_mass_g": 452.0,
+      "ingredients": [
+        "honeydew melons",
+        "pepper",
+        "cherry tomatoes",
+        "lettuce",
+        "mixed greens",
+        "pork",
+        "mustard",
+        "olive oil",
+        "lemon juice",
+        "onions",
+        "carrot",
+        "broccoli",
+        "green onions",
+        "shallots",
+        "arugula",
+        "vinegar",
+        "brown rice",
+        "fish",
+        "pumpkin seeds",
+        "basil",
+        "parsley",
+        "country rice",
+        "salt",
+        "garlic"
+      ],
+      "rgb_sha256": "674d948c11b0ff7bc32335122f3b364076fd979038bae71a1222161d0b49706b",
+      "rgb_size_bytes": 457189
+    },
+    {
+      "dish_id": "dish_1563984140",
+      "total_calories": 245.4,
+      "total_mass_g": 472.0,
+      "ingredients": [
+        "egg whites"
+      ],
+      "rgb_sha256": "75de382b0dde90d2d69ed7cadc71ec876005177bfe9404fb524fb75c8d18c580",
+      "rgb_size_bytes": 328398
+    },
+    {
+      "dish_id": "dish_1565020926",
+      "total_calories": 398.5,
+      "total_mass_g": 489.0,
+      "ingredients": [
+        "olive oil",
+        "sweet potato",
+        "grapes",
+        "berries",
+        "greek yogurt",
+        "egg whites",
+        "chia seeds",
+        "milk",
+        "bacon"
+      ],
+      "rgb_sha256": "9360ec4c10ac85519153a072d4130cbe90d696ff13242b9a6b0a358fe4e77aba",
+      "rgb_size_bytes": 361708
+    },
+    {
+      "dish_id": "dish_1566590056",
+      "total_calories": 815.6,
+      "total_mass_g": 519.0,
+      "ingredients": [
+        "tomatoes",
+        "pepper",
+        "millet",
+        "vinegar",
+        "tofu",
+        "jalapenos",
+        "mustard",
+        "olive oil",
+        "bell peppers",
+        "cherry tomatoes",
+        "chicken",
+        "chard",
+        "spinach (raw)",
+        "pizza",
+        "cucumbers",
+        "onions",
+        "garlic",
+        "salt",
+        "figs"
+      ],
+      "rgb_sha256": "b7c0c59855b0e7c59ac5b3aef7762b018be47177c6cc0ce6541d5abca03bb813",
+      "rgb_size_bytes": 455658
+    },
+    {
+      "dish_id": "dish_1563551220",
+      "total_calories": 561.7,
+      "total_mass_g": 558.0,
+      "ingredients": [
+        "cream cheese",
+        "berries",
+        "greek yogurt",
+        "milk",
+        "chia seeds",
+        "bagels",
+        "egg whites",
+        "olive oil",
+        "sweet potato"
+      ],
+      "rgb_sha256": "90e98a46266e69340be689782b21855fcafd1a5d068266ac5548ff3d6cc03de4",
+      "rgb_size_bytes": 397644
+    },
+    {
+      "dish_id": "dish_1563998513",
+      "total_calories": 757.5,
+      "total_mass_g": 599.0,
+      "ingredients": [
+        "chicken",
+        "pepper",
+        "cookies",
+        "brown rice",
+        "arugula",
+        "vinegar",
+        "oregano",
+        "tatsoi",
+        "olive oil",
+        "basil",
+        "cilantro",
+        "white wine",
+        "salt",
+        "roasted potatoes",
+        "garlic",
+        "shallots",
+        "cauliflower",
+        "mushroom",
+        "steak",
+        "jalapenos",
+        "cream",
+        "wheat berry",
+        "thyme",
+        "butter",
+        "rosemary",
+        "lemon juice",
+        "parsley"
+      ],
+      "rgb_sha256": "6ee08f797b7367511a4c03882a1676f992ffe04b793d0da5986aa654e6a0ce0c",
+      "rgb_size_bytes": 444926
+    },
+    {
+      "dish_id": "dish_1566316726",
+      "total_calories": 409.5,
+      "total_mass_g": 685.0,
+      "ingredients": [
+        "egg whites",
+        "olive oil",
+        "sweet potato"
+      ],
+      "rgb_sha256": "38f3b2223e2aa084028765c83a2fab27fe44b44803bdc738cdf8da7e6f01369e",
+      "rgb_size_bytes": 386976
+    },
+    {
+      "dish_id": "dish_1566920365",
+      "total_calories": 490.4,
+      "total_mass_g": 871.0,
+      "ingredients": [
+        "salsa",
+        "sweet potato",
+        "olive oil",
+        "egg whites"
+      ],
+      "rgb_sha256": "c94927c9ccbc8e06f766906e8ebf7aaae43c180e7a18b35bae2d3ad9f4580053",
+      "rgb_size_bytes": 470183
+    }
+  ]
+}

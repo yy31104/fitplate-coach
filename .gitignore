@@ -67,3 +67,7 @@ next-env.d.ts
 
 # Private portfolio preparation is kept outside the repository.
 /docs/PORTFOLIO_*
+
+# Nutrition5k images downloaded by `python -m app.nutrition5k download` (CC BY 4.0, ~40 MB).
+apps/api/evaluation/nutrition5k/data/
+apps/api/evaluation/nutrition5k/runs/
